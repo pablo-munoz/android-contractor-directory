@@ -1,0 +1,88 @@
+package munoz.pablo.directorio;
+
+/**
+ * Created by pablo on 1/28/2017.
+ */
+
+public class Contractor {
+    private int id;
+    private String firstName;
+    private String middleName;
+    private String lastName;
+    private String email;
+    private String phone;
+    private String website;
+    private int rating;
+
+    public Contractor(int id, String firstName, String middleName, String lastName, String email,
+                      String phone, String website, int rating) {
+        this.id = id;
+        this.firstName = firstName;
+        this.middleName = middleName;
+        this.lastName = lastName;
+        this.email = email;
+        this.phone = phone;
+        this.website = website;
+        this.rating = rating;
+    }
+
+    public int getId() {
+        return this.id;
+    }
+
+    public String getFirstName() {
+        return this.firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getMiddleName() {
+        return this.middleName;
+    }
+
+    public void setMiddleName(String middleName) {
+        this.middleName = middleName;
+    }
+
+    public String getLastName() {
+        return this.lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getEmail() {
+        return this.email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPhone() {
+        return this.phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getWebsite() {
+        return this.website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = firstName;
+    }
+
+    public int getRating() {
+        return this.rating;
+    }
+
+    public void setRating(int rating) {
+        this.rating = rating;
+    }
+}

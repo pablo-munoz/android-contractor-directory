@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_main"
+    android:id="@+id/activity_contractors_by_category"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="munoz.pablo.directorio.MainActivity">
+    tools:context="munoz.pablo.directorio.ContractorsByCategory">
 
-    <ListView
-        android:id="@+id/main_categories"
+    <TextView
+        android:id="@+id/contractors_by_category_title"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="24dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
 
 </RelativeLayout>
