@@ -24,8 +24,7 @@ public class MainActivity extends AppCompatActivity {
         items = ContractorCategory.makeExample();
 
 
-        this.categoriesAdapter =
-                new ContractorCategoryAdapter(this, items);
+        this.categoriesAdapter = new ContractorCategoryAdapter(this, items);
 
         listView = (ListView) findViewById(R.id.main_categories);
         listView.setAdapter(categoriesAdapter);

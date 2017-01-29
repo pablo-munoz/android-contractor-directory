@@ -1,5 +1,7 @@
 package munoz.pablo.directorio;
 
+import java.util.ArrayList;
+
 /**
  * Created by pablo on 1/28/2017.
  */
@@ -13,6 +15,14 @@ public class Contractor {
     private String phone;
     private String website;
     private int rating;
+
+    public static ArrayList<Contractor> makeExample() {
+        ArrayList<Contractor> contractors = new ArrayList<>();
+        contractors.add(new Contractor(1, "Darío", null, "Rubén", "rubendario@gmail.com", "33312312312", null, 0));
+        contractors.add(new Contractor(2, "Cosme", null, "Fulanito", "cosmefulanito@gmail.com", "33398798798", null, 2));
+        contractors.add(new Contractor(3, "Alfonso", null, "Muníz", "alfonsomuniz@gmail.com", "33356567562", null, 2));
+        return contractors;
+    }
 
     public Contractor(int id, String firstName, String middleName, String lastName, String email,
                       String phone, String website, int rating) {
@@ -84,5 +94,13 @@ public class Contractor {
 
     public void setRating(int rating) {
         this.rating = rating;
+    }
+
+    public String getFullName() {
+        String fullName = "";
+        if (this.firstName != null) fullName += this.firstName;
+        if (this.middleName != null) fullName += " " + this.middleName;
+        if (this.lastName != null) fullName += " " + this.lastName;
+        return fullName;
     }
 }

@@ -8,13 +8,21 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:layout_marginBottom="16dp"
     tools:context="munoz.pablo.directorio.ContractorsByCategory">
 
     <TextView
         android:id="@+id/contractors_by_category_title"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="24dp"
+        android:layout_marginBottom="16dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+
+    <ListView
+        android:layout_below="@+id/contractors_by_category_title"
+        android:id="@+id/contractors_by_category_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
 </RelativeLayout>

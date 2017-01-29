@@ -50,8 +50,6 @@ public class ContractorCategoryAdapter extends ArrayAdapter<ContractorCategory> 
                 .fitCenter()
                 .into(img);
 
-        System.out.println("Donwloaded");
-
         return convertView;
     }
 }
