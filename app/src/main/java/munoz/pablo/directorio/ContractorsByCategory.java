@@ -3,6 +3,8 @@ package munoz.pablo.directorio;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,11 +32,20 @@ public class ContractorsByCategory extends AppCompatActivity {
         title = (TextView) this.findViewById(R.id.contractors_by_category_title);
         title.setText(category.getName());
 
-        ArrayList<Contractor> contractorList = Contractor.makeExample();
+        final ArrayList<Contractor> contractorList = Contractor.makeExample();
 
         ContractorAdapter adapter = new ContractorAdapter(this, contractorList);
 
         contractorListView = (ListView) this.findViewById(R.id.contractors_by_category_list);
         contractorListView.setAdapter(adapter);
+
+        contractorListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(ContractorsByCategory.this, ContractorDetail.class);
+                intent.putExtra("contractorId", contractorList.get(position).getId());
+                startActivity(intent);
+            }
+        });
     }
 }

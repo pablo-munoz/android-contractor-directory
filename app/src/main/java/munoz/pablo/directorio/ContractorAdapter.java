@@ -1,9 +1,6 @@
 package munoz.pablo.directorio;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.graphics.ColorFilter;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,19 +18,17 @@ import java.util.ArrayList;
 
 public class ContractorAdapter extends ArrayAdapter<Contractor> {
     private Context mContext;
-    private ArrayList<Contractor> contractorList;
 
     public ContractorAdapter(Context context, ArrayList<Contractor> contractorList) {
         super(context, 0, contractorList);
         this.mContext = context;
-        this.contractorList = contractorList;
     }
 
     @NonNull
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         // Get data item for this position
-        Contractor contractor = contractorList.get(position);
+        Contractor contractor = this.getItem(position);
 
         // Check if an existing view is being reused, otherwise inflate the view
         if (convertView == null) {
@@ -42,15 +37,15 @@ public class ContractorAdapter extends ArrayAdapter<Contractor> {
 
         // Lookup view for data population
         TextView name = (TextView) convertView.findViewById(R.id.contractor_card_name);
-        LinearLayout rating = (LinearLayout) convertView.findViewById(R.id.contractor_card_rating);
+        name.setText(contractor.getFullName());
 
+        LinearLayout rating = (LinearLayout) convertView.findViewById(R.id.contractor_card_rating);
         // Draw as many filled stars as the contractor rating
         for (int i = 0; i < contractor.getRating(); i++) {
             ImageView starIcon = new ImageView(this.mContext);
             starIcon.setImageResource(R.drawable.ic_star_black_24dp);
             rating.addView(starIcon);
         }
-
         // Draw any possible remaining stars blank
         for (int i = 0; i < 5 - contractor.getRating(); i++) {
             ImageView starIcon = new ImageView(this.mContext);
@@ -58,7 +53,14 @@ public class ContractorAdapter extends ArrayAdapter<Contractor> {
             rating.addView(starIcon);
         }
 
-        name.setText(contractor.getFullName());
+        TextView phone = (TextView) convertView.findViewById(R.id.contractor_card_phone);
+        phone.setText(contractor.getPhone());
+
+        TextView email = (TextView) convertView.findViewById(R.id.contractor_card_email);
+        email.setText(contractor.getEmail());
+
+        TextView website = (TextView) convertView.findViewById(R.id.contractor_card_website);
+        website.setText(contractor.getWebsite());
 
         return convertView;
     }

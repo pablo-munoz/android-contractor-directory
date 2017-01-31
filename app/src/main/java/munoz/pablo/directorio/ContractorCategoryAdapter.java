@@ -19,12 +19,10 @@ import java.util.ArrayList;
 public class ContractorCategoryAdapter extends ArrayAdapter<ContractorCategory> {
 
     Context mContext;
-    ArrayList<ContractorCategory> categoryList;
 
     public ContractorCategoryAdapter(Context context, ArrayList<ContractorCategory> categoryList) {
         super(context, 0, categoryList);
         this.mContext = context;
-        this.categoryList = categoryList;
     }
 
     @Override
@@ -46,8 +44,9 @@ public class ContractorCategoryAdapter extends ArrayAdapter<ContractorCategory> 
         count.setText(category.getNumContacts() + " contactos");
 
         Glide.with(getContext())
-                .load("http://i.imgur.com/ERwnaPj.png")
+                .load(category.getImg())
                 .fitCenter()
+                .crossFade(100)
                 .into(img);
 
         return convertView;
