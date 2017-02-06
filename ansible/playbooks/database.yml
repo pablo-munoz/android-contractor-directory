@@ -1,0 +1,41 @@
+---
+- hosts: all
+  gather_facts: no
+  vars:
+    node_version: 7.5.0
+
+  tasks:
+    - name: ensure apt cache is up to date
+      become: yes
+      apt: update_cache=yes cache_valid_time=3600
+    - name: ensure packages are installed
+      become: yes
+      apt: name={{item}}
+      with_items:
+        - postgresql
+        - libpq-dev
+        - python-psycopg2
+        - git
+        - curl
+        - build-essential
+        - libssl-dev
+        - nginx
+
+    - name: Download nvm
+      get_url:
+        url: https://raw.githubusercontent.com/creationix/nvm/v0.33.0/install.sh
+        dest: /tmp/nvm-install.sh
+
+    - name: Install nvm
+      command: /bin/bash /tmp/nvm-install.sh creates=~/.nvm
+
+    - name: Install node and set version
+      shell: >
+        /bin/bash -c "source ~/.nvm/nvm.sh && nvm install {{ node_version }} && nvm alias default {{ node_version }} && nvm use {{ node_version }}"
+        creates=/home/vagrant/.nvm/alias
+
+    - name: Install app dependencies with npm
+      command: chdir=/vagrant /bin/bash -c "source ~/.nvm/nvm.sh && /home/vagrant/.nvm/versions/node/v7.5.0/bin/npm install --no-bin-link"
+
+    - name: Ensure pm2 is installed globally
+      command: chdir=/vagrant /bin/bash -c "source ~/.nvm/nvm.sh && /home/vagrant/.nvm/versions/node/v7.5.0/bin/npm install pm2 -g --no-bin-link"
