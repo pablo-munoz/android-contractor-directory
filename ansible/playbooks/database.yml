@@ -3,16 +3,24 @@
   gather_facts: no
   vars:
     node_version: 7.5.0
+    node_dir: /home/ubuntu/.nvm/versions/node/v7.5.0
 
   tasks:
+    - name: Add the postgresql repository to get latest version
+      become: yes
+      apt_repository:
+        repo: deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main
+        state: present
+    - name: Add a key for the postgresql apt-get repo?
+      become: yes
+      shell: wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
     - name: ensure apt cache is up to date
       become: yes
       apt: update_cache=yes cache_valid_time=3600
     - name: ensure packages are installed
       become: yes
-      apt: name={{item}}
+      apt: name={{item}} force=yes
       with_items:
-        - postgresql
         - libpq-dev
         - python-psycopg2
         - git
@@ -20,6 +28,8 @@
         - build-essential
         - libssl-dev
         - nginx
+        - postgresql-9.6
+        - postgresql-contrib-9.6
 
     - name: Download nvm
       get_url:
@@ -32,10 +42,68 @@
     - name: Install node and set version
       shell: >
         /bin/bash -c "source ~/.nvm/nvm.sh && nvm install {{ node_version }} && nvm alias default {{ node_version }} && nvm use {{ node_version }}"
-        creates=/home/vagrant/.nvm/alias
+        creates=/home/ubuntu/.nvm/alias
 
     - name: Install app dependencies with npm
-      command: chdir=/vagrant /bin/bash -c "source ~/.nvm/nvm.sh && /home/vagrant/.nvm/versions/node/v7.5.0/bin/npm install --no-bin-link"
+      command: /bin/bash -c "cd /vagrant && source ~/.nvm/nvm.sh && {{ node_dir }}/bin/npm install"
 
     - name: Ensure pm2 is installed globally
-      command: chdir=/vagrant /bin/bash -c "source ~/.nvm/nvm.sh && /home/vagrant/.nvm/versions/node/v7.5.0/bin/npm install pm2 -g --no-bin-link"
+      command: >
+        /bin/bash -c "source ~/.nvm/nvm.sh && {{ node_dir }}/bin/npm install pm2 --global"
+        creates={{ node_dir }}/bin/pm2
+
+    - name: Get the server daemon running
+      ignore_errors: yes
+      command: >
+        /bin/bash -c "source ~/.nvm/nvm.sh && {{ node_dir }}/bin/pm2 start /vagrant/api/api.js"
+
+    - name: Make it so that app will start on o.s. startup
+      become: yes
+      command: >
+        /bin/bash -c "source /home/ubuntu/.nvm/nvm.sh && {{ node_dir }}/bin/pm2 startup upstart"
+
+    - name: Run command that pm2 requests
+      become: yes
+      command: >
+        env PATH=$PATH:/home/ubuntu/.nvm/versions/node/v7.5.0/bin /home/ubuntu/.nvm/versions/node/v7.5.0/lib/node_modules/pm2/bin/pm2 startup upstart -u ubuntu --hp /home/ubuntu
+        && touch /tmp/pm2startup
+        creates=pm2startup
+
+    - name: Copy nginx configuration
+      become: yes
+      copy:
+        src: ../templates/nginx-default
+        dest: /etc/nginx/sites-available/default
+
+    - name: Restart nginx
+      become: yes
+      service:
+        name: nginx
+        state: restarted
+
+    # Create a new database with name "acme" and specific encoding and locale
+    # settings. If a template different from "template0" is specified, encoding
+    # and locale settings must match those of the template.
+    - name: Ensure database exists
+      become: yes
+      become_user: postgres
+      postgresql_db:
+        name: directorio
+        encoding: UTF-8
+        lc_collate: en_US.UTF-8
+        lc_ctype: en_US.UTF-8
+
+    - name: Run database baseline file
+      become: yes
+      become_user: postgres
+      command: >
+        psql -d directorio -a -f /vagrant/db/baseline.sql
+        
+    - name: Run database change scripts
+      become: yes
+      become_user: postgres
+      command: >
+        psql -d directorio -a -f {{ item }}
+      with_fileglob:
+        ../../db/2*.sql
+
