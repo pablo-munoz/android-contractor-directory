@@ -11,9 +11,6 @@
       apt_repository:
         repo: deb http://apt.postgresql.org/pub/repos/apt/ xenial-pgdg main
         state: present
-    - name: Add a key for the postgresql apt-get repo?
-      become: yes
-      shell: wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
     - name: ensure apt cache is up to date
       become: yes
       apt: update_cache=yes cache_valid_time=3600
@@ -55,7 +52,7 @@
     - name: Get the server daemon running
       ignore_errors: yes
       command: >
-        /bin/bash -c "source ~/.nvm/nvm.sh && {{ node_dir }}/bin/pm2 start /vagrant/api/api.js"
+        /bin/bash -c "source ~/.nvm/nvm.sh && {{ node_dir }}/bin/pm2 start /vagrant/api/api.js --watch"
 
     - name: Make it so that app will start on o.s. startup
       become: yes
@@ -107,3 +104,10 @@
       with_fileglob:
         ../../db/2*.sql
 
+    - name: Create a password for the postgres database user
+      become: yes
+      become_user: postgres
+      postgresql_user:
+        db: directorio
+        name: postgres
+        password: postgres
