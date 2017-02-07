@@ -102,7 +102,7 @@
       command: >
         psql -d directorio -a -f {{ item }}
       with_fileglob:
-        ../../db/2*.sql
+        /vagrant/db/2*.sql
 
     - name: Create a password for the postgres database user
       become: yes

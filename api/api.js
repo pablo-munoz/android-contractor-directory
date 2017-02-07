@@ -10,6 +10,7 @@ const knex = require('knex')({
     connection: 'postgres://postgres:postgres@localhost:5432/directorio'
 });
 
+const api_version = '/api/v1';
 
 app.route('/')
     .get(function(request, response) {
@@ -29,7 +30,7 @@ app.use(bodyParser.json());
 function validate_data(schema, data) {
     var result = {
         has_errors: false,
-        errors_info: {},
+        errors_info: [],
         data: data
     };
 
@@ -38,9 +39,10 @@ function validate_data(schema, data) {
     _.forIn(schema, function(value, key) {
         if (value.not_null && !value.has_default && _.isUndefined(data[key])) {
             result.has_errors = true;
-            _.extend(errors_info, {
-                [key]: {
-                    required: "Value is required"
+            result.errors_info.push({
+                title: "Missing required value",
+                source: {
+                    pointer: "data/attributes/" + key
                 }
             });
         }
@@ -49,45 +51,109 @@ function validate_data(schema, data) {
     return result;
 }
 
-function catch_data_validation_error(response, error_info) {
-    response.status(400).json(error_info);
-}
-
 function catch_unknown_error(response, error_msg) {
     response.status(400).send(error_msg);
 }
 
-router.route('/contractor_category')
-    .get(function(request, response) {
-        knex(dbconfig.contractor_category.table_name)
-            .select('*')
+function make_simple_list_route(table) {
+    return function(request, response) {
+        var response_obj = {};
+
+        knex(table.table_name)
+            .count('*')
+            .then(function(total) {
+                response_obj.meta = {
+                    count: total[0].count
+                };
+
+                return knex(table.table_name)
+                    .select('*');
+            })
             .then(function(result) {
-                response.json({
-                    data: result
+                response_obj.links = {
+                    self: api_version + '/' + table.table_name
+                };
+                response_obj.data = _.map(result, function(resource) {
+                    return {
+                        type: table.table_name,
+                        id: resource.id,
+                        attributes: _.omit(resource, 'id')
+                    };
                 });
+                response.json(response_obj);
             })
             .catch(_.partial(catch_unknown_error, response));
-    })
-    .post(function(request, response) {
-        var data = request.body;
-        var validated_data = validate_data(
-            dbconfig.contractor_category.schema, data);
+    }
+}
+
+function make_simple_create_route(table) {
+    return function(request, response) {
+        var data = _.pick(request.body.data.attributes, _.keys(table.schema));
+        var validated_data = validate_data(table.schema, data);
 
         if (validated_data.has_errors) {
-            catch_data_validation_error(validated_data.errors_info, response);
+            request.body.errors = validated_data.errors_info;
+            response.status(400).json(request.body);
             return;
         }
 
-        knex(dbconfig.contractor_category.table_name)
+        knex(table.table_name)
             .insert(validated_data.data)
             .returning('*')
             .then(function(result) {
-                response.json(result[0])
+                response.json({
+                    links: {
+                        self: api_version + '/' + table.table_name + '/' + result[0].id,
+                        all: api_version + '/' + table.table_name 
+                    },
+                    data: {
+                        type: table.table_name,
+                        id: result[0].id,
+                        attributes: _.omit(result[0], 'id')
+                    }
+                });
             })
             .catch(_.partial(catch_unknown_error, response));
-    });
+    }
+}
 
-app.use('/api/v1', router);
+function make_simple_detail_route(table) {
+    return function(request, response) {
+        knex(table.table_name)
+            .select('*')
+            .where({ id: request.params.id })
+            .then(function(result) {
+                response.json({
+                    links: {
+                        self: api_version + '/' + table.table_name + '/' + result[0].id,
+                        all: api_version + '/' + table.table_name 
+                    },
+                    data: {
+                        type: table.table_name,
+                        id: result[0].id,
+                        attributes: _.omit(result[0], 'id')
+                    }
+                });
+            })
+            .catch(_.partial(catch_unknown_error, response));
+    }
+}
+
+router.route('/contractor_category')
+    .get(make_simple_list_route(dbconfig.contractor_category))
+    .post(make_simple_create_route(dbconfig.contractor_category));
+
+router.route('/contractor_category/:id')
+    .get(make_simple_detail_route(dbconfig.contractor_category));
+
+router.route('/contractor')
+    .get(make_simple_list_route(dbconfig.contractor))
+    .post(make_simple_create_route(dbconfig.contractor));
+
+router.route('/contractor/:id')
+    .get(make_simple_detail_route(dbconfig.contractor));
+
+app.use(api_version, router);
 
 
 http.createServer(app).listen(+process.argv[2] || 8080, function() {
