@@ -9,7 +9,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
-    tools:context="munoz.pablo.directorio.ContractorRegistration">
+    tools:context="munoz.pablo.directorio.activities.ContractorRegistration">
 
     <EditText
         android:layout_width="match_parent"
