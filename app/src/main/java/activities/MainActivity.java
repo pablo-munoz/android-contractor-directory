@@ -1,9 +1,10 @@
 package activities;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,6 +17,8 @@ import java.util.ArrayList;
 import adapters.ContractorCategoryAdapter;
 import models.ContractorCategory;
 import munoz.pablo.directorio.R;
+import services.RESTCallback;
+import services.RESTService;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,11 +31,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Set up toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        items = ContractorCategory.makeExample();
+        items = new ArrayList<>();
 
         this.categoriesAdapter = new ContractorCategoryAdapter(this, items);
 
@@ -50,6 +52,23 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        RESTService contractorCategoryService = new RESTService();
+        contractorCategoryService.getMany(
+                ContractorCategory.class,
+                new RESTCallback() {
+                    @Override
+                    public void onSuccess(Object modelInstance, String rawResponse) {
+                        items = (ArrayList<ContractorCategory>) modelInstance;
+                        MainActivity.this.categoriesAdapter.addAll(items);
+                        Log.d("MainActivity", items.get(0).getName() + " " + items.get(0).getId());
+                    }
+
+                    @Override
+                    public void onFailure(String rawResponse) {
+                        Log.d("MainActivity", "Failed to retrieve contractor categories");
+                    }
+                });
     }
 
     @Override

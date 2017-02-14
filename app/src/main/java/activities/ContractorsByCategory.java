@@ -1,8 +1,8 @@
 package activities;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -13,7 +13,6 @@ import java.util.ArrayList;
 
 import adapters.ContractorAdapter;
 import models.Contractor;
-import models.ContractorCategory;
 import munoz.pablo.directorio.R;
 
 public class ContractorsByCategory extends AppCompatActivity {
@@ -32,10 +31,8 @@ public class ContractorsByCategory extends AppCompatActivity {
             Toast.makeText(this, "Unknown contractor category error.", Toast.LENGTH_SHORT).show();
         }
 
-        ContractorCategory category = ContractorCategory.makeExample().get(categoryId - 1);
-
         title = (TextView) this.findViewById(R.id.contractors_by_category_title);
-        title.setText(category.getName());
+        title.setText("TODO: CAT");
 
         final ArrayList<Contractor> contractorList = Contractor.makeExample();
 

@@ -44,7 +44,6 @@ public class ContractorCategoryAdapter extends ArrayAdapter<ContractorCategory> 
         ImageView img = (ImageView) convertView.findViewById(R.id.category_card_img);
 
         name.setText(category.getName());
-        count.setText(category.getNumContacts() + " contactos");
 
         Glide.with(getContext())
                 .load(category.getImg())
