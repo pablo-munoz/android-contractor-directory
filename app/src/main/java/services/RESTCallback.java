@@ -1,12 +1,14 @@
 package services;
 
+import org.json.JSONObject;
+
 /**
  * Created by pablo on 2/14/2017.
  */
 
 public interface RESTCallback {
 
-    void onSuccess(Object modelInstance, String rawResponse);
+    void onSuccess(JSONObject responseJson);
     void onFailure(String rawResponse);
 
 }

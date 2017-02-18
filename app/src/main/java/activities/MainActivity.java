@@ -12,10 +12,14 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 import adapters.ContractorCategoryAdapter;
 import models.ContractorCategory;
+import models.ModelBuilder;
 import munoz.pablo.directorio.R;
 import services.RESTCallback;
 import services.RESTService;
@@ -53,22 +57,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        RESTService contractorCategoryService = new RESTService();
-        contractorCategoryService.getMany(
-                ContractorCategory.class,
-                new RESTCallback() {
-                    @Override
-                    public void onSuccess(Object modelInstance, String rawResponse) {
-                        items = (ArrayList<ContractorCategory>) modelInstance;
-                        MainActivity.this.categoriesAdapter.addAll(items);
-                        Log.d("MainActivity", items.get(0).getName() + " " + items.get(0).getId());
-                    }
-
-                    @Override
-                    public void onFailure(String rawResponse) {
-                        Log.d("MainActivity", "Failed to retrieve contractor categories");
-                    }
-                });
+        this.loadContractorCategoriesData();
     }
 
     @Override
@@ -94,7 +83,36 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void goToContractorRegistrationActivity() {
-       Intent intent = new Intent(this, ContractorRegistration.class);
-       startActivity(intent);
+        Intent intent = new Intent(this, ContractorRegistration.class);
+        startActivity(intent);
+    }
+
+    private void loadContractorCategoriesData() {
+        RESTService contractorCategoryService = new RESTService();
+        contractorCategoryService.get(
+                "http://192.168.33.10:3000/api/v1/contractor_category",
+                new RESTCallback() {
+                    @Override
+                    public void onSuccess(JSONObject responseJson) {
+                        try {
+                            // HACK: ModelBuilder returns an Arraylist<Object>, the
+                            // activity works with an ArrayList<ContractorCategory> but
+                            // we cannot cast between them, we must first cast to ArrayList<?>.
+                            items = (ArrayList<ContractorCategory>)(ArrayList<?>) ModelBuilder.resourceListFromJson(
+                                    ContractorCategory.class,
+                                    responseJson
+                            );
+                            Log.d("DBG", "Number of contractor categories " + items.size());
+                            MainActivity.this.categoriesAdapter.addAll(items);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(String rawResponse) {
+                        Log.d("MainActivity", "Failed to retrieve contractor categories");
+                    }
+                });
     }
 }
