@@ -55,8 +55,20 @@ function catch_unknown_error(response, error_msg) {
     response.status(400).send(error_msg);
 }
 
+function serializeResourceListToJSONApi(table, resource_list) {
+    return _.map(resource_list, function(resource) {
+        return {
+            type: table.table_name,
+            id: resource.id,
+            attributes: _.omit(resource, 'id')
+        };
+    });
+}
+
 function make_simple_list_route(table) {
     return function(request, response) {
+        const queries = _.pick(request.query, _.keys(table.schema));
+
         var response_obj = {};
 
         knex(table.table_name)
@@ -67,19 +79,14 @@ function make_simple_list_route(table) {
                 };
 
                 return knex(table.table_name)
-                    .select('*');
+                    .select('*')
+                    .where(queries);
             })
             .then(function(result) {
                 response_obj.links = {
                     self: api_version + '/' + table.table_name
                 };
-                response_obj.data = _.map(result, function(resource) {
-                    return {
-                        type: table.table_name,
-                        id: resource.id,
-                        attributes: _.omit(resource, 'id')
-                    };
-                });
+                response_obj.data = serializeResourceListToJSONApi(table, result);
                 response.json(response_obj);
             })
             .catch(_.partial(catch_unknown_error, response));
@@ -147,7 +154,35 @@ router.route('/contractor_category/:id')
     .get(make_simple_detail_route(dbconfig.contractor_category));
 
 router.route('/contractor')
-    .get(make_simple_list_route(dbconfig.contractor))
+    .get(function(request, response) {
+        var query = [
+            'SELECT contractor.*',
+            'FROM contractor',
+            'JOIN contractor_category_map AS map',
+            '  ON contractor.id = map.contractor_id'
+        ].join('\n');
+
+        if (request.query.contractor_category) {
+            query += '\nWHERE map.contractor_category_id = \'' +
+                request.query.contractor_category + '\';';
+        } else {
+            query += ';'
+        }
+
+        console.log(query);
+
+        knex.raw(query)
+            .then(function(result) {
+                console.log(result);
+                response.json({
+                    data: serializeResourceListToJSONApi(
+                        dbconfig.contractor, result.rows)
+                });
+            })
+            .catch(function(error) {
+                console.error(error);
+            });
+    })
     .post(make_simple_create_route(dbconfig.contractor));
 
 router.route('/contractor/:id')

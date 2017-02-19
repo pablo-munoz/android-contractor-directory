@@ -27,7 +27,7 @@ import services.RESTService;
 public class MainActivity extends AppCompatActivity {
 
     ContractorCategoryAdapter categoriesAdapter;
-    ArrayList<ContractorCategory> items;
+    ArrayList<ContractorCategory> contractorCategoryList;
     ListView listView;
 
     @Override
@@ -38,9 +38,9 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        items = new ArrayList<>();
+        contractorCategoryList = new ArrayList<>();
 
-        this.categoriesAdapter = new ContractorCategoryAdapter(this, items);
+        this.categoriesAdapter = new ContractorCategoryAdapter(this, contractorCategoryList);
 
         listView = (ListView) findViewById(R.id.main_categories);
         listView.setAdapter(categoriesAdapter);
@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ContractorCategory category = items.get(position);
+                ContractorCategory category = contractorCategoryList.get(position);
 
                 Intent intent = new Intent(MainActivity.this, ContractorsByCategory.class);
                 intent.putExtra("categoryId", category.getId()) ;
@@ -77,6 +77,10 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "TODO: go to settings activity.", Toast.LENGTH_SHORT).show();
                 return true;
 
+            case R.id.action_refresh:
+                MainActivity.this.loadContractorCategoriesData();
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -88,8 +92,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadContractorCategoriesData() {
-        RESTService contractorCategoryService = new RESTService();
-        contractorCategoryService.get(
+        RESTService restApi = new RESTService();
+        restApi.get(
                 "http://192.168.33.10:3000/api/v1/contractor_category",
                 new RESTCallback() {
                     @Override
@@ -98,12 +102,12 @@ public class MainActivity extends AppCompatActivity {
                             // HACK: ModelBuilder returns an Arraylist<Object>, the
                             // activity works with an ArrayList<ContractorCategory> but
                             // we cannot cast between them, we must first cast to ArrayList<?>.
-                            items = (ArrayList<ContractorCategory>)(ArrayList<?>) ModelBuilder.resourceListFromJson(
+                            contractorCategoryList = (ArrayList<ContractorCategory>)(ArrayList<?>)
+                                    ModelBuilder.resourceListFromJson(
                                     ContractorCategory.class,
                                     responseJson
                             );
-                            Log.d("DBG", "Number of contractor categories " + items.size());
-                            MainActivity.this.categoriesAdapter.addAll(items);
+                            MainActivity.this.categoriesAdapter.addAll(contractorCategoryList);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

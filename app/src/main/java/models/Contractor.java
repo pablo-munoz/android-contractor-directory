@@ -7,7 +7,7 @@ import java.util.ArrayList;
  */
 
 public class Contractor {
-    private int id;
+    private String id;
     private String firstName;
     private String middleName;
     private String lastName;
@@ -17,15 +17,8 @@ public class Contractor {
     private String portrait;
     private int rating;
 
-    public static ArrayList<Contractor> makeExample() {
-        ArrayList<Contractor> contractors = new ArrayList<>();
-        contractors.add(new Contractor(1, "Darío", null, "Rubén", "rubendario@gmail.com", "33312312312", null, "http://tomsworkbench.com/wp-content/uploads/2012/04/woodworking-2-1023x680.jpg", 0));
-        contractors.add(new Contractor(2, "Cosme", null, "Fulanito", "cosmefulanito@gmail.com", "33398798798", "sehacetodo.com", "http://www.bls.gov/ooh/images/3111.jpg", 2));
-        contractors.add(new Contractor(3, "Amy", null, "Gutiérrez", "amygtz@gmail.com", "33356567562", null, "http://tomsworkbench.com/wp-content/uploads/2012/01/dscn6718.jpg", 2));
-        return contractors;
-    }
 
-    public Contractor(int id, String firstName, String middleName, String lastName, String email,
+    public Contractor(String id, String firstName, String middleName, String lastName, String email,
                       String phone, String website, String portrait, int rating) {
         this.id = id;
         this.firstName = firstName;
@@ -38,7 +31,7 @@ public class Contractor {
         this.rating = rating;
     }
 
-    public int getId() {
+    public String getId() {
         return this.id;
     }
 

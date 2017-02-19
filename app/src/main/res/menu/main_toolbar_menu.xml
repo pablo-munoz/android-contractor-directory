@@ -10,6 +10,12 @@
         android:title="Add new contractor"
         app:showAsAction="ifRoom"/>
 
+    <item
+        android:id="@+id/action_refresh"
+        android:icon="@drawable/ic_cached_black_24dp"
+        android:title="Refresh"
+        app:showAsAction="ifRoom"/>
+
     <!-- Settings, should always be in the overflow -->
     <item android:id="@+id/action_settings"
         android:title="Settings"

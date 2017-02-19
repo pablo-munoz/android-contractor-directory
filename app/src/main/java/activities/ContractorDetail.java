@@ -49,7 +49,7 @@ public class ContractorDetail extends AppCompatActivity {
             System.out.println("Error, invalid contractor id in intent");
             return null;
         } else {
-            return Contractor.makeExample().get(contractorId - 1);
+            return null;
         }
     }
 }

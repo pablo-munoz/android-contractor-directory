@@ -11,6 +11,11 @@ import java.util.ArrayList;
 
 /**
  * Created by pablo on 2/14/2017.
+ *
+ * Important notes:
+ * Rather than using JSONObject's getString method use this class static method
+ * getJSONString as getString parses null as the string "null" and not the value null.
+ *
  */
 
 public class ModelBuilder {
@@ -37,13 +42,13 @@ public class ModelBuilder {
 
     public static ArrayList<Object> resourceListFromJson(Type modelType, JSONObject responseJson)
             throws JSONException {
-        if (responseJson == null) {
-            Log.e("ModelBuilder", "ResponseJson argument cannot be null.");
-            return null;
-        }
-
         JSONArray resourceDataList;
         ArrayList<Object> modelInstanceList = new ArrayList<Object>();
+
+        if (responseJson == null) {
+            Log.e("ModelBuilder", "ResponseJson argument cannot be null.");
+            return modelInstanceList;
+        }
 
         try {
             // The data pertaining to the resource list will always be located
@@ -96,10 +101,26 @@ public class ModelBuilder {
         if (modelType == ContractorCategory.class) {
             try {
                 modelInstance = new ContractorCategory(
-                        resourceAttributes.getString("id"),
-                        resourceAttributes.getString("name"),
-                        resourceAttributes.getString("short_name"),
-                        resourceAttributes.getString("img")
+                        ModelBuilder.getJSONString(resourceAttributes, "id"),
+                        ModelBuilder.getJSONString(resourceAttributes, "name"),
+                        ModelBuilder.getJSONString(resourceAttributes, "short_name"),
+                        ModelBuilder.getJSONString(resourceAttributes, "img")
+                );
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } else if (modelType == Contractor.class) {
+            try {
+                modelInstance = new Contractor(
+                        ModelBuilder.getJSONString(resourceAttributes, "id"),
+                        ModelBuilder.getJSONString(resourceAttributes, "first_name"),
+                        ModelBuilder.getJSONString(resourceAttributes, "middle_name"),
+                        ModelBuilder.getJSONString(resourceAttributes, "last_names"),
+                        ModelBuilder.getJSONString(resourceAttributes, "email"),
+                        ModelBuilder.getJSONString(resourceAttributes, "phone"),
+                        ModelBuilder.getJSONString(resourceAttributes, "website"),
+                        "http://ewic.org/wp-content/themes/ewic/images/Construction%20Worker.png",
+                        3
                 );
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -107,6 +128,17 @@ public class ModelBuilder {
         }
 
         return modelInstance;
+    }
+
+    private static String getJSONString(JSONObject json, String fieldName) throws JSONException {
+        if (json == null) return null;
+
+        String value = json.getString(fieldName);
+        if (value == "null") {
+            return null;
+        } else {
+            return value;
+        }
     }
 
 }
