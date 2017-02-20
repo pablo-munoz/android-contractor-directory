@@ -34,7 +34,7 @@ public class ModelBuilder {
             Log.e("ModelBuilder", "Parsed resource attributes turned out to be null.");
         }
 
-        modelInstance = ModelBuilder.instantiateModel(ContractorCategory.class, resourceAttributes);
+        modelInstance = ModelBuilder.instantiateModel(modelType, resourceAttributes);
 
         return modelInstance;
     }

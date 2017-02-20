@@ -169,11 +169,8 @@ router.route('/contractor')
             query += ';'
         }
 
-        console.log(query);
-
         knex.raw(query)
             .then(function(result) {
-                console.log(result);
                 response.json({
                     data: serializeResourceListToJSONApi(
                         dbconfig.contractor, result.rows)

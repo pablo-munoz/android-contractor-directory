@@ -8,7 +8,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,7 +15,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import adapters.ContractorAdapter;
-import adapters.ContractorCategoryAdapter;
 import models.Contractor;
 import models.ContractorCategory;
 import models.ModelBuilder;
@@ -72,9 +70,12 @@ public class ContractorsByCategory extends AppCompatActivity {
                     public void onSuccess(JSONObject responseJson) {
                         try {
                             ContractorsByCategory.this.contractorCategory = category = (ContractorCategory)
-                                    ModelBuilder.resourceFromJson(Contractor.class, responseJson);
-                            ContractorsByCategory.this.title.setText(category.getName());
-                            ContractorsByCategory.this.loadContractorsData();
+                                    ModelBuilder.resourceFromJson(ContractorCategory.class, responseJson);
+
+                            if (category != null) {
+                                ContractorsByCategory.this.title.setText(category.getName());
+                                ContractorsByCategory.this.loadContractorsData();
+                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

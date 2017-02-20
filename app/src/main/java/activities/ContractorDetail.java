@@ -1,20 +1,28 @@
 package activities;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import models.Contractor;
+import models.ModelBuilder;
 import munoz.pablo.directorio.R;
+import services.RESTCallback;
+import services.RESTService;
 
 public class ContractorDetail extends AppCompatActivity {
-    TextView nameTv;
-    TextView idTv;
-    ImageView portraitIv;
+    private TextView nameTv;
+    private TextView idTv;
+    private ImageView portraitIv;
+    private Contractor contractor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,29 +35,48 @@ public class ContractorDetail extends AppCompatActivity {
         portraitIv = (ImageView) findViewById(R.id.contractor_detail_img);
 
         Intent intent = getIntent();
-        Contractor contractor = this.getContractor(intent);
-
-        if (contractor == null) {
-            System.out.println("Error, could not display contractor data, it was null");
-        } else {
-            nameTv.setText(contractor.getFullName());
-            idTv.setText("" + contractor.getId());
-
-            Glide.with(this)
-                    .load(contractor.getPortrait())
-                    .fitCenter()
-                    .into(portraitIv);
-        }
+        String contractorId = intent.getStringExtra("contractorId");
+        this.loadContractorData(contractorId);
     }
 
-    private Contractor getContractor(Intent intent) {
-        int contractorId = intent.getIntExtra("contractorId", -1);
+    private void loadContractorData(String contractorId) {
+        RESTService restApi = new RESTService();
 
-        if (contractorId == -1) {
-            System.out.println("Error, invalid contractor id in intent");
-            return null;
-        } else {
-            return null;
-        }
+        restApi.get("http://192.168.33.10:3000/api/v1/contractor/" + contractorId,
+                new RESTCallback() {
+                    Contractor contractor;
+
+                    @Override
+                    public void onSuccess(JSONObject responseJson) {
+                        try {
+                            ContractorDetail.this.contractor = contractor = (Contractor)
+                                    ModelBuilder.resourceFromJson(Contractor.class, responseJson);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (contractor == null) {
+                                    System.out.println("Error, could not display contractor data, it was null");
+                                } else {
+                                    nameTv.setText(contractor.getFullName());
+                                    idTv.setText("" + contractor.getId());
+
+                                    Glide.with(ContractorDetail.this)
+                                            .load(contractor.getPortrait())
+                                            .fitCenter()
+                                            .into(portraitIv);
+                                }
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(String rawResponse) {
+                        Log.e("ContractorDetail", "Error pulling contractor data from the API");
+                    }
+                });
     }
 }
