@@ -78,12 +78,6 @@
         name: nginx
         state: restarted
 
-    - name: Ensure user postgres exists and has a password
-      user:
-        name: postgres
-        state: present
-        password: {{ postgres | password_hash('sha512') }}
-
     # Create a new database with name "acme" and specific encoding and locale
     # settings. If a template different from "template0" is specified, encoding
     # and locale settings must match those of the template.
@@ -118,3 +112,22 @@
         name: postgres
         password: postgres
 
+    - name: Ensure there is an alias for the rundevserver command
+      lineinfile:
+        dest: /home/ubuntu/.bashrc
+        line: "alias devrunserver='node /vagrant/api/api.js 3000'"
+        owner: ubuntu
+        regexp: "^alias devrunserver='node /vagrant/api/api.js 3000'$"
+        state: present
+        insertafter: EOF
+        create: True
+
+    - name: Ensure there is an alias for the devpsql command
+      lineinfile:
+        dest: /home/ubuntu/.bashrc
+        line: "alias devpsql='sudo -u postgres psql -d directorio'"
+        owner: ubuntu
+        regexp: "^alias devpsql='sudo -u postgres psql -d directorio'$"
+        state: present
+        insertafter: EOF
+        create: True

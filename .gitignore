@@ -8,3 +8,8 @@
 /captures
 .externalNativeBuild
 node_modules/
+*~
+*#
+.vagrant/
+*.retry
+*.log

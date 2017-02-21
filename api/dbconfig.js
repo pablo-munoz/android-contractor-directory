@@ -66,6 +66,9 @@ module.exports = {
                 type: 'date',
                 not_null: true,
                 has_default: true
+            },
+            portrait: {
+                type: 'text'
             }
         }
     },

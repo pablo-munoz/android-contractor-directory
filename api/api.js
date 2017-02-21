@@ -302,5 +302,5 @@ app.use(api_version, router);
 
 
 http.createServer(app).listen(+process.argv[2] || 8080, function() {
-    console.log('App running on 192.168.33.10 or localhost:8080');
+    console.log('App running on 192.168.33.10:3000');
 });
