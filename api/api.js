@@ -186,28 +186,27 @@ router.route('/contractor_category/:id')
 
 router.route('/contractor')
     .get(function(request, response) {
-        var query = [
-            'SELECT contractor.*',
-            'FROM contractor',
-            'JOIN contractor_category_map AS map',
-            '  ON contractor.id = map.contractor_id'
-        ].join('\n');
-
-        if (request.query.contractor_category) {
-            query += '\nWHERE map.contractor_category_id = \'' +
-                request.query.contractor_category + '\';';
-        } else {
-            query += ';'
-        }
+        const hasCategoryFilter = _.has(request, 'query.contractor_category');
+        const categoryFilter = hasCategoryFilter ?
+              `AND map.contractor_category_id = '${request.query.contractor_category}'` :
+              '';
+        const query = `
+SELECT contractor.*
+FROM contractor
+JOIN contractor_category_map AS map
+  ON contractor.id = map.contractor_id
+WHERE contractor.status = 'active'
+${ categoryFilter };
+`;
 
         knex.raw(query)
-            .then(function(result) {
+            .then((result) => {
                 response.json({
                     data: serializeResourceListToJSONApi(
                         dbconfig.contractor, result.rows)
                 });
             })
-            .catch(function(error) {
+            .catch((error) => {
                 console.error(error);
             });
     })
@@ -293,9 +292,28 @@ router.route('/contractor')
             });
     });
 
-
 router.route('/contractor/:id')
-    .get(make_simple_detail_route(dbconfig.contractor));
+    .get(make_simple_detail_route(dbconfig.contractor))
+    .delete((request, response) => {
+        const contractor_id = request.params.id;
+        const query = `
+UPDATE contractor
+SET status = 'inactive'
+WHERE contractor.id = '${contractor_id}';
+`;
+
+        debug_log("DELETE on /contractor/:id");
+        debug_log(`Contractor id: ${contractor_id}`);
+
+        knex.raw(query)
+            .then((result) => {
+                response.status(200).send("Deletion successfull");
+            })
+            .catch((error) => {
+                debug_log(error);
+                response.status(400).send("Deletion failed.");
+            });
+    });
 
 
 app.use(api_version, router);

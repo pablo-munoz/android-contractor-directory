@@ -69,6 +69,11 @@ module.exports = {
             },
             portrait: {
                 type: 'text'
+            },
+            status: {
+                type: 'enum',
+                not_null: true,
+                default: 'active'
             }
         }
     },

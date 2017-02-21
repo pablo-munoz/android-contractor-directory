@@ -2,4 +2,4 @@
 -- which will contain an url of an image of the contractor.
 
 ALTER TABLE contractor
-      ADD COLUMN portrait TEXT;
+      ADD COLUMN IF NOT EXISTS portrait TEXT;
