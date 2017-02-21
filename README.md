@@ -2,9 +2,16 @@
 
 - First clone the repository
 - Make sure you have vagrant installed https://www.vagrantup.com/
+- Make sure you have virtualbox installed https://www.virtualbox.org/wiki/VirtualBox
 - In your terminal, navigate to the project directory
 - Make sure you are in the dev branch `git checkout dev`
 - In your console run the command `vagrant up`
-- You can now interact with the api through 192.168.33.10/api/v1
-- Postman (https://www.getpostman.com/) is recommended to interact with the api
-- In postman you could do a GET request to http://192.168.33.10/api/v1/contractor to ensure it is working
+- You may now start an ssh session with the server by running `vagrant ssh`
+- Once in the ssh terminal you may access the database via psql by running
+  the command `devpsql`
+- OR you may start the server (which will run on your host @ 192.168.33.10/3000)
+  by running the command `devrunserver`
+- When you are done with your work you can do a `vagrant halt` so that the vm
+  shuts down and doesn't consume resources.
+- In the future you will want to pull the changes from the repository with
+  `git pull` and issue another `vagrant up`
