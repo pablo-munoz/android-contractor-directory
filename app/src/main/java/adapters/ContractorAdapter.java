@@ -42,18 +42,19 @@ public class ContractorAdapter extends ArrayAdapter<Contractor> {
         TextView name = (TextView) convertView.findViewById(R.id.contractor_card_name);
         name.setText(contractor.getFullName());
 
-        LinearLayout rating = (LinearLayout) convertView.findViewById(R.id.contractor_card_rating);
+        LinearLayout ratingLayout = (LinearLayout) convertView.findViewById(R.id.contractor_card_rating);
         // Draw as many filled stars as the contractor rating
         for (int i = 0; i < contractor.getRating(); i++) {
             ImageView starIcon = new ImageView(this.mContext);
             starIcon.setImageResource(R.drawable.ic_star_black_24dp);
-            rating.addView(starIcon);
+            ratingLayout.addView(starIcon);
         }
+
         // Draw any possible remaining stars blank
         for (int i = 0; i < 5 - contractor.getRating(); i++) {
             ImageView starIcon = new ImageView(this.mContext);
             starIcon.setImageResource(R.drawable.ic_star_border_black_24dp);
-            rating.addView(starIcon);
+            ratingLayout.addView(starIcon);
         }
 
         TextView phone = (TextView) convertView.findViewById(R.id.contractor_card_phone);

@@ -93,5 +93,5 @@ module.exports = {
                 has_default: true
             }
         }
-    }
+    },
 };

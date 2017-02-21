@@ -26,9 +26,9 @@ import services.RESTService;
 
 public class MainActivity extends AppCompatActivity {
 
-    ContractorCategoryAdapter categoriesAdapter;
-    ArrayList<ContractorCategory> contractorCategoryList;
-    ListView listView;
+    private ContractorCategoryAdapter categoriesAdapter;
+    private ArrayList<ContractorCategory> contractorCategoryList;
+    private ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

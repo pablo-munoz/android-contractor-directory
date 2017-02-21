@@ -1,10 +1,12 @@
 const http = require('http');
-const express = require('express');
 const bodyParser = require('body-parser');
 const _ = require('lodash');
-const app = express();
-const dbconfig = require('./dbconfig.js');
+const Promise = require('bluebird');
 
+const express = require('express');
+const app = express();
+
+const dbconfig = require('./dbconfig.js');
 const knex = require('knex')({
     client: 'pg',
     connection: 'postgres://postgres:postgres@localhost:5432/directorio'
@@ -23,11 +25,16 @@ const router = express.Router();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+function debug_log(message) {
+    if (process.env.DEBUG)
+        console.log(message);
+}
+
 // A function to validate json data. It looks at the data
 // in the corresponding dbconfig table schema and determines
 // if some data is missing / wrong, in which case it returns
 // a json with appropiate error info
-function validate_data(schema, data) {
+function validate_data(data, schema) {
     var result = {
         has_errors: false,
         errors_info: [],
@@ -93,14 +100,37 @@ function make_simple_list_route(table) {
     }
 }
 
+function getResourceAttributesFromJson(json, schema) {
+    return _.pick(json, _.keys(schema));
+}
+
+function getResourceAttributesFromRequest(request, schema) {
+    return getResourceAttributesFromJson(
+        _.get(request, 'body.data.attributes', {}),
+        schema
+    );
+}
+
 function make_simple_create_route(table) {
     return function(request, response) {
-        var data = _.pick(request.body.data.attributes, _.keys(table.schema));
-        var validated_data = validate_data(table.schema, data);
+        let data = undefined;
+        let validated_data = undefined;
+        let error_json = undefined;
 
-        if (validated_data.has_errors) {
-            request.body.errors = validated_data.errors_info;
-            response.status(400).json(request.body);
+        data = getResourceAttributesFromRequest(request, table.schema);
+        validated_data = validate_data(data, table.schema);
+
+        if (!validated_data || validated_data.has_errors) {
+            if (request.body) {
+                error_json = request.body;
+            } else {
+                error_json = {
+                    body: {}
+                };
+            }
+
+            error_json.errors = validated_data.errors_info;
+            response.status(400).json(error_json);
             return;
         }
 
@@ -180,10 +210,79 @@ router.route('/contractor')
                 console.error(error);
             });
     })
-    .post(make_simple_create_route(dbconfig.contractor));
+    .post(function(request, response) {
+        debug_log("POST request to /contractor");
+        debug_log("BODY: ");
+        debug_log(request.body);
+
+        const body = request.body;
+        let categoriesAssociated = [];
+        let hasCategoriesAssociated = false;
+
+        if (_.has(body, 'relationships.contractor_category.data')) {
+            const categoriesRelData = body.relationships.contractor_category.data;
+            hasCategoriesAssociated = true;
+            if (_.isPlainObject(categoriesRelData)) {
+                categoriesAssociated.push(categoriesRelData.id);
+            } else if (_.isArray(categoriesRelData)) {
+                categoriesAssociated = _.map(categoriesRelData, (cat) => cat.id);
+            }
+        }
+
+        const data = getResourceAttributesFromRequest(
+            request, dbconfig.contractor.schema);
+        debug_log("DATA:");
+        debug_log(data);
+
+        const validated_data = validate_data(data, dbconfig.contractor.schema);
+        debug_log("VALIDATED DATA:");
+        debug_log(validated_data);
+
+        if (!validated_data || validated_data.has_errors) {
+            if (request.body) {
+                error_json = request.body;
+            } else {
+                error_json = {
+                    body: {}
+                };
+            }
+
+            error_json.errors = validated_data.errors_info;
+            response.status(400).json(error_json);
+            return;
+        }
+
+        let new_contractor;
+
+        knex.transaction((trx) => {
+            return trx.insert(validated_data.data)
+                .into(dbconfig.contractor.table_name)
+                .returning('*')
+                .then((result) => {
+                    new_contractor = result[0];
+
+                    debug_log("INSERTED CONTRACTOR:");
+                    debug_log(new_contractor);
+
+                    return Promise.map(categoriesAssociated, (category_id) => {
+                        return trx.insert({
+                            contractor_id: new_contractor.id,
+                            contractor_category_id: category_id
+                        }).into(dbconfig.contractor_category_map.table_name);
+                    });
+                });
+        })
+            .then((anything) => response.json(new_contractor))
+            .catch((error) =>  {
+                console.error(error);
+                response.status(400).send("Wrong input.")
+            });
+    });
+
 
 router.route('/contractor/:id')
     .get(make_simple_detail_route(dbconfig.contractor));
+
 
 app.use(api_version, router);
 

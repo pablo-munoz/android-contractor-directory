@@ -78,6 +78,12 @@
         name: nginx
         state: restarted
 
+    - name: Ensure user postgres exists and has a password
+      user:
+        name: postgres
+        state: present
+        password: {{ postgres | password_hash('sha512') }}
+
     # Create a new database with name "acme" and specific encoding and locale
     # settings. If a template different from "template0" is specified, encoding
     # and locale settings must match those of the template.
@@ -111,3 +117,4 @@
         db: directorio
         name: postgres
         password: postgres
+
