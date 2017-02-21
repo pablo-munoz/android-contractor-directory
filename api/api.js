@@ -13,6 +13,7 @@ const knex = require('knex')({
 });
 
 const api_version = '/api/v1';
+const api_root_url = 'http://192.168.33.10:3000' + api_version;
 
 app.route('/')
     .get(function(request, response) {
@@ -272,7 +273,20 @@ router.route('/contractor')
                     });
                 });
         })
-            .then((anything) => response.json(new_contractor))
+            .then((anything) => {
+                response.set({
+                    location: api_root_url + `/contractor/${new_contractor.id}`
+                });
+                response.status(201);
+                response.json({
+                    type: "contractor",
+                    id: new_contractor.id,
+                    attributes: _.omit(new_contractor, 'id'),
+                    links: {
+                        self: api_root_url + `/contractor/${new_contractor.id}`
+                    }
+                });
+            })
             .catch((error) =>  {
                 console.error(error);
                 response.status(400).send("Wrong input.")
