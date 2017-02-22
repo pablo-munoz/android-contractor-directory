@@ -82,6 +82,11 @@ public class MainActivity extends AppCompatActivity {
                 MainActivity.this.pullContractorCategoriesData();
                 return true;
 
+            case R.id.action_login:
+                Intent intent = new Intent(this, LoginScreen.class);
+                startActivity(intent);
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -112,6 +117,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        apiRequest.execute("http://192.168.33.10:3000/api/v1/contractor_category");
+        apiRequest.execute(APIRequest.HTTP_GET, "http://192.168.33.10:3000/api/v1/contractor_category");
     }
 }

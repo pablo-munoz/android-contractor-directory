@@ -33,6 +33,7 @@ app.use(
     require('./routes/contractor_category_detail'));
 app.use(constants.api_version + '/contractor', require('./routes/contractor'));
 app.use(constants.api_version + '/contractor', require('./routes/contractor_detail'));
+app.use(constants.api_version + '/auth', require('./routes/auth'));
 
 
 http.createServer(app).listen(+process.argv[2] || 8080, function() {

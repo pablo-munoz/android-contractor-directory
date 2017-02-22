@@ -16,6 +16,11 @@
         android:title="Refresh"
         app:showAsAction="ifRoom"/>
 
+    <item
+        android:id="@+id/action_login"
+        android:title="@string/login_button_text"
+        app:showAsAction="never"/>
+
     <!-- Settings, should always be in the overflow -->
     <item android:id="@+id/action_settings"
         android:title="Settings"

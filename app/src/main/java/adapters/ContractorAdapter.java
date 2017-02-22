@@ -39,8 +39,8 @@ public class ContractorAdapter extends ArrayAdapter<Contractor> {
         }
 
         // Lookup view for data population
-        TextView name = (TextView) convertView.findViewById(R.id.contractor_card_name);
-        name.setText(contractor.getFullName());
+        TextView nameTv = (TextView) convertView.findViewById(R.id.contractor_card_name);
+        nameTv.setText(contractor.getFullName());
 
         LinearLayout ratingLayout = (LinearLayout) convertView.findViewById(R.id.contractor_card_rating);
         // Draw as many filled stars as the contractor rating
@@ -57,14 +57,14 @@ public class ContractorAdapter extends ArrayAdapter<Contractor> {
             ratingLayout.addView(starIcon);
         }
 
-        TextView phone = (TextView) convertView.findViewById(R.id.contractor_card_phone);
-        phone.setText(contractor.getPhone());
+        TextView phoneTv = (TextView) convertView.findViewById(R.id.contractor_card_phone);
+        phoneTv.setText(contractor.getPhone());
 
-        TextView email = (TextView) convertView.findViewById(R.id.contractor_card_email);
-        email.setText(contractor.getEmail());
+        TextView emailTv = (TextView) convertView.findViewById(R.id.contractor_card_email);
+        emailTv.setText(contractor.getEmail());
 
-        TextView website = (TextView) convertView.findViewById(R.id.contractor_card_website);
-        website.setText(contractor.getWebsite());
+        TextView websiteTv = (TextView) convertView.findViewById(R.id.contractor_card_website);
+        websiteTv.setText(contractor.getWebsite());
 
         return convertView;
     }

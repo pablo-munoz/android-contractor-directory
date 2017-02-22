@@ -62,6 +62,8 @@ function serialize_resource_list_to_json_api(table, resource_list) {
 
 function make_simple_list_route(table) {
     return function(request, response) {
+        utils.debug_log("LISTING " + table.table_name);
+
         const queries = _.pick(request.query, _.keys(table.schema));
 
         var response_obj = {};

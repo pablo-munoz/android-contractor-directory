@@ -1,7 +1,5 @@
 package models;
 
-import android.util.Log;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -83,10 +81,7 @@ public class ModelBuilder<ModelType>  {
     private ModelType instantiateModel(String modelType, JSONObject resourceAttributes) throws JSONException {
         Object modelInstance;
 
-        Log.d("Entered", "instantiate");
-        Log.d(modelType, modelType.toString());
         if (modelType.equals("contractor_category")) {
-            Log.d("IDENTIFIED", "CLASS");
             modelInstance = new ContractorCategory(
                     ModelBuilder.getJSONString(resourceAttributes, "id"),
                     ModelBuilder.getJSONString(resourceAttributes, "name"),

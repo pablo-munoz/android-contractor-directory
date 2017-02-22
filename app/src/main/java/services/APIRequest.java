@@ -2,22 +2,29 @@ package services;
 
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 
 /**
  * Created by pablo on 2/14/2017.
  */
 
 public class APIRequest extends AsyncTask<String, Void, JSONObject> {
+    public static final String HTTP_GET = "GET";
+    public static final String HTTP_POST = "POST";
 
     private APIRequestCallback listener;
     private boolean hasErrors;
@@ -32,28 +39,68 @@ public class APIRequest extends AsyncTask<String, Void, JSONObject> {
     protected JSONObject doInBackground(String... params) {
         JSONObject result = null;
         try {
-            URL url = new URL(params[0]);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            URL url = new URL(params[1]);
 
-            this.code = connection.getResponseCode();
+            if (params[0].equals(APIRequest.HTTP_GET)) {
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-            if (code == HttpURLConnection.HTTP_OK ||
-                    code == HttpURLConnection.HTTP_CREATED) {
-                InputStream is = connection.getInputStream();
-                BufferedReader br = new BufferedReader(new InputStreamReader(is));
-                StringBuilder sb = new StringBuilder();
-                String currentLine = "";
+                this.code = connection.getResponseCode();
 
-                while((currentLine = br.readLine()) != null) {
-                    sb.append(currentLine);
+                if (code == HttpURLConnection.HTTP_OK ||
+                        code == HttpURLConnection.HTTP_CREATED) {
+                    InputStream is = connection.getInputStream();
+                    BufferedReader br = new BufferedReader(new InputStreamReader(is));
+                    StringBuilder sb = new StringBuilder();
+                    String currentLine = "";
+
+                    while ((currentLine = br.readLine()) != null) {
+                        sb.append(currentLine);
+                    }
+
+                    result = new JSONObject(sb.toString());
+                } else {
+                    this.hasErrors = true;
                 }
+            } else if (params[0].equals(APIRequest.HTTP_POST)) {
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("POST");
+                connection.setDoInput(true);
+                connection.setDoOutput(true);
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestProperty("Accept", "application/json");
+                connection.connect();
 
-                result = new JSONObject(sb.toString());
+                OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
+                wr.write(params[2]);
+                wr.flush();
+
+                this.code = connection.getResponseCode();
+                Log.d("CODE", ""+this.code);
+
+                if (this.code == HttpURLConnection.HTTP_OK ||
+                        this.code == HttpURLConnection.HTTP_CREATED) {
+                                        InputStream is = connection.getInputStream();
+                    BufferedReader br = new BufferedReader(new InputStreamReader(is));
+                    StringBuilder sb = new StringBuilder();
+                    String currentLine = "";
+
+                    while ((currentLine = br.readLine()) != null) {
+                        sb.append(currentLine);
+                    }
+
+                    result = new JSONObject(sb.toString());
+                } else {
+                    this.hasErrors = true;
+                }
             }
-        } catch (IOException e) {
+        } catch(MalformedURLException e) {
+            e.printStackTrace();
+            Log.e("APIRequest", "Malformed url");
+            this.hasErrors = true;
+        } catch(IOException e) {
             e.printStackTrace();
             this.hasErrors = true;
-        } catch (JSONException e) {
+        } catch(JSONException e) {
             e.printStackTrace();
             this.hasErrors = true;
         }

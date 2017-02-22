@@ -84,7 +84,7 @@ public class ContractorsByCategory extends AppCompatActivity {
             }
         });
 
-        apiRequest.execute("http://192.168.33.10:3000/api/v1/contractor_category/" + categoryId);
+        apiRequest.execute(APIRequest.HTTP_GET, "http://192.168.33.10:3000/api/v1/contractor_category/" + categoryId);
     }
 
 
@@ -109,6 +109,6 @@ public class ContractorsByCategory extends AppCompatActivity {
             }
         });
 
-        apiRequest.execute("http://192.168.33.10:3000/api/v1/contractor?contractor_category=" + contractorCategory.getId());
+        apiRequest.execute(APIRequest.HTTP_GET, "http://192.168.33.10:3000/api/v1/contractor?contractor_category=" + contractorCategory.getId());
     }
 }

@@ -19,7 +19,8 @@
         </activity>
         <activity android:name="activities.ContractorsByCategory" />
         <activity android:name="activities.ContractorDetail" />
-        <activity android:name="activities.ContractorRegistration"></activity>
+        <activity android:name="activities.ContractorRegistration" />
+        <activity android:name="activities.LoginScreen"></activity>
     </application>
 
 </manifest>
