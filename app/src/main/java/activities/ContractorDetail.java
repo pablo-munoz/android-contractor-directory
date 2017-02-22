@@ -15,68 +15,61 @@ import org.json.JSONObject;
 import models.Contractor;
 import models.ModelBuilder;
 import munoz.pablo.directorio.R;
-import services.RESTCallback;
-import services.RESTService;
+import services.APIRequest;
 
 public class ContractorDetail extends AppCompatActivity {
     private TextView nameTv;
     private TextView idTv;
     private ImageView portraitIv;
     private Contractor contractor;
+    private ModelBuilder<Contractor> modelBuilder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contractor_detail);
 
-        // Get references to layout views
         nameTv = (TextView) findViewById(R.id.contractor_detail_name);
         idTv = (TextView) findViewById(R.id.contractor_detail_id);
         portraitIv = (ImageView) findViewById(R.id.contractor_detail_img);
 
+        this.modelBuilder = new ModelBuilder<>();
+
         Intent intent = getIntent();
         String contractorId = intent.getStringExtra("contractorId");
-        this.loadContractorData(contractorId);
+        this.pullContractorData(contractorId);
     }
 
-    private void loadContractorData(String contractorId) {
-        RESTService restApi = new RESTService();
+    private void pullContractorData(String contractorId) {
+        APIRequest apiRequest = new APIRequest(new APIRequest.APIRequestCallback() {
+            @Override
+            public void onSuccess(JSONObject json, int code) {
+                ContractorDetail activity = ContractorDetail.this;
 
-        restApi.get("http://192.168.33.10:3000/api/v1/contractor/" + contractorId,
-                new RESTCallback() {
-                    Contractor contractor;
+                try {
+                    activity.contractor =  activity.modelBuilder.resourceFromJson(json);
+                    activity.updateView();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
 
-                    @Override
-                    public void onSuccess(JSONObject responseJson) {
-                        try {
-                            ContractorDetail.this.contractor = contractor = (Contractor)
-                                    ModelBuilder.resourceFromJson(Contractor.class, responseJson);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+            @Override
+            public void onError(String errorMessage, int code) {
+                Log.e("ContractorDetail", "Error pulling contractor data from the API");
+            }
+        });
 
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (contractor == null) {
-                                    System.out.println("Error, could not display contractor data, it was null");
-                                } else {
-                                    nameTv.setText(contractor.getFullName());
-                                    idTv.setText("" + contractor.getId());
+        apiRequest.execute("http://192.168.33.10:3000/api/v1/contractor/" + contractorId);
+    }
 
-                                    Glide.with(ContractorDetail.this)
-                                            .load(contractor.getPortrait())
-                                            .fitCenter()
-                                            .into(portraitIv);
-                                }
-                            }
-                        });
-                    }
+    public void updateView() {
+        nameTv.setText(contractor.getFullName());
+        idTv.setText("" + contractor.getId());
 
-                    @Override
-                    public void onFailure(String rawResponse) {
-                        Log.e("ContractorDetail", "Error pulling contractor data from the API");
-                    }
-                });
+        Glide.with(ContractorDetail.this)
+                .load(contractor.getPortrait())
+                .fitCenter()
+                .into(portraitIv);
     }
 }

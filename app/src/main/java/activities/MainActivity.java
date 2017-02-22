@@ -21,14 +21,14 @@ import adapters.ContractorCategoryAdapter;
 import models.ContractorCategory;
 import models.ModelBuilder;
 import munoz.pablo.directorio.R;
-import services.RESTCallback;
-import services.RESTService;
+import services.APIRequest;
 
 public class MainActivity extends AppCompatActivity {
 
     private ContractorCategoryAdapter categoriesAdapter;
     private ArrayList<ContractorCategory> contractorCategoryList;
     private ListView listView;
+    private ModelBuilder<ContractorCategory> modelBuilder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,10 +36,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        this.setSupportActionBar(toolbar);
 
-        contractorCategoryList = new ArrayList<>();
+        this.modelBuilder = new ModelBuilder<>();
 
+        this.contractorCategoryList = new ArrayList<>();
         this.categoriesAdapter = new ContractorCategoryAdapter(this, contractorCategoryList);
 
         listView = (ListView) findViewById(R.id.main_categories);
@@ -57,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        this.loadContractorCategoriesData();
+        this.pullContractorCategoriesData();
     }
 
     @Override
@@ -78,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_refresh:
-                MainActivity.this.loadContractorCategoriesData();
+                MainActivity.this.pullContractorCategoriesData();
                 return true;
 
             default:
@@ -91,32 +92,26 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void loadContractorCategoriesData() {
-        RESTService restApi = new RESTService();
-        restApi.get(
-                "http://192.168.33.10:3000/api/v1/contractor_category",
-                new RESTCallback() {
-                    @Override
-                    public void onSuccess(JSONObject responseJson) {
-                        try {
-                            // HACK: ModelBuilder returns an Arraylist<Object>, the
-                            // activity works with an ArrayList<ContractorCategory> but
-                            // we cannot cast between them, we must first cast to ArrayList<?>.
-                            contractorCategoryList = (ArrayList<ContractorCategory>)(ArrayList<?>)
-                                    ModelBuilder.resourceListFromJson(
-                                    ContractorCategory.class,
-                                    responseJson
-                            );
-                            MainActivity.this.categoriesAdapter.addAll(contractorCategoryList);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
+    private void pullContractorCategoriesData() {
+        APIRequest apiRequest = new APIRequest(new APIRequest.APIRequestCallback() {
+            @Override
+            public void onSuccess(JSONObject json, int code) {
+                MainActivity activity = MainActivity.this;
 
-                    @Override
-                    public void onFailure(String rawResponse) {
-                        Log.d("MainActivity", "Failed to retrieve contractor categories");
-                    }
-                });
+                try {
+                    activity.contractorCategoryList = activity.modelBuilder.resourceListFromJson(json);
+                    activity.categoriesAdapter.addAll(activity.contractorCategoryList);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onError(String errorMessage, int code) {
+                Log.d("MainActivity", "Failed to retrieve contractor categories");
+            }
+        });
+
+        apiRequest.execute("http://192.168.33.10:3000/api/v1/contractor_category");
     }
 }

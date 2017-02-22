@@ -1,6 +1,7 @@
 package adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,17 +40,17 @@ public class ContractorCategoryAdapter extends ArrayAdapter<ContractorCategory> 
         }
 
         // Lookup view for data population
-        TextView name = (TextView) convertView.findViewById(R.id.category_card_name);
-        TextView count = (TextView) convertView.findViewById(R.id.category_card_num_contacts);
-        ImageView img = (ImageView) convertView.findViewById(R.id.category_card_img);
+        TextView nameTv = (TextView) convertView.findViewById(R.id.category_card_name);
+        TextView countTv = (TextView) convertView.findViewById(R.id.category_card_num_contacts);
+        ImageView categoryIv = (ImageView) convertView.findViewById(R.id.category_card_img);
 
-        name.setText(category.getName());
+        nameTv.setText(category.getName());
 
         Glide.with(getContext())
                 .load(category.getImg())
                 .fitCenter()
                 .crossFade(100)
-                .into(img);
+                .into(categoryIv);
 
         return convertView;
     }

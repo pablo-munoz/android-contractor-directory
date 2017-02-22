@@ -6,7 +6,7 @@ import java.util.ArrayList;
  * Created by pablo on 1/28/2017.
  */
 
-public class Contractor {
+public class Contractor{
     private String id;
     private String firstName;
     private String middleName;

@@ -6,7 +6,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 /**
@@ -18,116 +17,101 @@ import java.util.ArrayList;
  *
  */
 
-public class ModelBuilder {
+public class ModelBuilder<ModelType>  {
 
-    public static Object resourceFromJson(Type modelType, JSONObject responseJson) throws JSONException {
-        if (responseJson == null) {
-            Log.e("ModelBuilder", "ResponseJson argument cannot be null.");
-            return null;
+    public ModelType resourceFromJson(JSONObject apiJson) throws JSONException {
+        JSONObject data;
+        JSONObject attributes;
+
+        if (apiJson == null) {
+            throw new JSONException("Given json cannot be null.");
+        } else if ((data = apiJson.getJSONObject("data")) == null) {
+            throw new JSONException("Malformed json, 'data' property missing.");
+        } else if ((attributes = data.getJSONObject("attributes")) == null) {
+            throw new JSONException("Malformed json, 'data.attributes' property missing.");
         }
 
-        Object modelInstance = null;
-
-        JSONObject resourceAttributes = ModelBuilder.parseResourceAttributes(responseJson);
-
-        if (resourceAttributes == null) {
-            Log.e("ModelBuilder", "Parsed resource attributes turned out to be null.");
+        if (!data.has("id")) {
+            throw new JSONException("Incorrect json, 'data.id' value missing.");
         }
 
-        modelInstance = ModelBuilder.instantiateModel(modelType, resourceAttributes);
+        attributes.put("id", data.getString("id"));
+
+        ModelType modelInstance = null;
+        String modelType = data.getString("type");
+
+        modelInstance =  this.instantiateModel(modelType, attributes);
 
         return modelInstance;
     }
 
 
-    public static ArrayList<Object> resourceListFromJson(Type modelType, JSONObject responseJson)
-            throws JSONException {
-        JSONArray resourceDataList;
-        ArrayList<Object> modelInstanceList = new ArrayList<Object>();
+    public ArrayList<ModelType> resourceListFromJson(JSONObject apiJson) throws JSONException {
+        JSONArray data;
+        JSONObject datum;
+        JSONObject attributes;
+        String instanceId;
 
-        if (responseJson == null) {
-            Log.e("ModelBuilder", "ResponseJson argument cannot be null.");
-            return modelInstanceList;
+        if (apiJson == null) {
+            throw new JSONException("Given json cannot be null.");
+        } else if ((data = apiJson.getJSONArray("data")) == null) {
+            throw new JSONException("Malformed json, 'data' property missing.");
         }
 
-        try {
-            // The data pertaining to the resource list will always be located
-            // in the top-level *data* attribute per jsonapi specification.
-            resourceDataList = responseJson.getJSONArray("data");
+        ArrayList<ModelType> modelInstanceList = new ArrayList<>();
+        String modelType;
 
-            for (int i = 0; i < resourceDataList.length(); i++) {
-                JSONObject resourceData = resourceDataList.getJSONObject(i);
-                JSONObject resourceAttributes = ModelBuilder.parseResourceAttributes(resourceData);
-                modelInstanceList.add(
-                        ModelBuilder.instantiateModel(modelType, resourceAttributes)
-                );
+        for (int i = 0; i < data.length(); i++) {
+            if ((datum = data.getJSONObject(i)) == null) {
+                throw new JSONException("Incorrect json, element of data doesn't is not a json object.");
+            } else if ((attributes = datum.getJSONObject("attributes")) == null) {
+                throw new JSONException("Incorrect json, element of datum 'attributes' property.");
+            } else if ((instanceId = datum.getString("id")) == null) {
+                throw new JSONException("Incorrect json, element of data doesn't have 'id' property.");
             }
 
-        } catch (JSONException e) {
-            e.printStackTrace();
+            attributes.put("id", instanceId);
+            modelType = datum.getString("type");
+
+            modelInstanceList.add(this.instantiateModel(modelType, attributes));
         }
 
         return modelInstanceList;
     }
 
-    private static JSONObject parseResourceAttributes(JSONObject json) throws JSONException {
-        JSONObject resourceData = null;
-        JSONObject resourceAttributes = null;
 
-        try {
-            // The data pertaining to the resource will always be located
-            // in the top-level *data* attribute per jsonapi specification.
-            if (json.has("data")) {
-                resourceData = json.getJSONObject("data");
-            } else {
-                resourceData = json;
-            }
+    private ModelType instantiateModel(String modelType, JSONObject resourceAttributes) throws JSONException {
+        Object modelInstance;
 
-            // Each fields' data is located in the *attributes* property of the
-            // data object of the response. With the exception of *id* which is
-            // a child of *data* itself.
-            resourceAttributes = resourceData.getJSONObject("attributes");
-            resourceAttributes.put("id", resourceData.getString("id"));
-        } catch (JSONException e) {
-            e.printStackTrace();
+        Log.d("Entered", "instantiate");
+        Log.d(modelType, modelType.toString());
+        if (modelType.equals("contractor_category")) {
+            Log.d("IDENTIFIED", "CLASS");
+            modelInstance = new ContractorCategory(
+                    ModelBuilder.getJSONString(resourceAttributes, "id"),
+                    ModelBuilder.getJSONString(resourceAttributes, "name"),
+                    ModelBuilder.getJSONString(resourceAttributes, "short_name"),
+                    ModelBuilder.getJSONString(resourceAttributes, "img")
+            );
         }
 
-        return resourceAttributes;
-    }
-
-    private static Object instantiateModel(Type modelType, JSONObject resourceAttributes) {
-        Object modelInstance = null;
-
-        if (modelType == ContractorCategory.class) {
-            try {
-                modelInstance = new ContractorCategory(
-                        ModelBuilder.getJSONString(resourceAttributes, "id"),
-                        ModelBuilder.getJSONString(resourceAttributes, "name"),
-                        ModelBuilder.getJSONString(resourceAttributes, "short_name"),
-                        ModelBuilder.getJSONString(resourceAttributes, "img")
-                );
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        } else if (modelType == Contractor.class) {
-            try {
-                modelInstance = new Contractor(
-                        ModelBuilder.getJSONString(resourceAttributes, "id"),
-                        ModelBuilder.getJSONString(resourceAttributes, "first_name"),
-                        ModelBuilder.getJSONString(resourceAttributes, "middle_name"),
-                        ModelBuilder.getJSONString(resourceAttributes, "last_names"),
-                        ModelBuilder.getJSONString(resourceAttributes, "email"),
-                        ModelBuilder.getJSONString(resourceAttributes, "phone"),
-                        ModelBuilder.getJSONString(resourceAttributes, "website"),
-                        "http://ewic.org/wp-content/themes/ewic/images/Construction%20Worker.png",
-                        3
-                );
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+        else if (modelType.equals("contractor")) {
+            modelInstance = new Contractor(
+                    ModelBuilder.getJSONString(resourceAttributes, "id"),
+                    ModelBuilder.getJSONString(resourceAttributes, "first_name"),
+                    ModelBuilder.getJSONString(resourceAttributes, "middle_name"),
+                    ModelBuilder.getJSONString(resourceAttributes, "last_names"),
+                    ModelBuilder.getJSONString(resourceAttributes, "email"),
+                    ModelBuilder.getJSONString(resourceAttributes, "phone"),
+                    ModelBuilder.getJSONString(resourceAttributes, "website"),
+                    "http://ewic.org/wp-content/themes/ewic/images/Construction%20Worker.png",
+                    3
+            );
+        } else {
+            throw new JSONException("I don't know how to parse the given model type.");
         }
 
-        return modelInstance;
+        return (ModelType) modelInstance;
     }
 
     private static String getJSONString(JSONObject json, String fieldName) throws JSONException {
@@ -140,5 +124,6 @@ public class ModelBuilder {
             return value;
         }
     }
+
 
 }

@@ -19,29 +19,30 @@ import models.Contractor;
 import models.ContractorCategory;
 import models.ModelBuilder;
 import munoz.pablo.directorio.R;
-import services.RESTCallback;
-import services.RESTService;
+import services.APIRequest;
 
 public class ContractorsByCategory extends AppCompatActivity {
-    private TextView title;
+    private TextView titleTv;
 
     private ContractorCategory contractorCategory;
     private ArrayList<Contractor> contractorList;
     private ListView contractorListView;
     private ContractorAdapter adapter;
+    private ModelBuilder<ContractorCategory> categoryModelBuilder;
+    private ModelBuilder<Contractor> contractorModelBuilder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contractors_by_category);
 
-        contractorCategory = null;
+        this.titleTv = (TextView) this.findViewById(R.id.contractors_by_category_title);
+        this.contractorList = new ArrayList<>();
+        this.categoryModelBuilder = new ModelBuilder<>();
+        this.contractorModelBuilder = new ModelBuilder<>();
 
         this.pullDataFromAPI();
 
-        this.title = (TextView) this.findViewById(R.id.contractors_by_category_title);
-
-        this.contractorList = new ArrayList<>();
 
         this.adapter = new ContractorAdapter(this, contractorList);
 
@@ -59,58 +60,55 @@ public class ContractorsByCategory extends AppCompatActivity {
     }
 
     private void pullDataFromAPI() {
-        RESTService restApi = new RESTService();
-        String categoryId = getIntent().getStringExtra("categoryId");
+        String categoryId = this.getIntent().getStringExtra("categoryId");
+        APIRequest apiRequest = new APIRequest(new APIRequest.APIRequestCallback() {
+            @Override
+            public void onSuccess(JSONObject json, int code) {
+                ContractorsByCategory activity = ContractorsByCategory.this;
 
-        restApi.get("http://192.168.33.10:3000/api/v1/contractor_category/" + categoryId,
-                new RESTCallback() {
-                    ContractorCategory category;
+                try {
+                    activity.contractorCategory = activity.categoryModelBuilder.resourceFromJson(json);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
-                    @Override
-                    public void onSuccess(JSONObject responseJson) {
-                        try {
-                            ContractorsByCategory.this.contractorCategory = category = (ContractorCategory)
-                                    ModelBuilder.resourceFromJson(ContractorCategory.class, responseJson);
+                if (activity.contractorCategory != null) {
+                    ContractorsByCategory.this.titleTv.setText(activity.contractorCategory.getName());
+                    ContractorsByCategory.this.loadContractorsData();
+                }
+            }
 
-                            if (category != null) {
-                                ContractorsByCategory.this.title.setText(category.getName());
-                                ContractorsByCategory.this.loadContractorsData();
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+            @Override
+            public void onError(String errorMessage, int code) {
+                Log.e("ContractorsByCategory", "Error loading contractor category data.");
+            }
+        });
 
-                    }
-
-                    @Override
-                    public void onFailure(String rawResponse) {
-                        Log.e("ContractorsByCategory", "Error loading contractor category data.");
-                    }
-                });
+        apiRequest.execute("http://192.168.33.10:3000/api/v1/contractor_category/" + categoryId);
     }
 
 
     private void loadContractorsData() {
-        RESTService restApi = new RESTService();
+        APIRequest apiRequest = new APIRequest(new APIRequest.APIRequestCallback() {
+            @Override
+            public void onSuccess(JSONObject json, int code) {
+                ContractorsByCategory activity = ContractorsByCategory.this;
 
-        restApi.get("http://192.168.33.10:3000/api/v1/contractor?contractor_category=" + contractorCategory.getId(),
-                new RESTCallback() {
-                    @Override
-                    public void onSuccess(JSONObject responseJson) {
-                        try {
-                            // Hack. Cannot cast directly from ArrayList<Object> to ArrayList<Contractor>
-                            ContractorsByCategory.this.contractorList = (ArrayList<Contractor>)(ArrayList<?>)
-                                    ModelBuilder.resourceListFromJson(Contractor.class, responseJson);
-                            ContractorsByCategory.this.adapter.addAll(ContractorsByCategory.this.contractorList);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
+                try {
+                    // Hack. Cannot cast directly from ArrayList<Object> to ArrayList<Contractor>
+                    activity.contractorList = activity.contractorModelBuilder.resourceListFromJson(json);
+                    activity.adapter.addAll(ContractorsByCategory.this.contractorList);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
 
-                    @Override
-                    public void onFailure(String rawResponse) {
-                        Log.e("ContractorsByCategory", "Error loading contractor data.");
-                    }
-                });
+            @Override
+            public void onError(String errorMessage, int code) {
+                    Log.e("ContractorsByCategory", "Error loading contractor data.");
+            }
+        });
+
+        apiRequest.execute("http://192.168.33.10:3000/api/v1/contractor?contractor_category=" + contractorCategory.getId());
     }
 }
