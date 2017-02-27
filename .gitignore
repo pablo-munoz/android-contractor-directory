@@ -13,3 +13,4 @@ node_modules/
 .vagrant/
 *.retry
 *.log
+.idea/
