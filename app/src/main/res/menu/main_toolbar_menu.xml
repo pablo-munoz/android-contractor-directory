@@ -21,6 +21,12 @@
         android:title="@string/login_button_text"
         app:showAsAction="never"/>
 
+    <item
+        android:id="@+id/action_register_account"
+        android:icon="@drawable/ic_playlist_add_check_black_24dp"
+        android:title="Registro"
+        app:showAsAction="never"/>
+
     <!-- Settings, should always be in the overflow -->
     <item android:id="@+id/action_settings"
         android:title="Settings"

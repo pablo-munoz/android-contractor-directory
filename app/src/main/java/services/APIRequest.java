@@ -8,7 +8,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -16,7 +15,6 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
 
 /**
  * Created by pablo on 2/14/2017.
@@ -30,7 +28,7 @@ public class APIRequest extends AsyncTask<String, Void, JSONObject> {
     private boolean hasErrors;
     private int code;
 
-    public APIRequest(APIRequestCallback listener) {
+        public APIRequest(APIRequestCallback listener) {
         this.hasErrors = false;
         this.listener = listener;
     }

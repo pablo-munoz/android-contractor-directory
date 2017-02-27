@@ -69,6 +69,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent;
+
         switch(item.getItemId()) {
             case R.id.action_register:
                 this.goToContractorRegistrationActivity();
@@ -83,9 +85,13 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_login:
-                Intent intent = new Intent(this, LoginScreen.class);
+                intent = new Intent(this, LoginScreen.class);
                 startActivity(intent);
                 return true;
+
+            case R.id.action_register_account:
+                intent = new Intent(this, AccountRegistration.class);
+                startActivity(intent);
 
             default:
                 return super.onOptionsItemSelected(item);
