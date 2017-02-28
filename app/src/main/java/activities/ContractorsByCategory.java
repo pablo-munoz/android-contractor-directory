@@ -1,5 +1,6 @@
 package activities;
 
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +16,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import adapters.ContractorAdapter;
+import fragments.LoadingFragment;
 import models.Contractor;
 import models.ContractorCategory;
 import models.ModelBuilder;
@@ -22,6 +24,7 @@ import munoz.pablo.directorio.R;
 import services.APIRequest;
 
 public class ContractorsByCategory extends AppCompatActivity {
+
     private TextView titleTv;
 
     private ContractorCategory contractorCategory;
@@ -30,6 +33,9 @@ public class ContractorsByCategory extends AppCompatActivity {
     private ContractorAdapter adapter;
     private ModelBuilder<ContractorCategory> categoryModelBuilder;
     private ModelBuilder<Contractor> contractorModelBuilder;
+    private FragmentManager fragmentManager;
+
+    private LoadingFragment loadingFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +47,11 @@ public class ContractorsByCategory extends AppCompatActivity {
         this.categoryModelBuilder = new ModelBuilder<>();
         this.contractorModelBuilder = new ModelBuilder<>();
 
-        this.pullDataFromAPI();
+        this.fragmentManager = this.getFragmentManager();
+        this.loadingFragment = LoadingFragment.newInstance("Cargando información de contratistas");
+        this.loadingFragment.addToManager(this.fragmentManager, R.id.contractors_by_category_container);
+
+        this.pullContractorCategoryData();
 
 
         this.adapter = new ContractorAdapter(this, contractorList);
@@ -59,7 +69,7 @@ public class ContractorsByCategory extends AppCompatActivity {
         });
     }
 
-    private void pullDataFromAPI() {
+    private void pullContractorCategoryData() {
         String categoryId = this.getIntent().getStringExtra("categoryId");
         APIRequest apiRequest = new APIRequest(new APIRequest.APIRequestCallback() {
             @Override
@@ -74,7 +84,7 @@ public class ContractorsByCategory extends AppCompatActivity {
 
                 if (activity.contractorCategory != null) {
                     ContractorsByCategory.this.titleTv.setText(activity.contractorCategory.getName());
-                    ContractorsByCategory.this.loadContractorsData();
+                    ContractorsByCategory.this.pullContractorsInCategoryData();
                 }
             }
 
@@ -88,8 +98,10 @@ public class ContractorsByCategory extends AppCompatActivity {
     }
 
 
-    private void loadContractorsData() {
+    private void pullContractorsInCategoryData() {
         APIRequest apiRequest = new APIRequest(new APIRequest.APIRequestCallback() {
+            ContractorsByCategory activity = ContractorsByCategory.this;
+
             @Override
             public void onSuccess(JSONObject json, int code) {
                 ContractorsByCategory activity = ContractorsByCategory.this;
@@ -98,6 +110,7 @@ public class ContractorsByCategory extends AppCompatActivity {
                     // Hack. Cannot cast directly from ArrayList<Object> to ArrayList<Contractor>
                     activity.contractorList = activity.contractorModelBuilder.resourceListFromJson(json);
                     activity.adapter.addAll(ContractorsByCategory.this.contractorList);
+                    activity.loadingFragment.removeFromManager(activity.fragmentManager);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -111,4 +124,5 @@ public class ContractorsByCategory extends AppCompatActivity {
 
         apiRequest.execute(APIRequest.HTTP_GET, "http://192.168.33.10:3000/api/v1/contractor?contractor_category=" + contractorCategory.getId());
     }
+
 }

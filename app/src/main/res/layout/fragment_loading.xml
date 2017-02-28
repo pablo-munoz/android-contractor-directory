@@ -1,5 +1,4 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,13 +7,15 @@
     <ImageView
         android:layout_width="250dp"
         android:layout_height="250dp"
-        android:layout_gravity="center_horizontal|center_vertical"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
         android:id="@+id/loading_fragment_image" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textAlignment="center"
-        android:textSize="14dp"
+        android:textSize="20sp"
+        android:layout_below="@+id/loading_fragment_image"
         android:id="@+id/loading_fragment_message" />
-</FrameLayout>
+</RelativeLayout>

@@ -1,5 +1,6 @@
 package activities;
 
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +13,7 @@ import com.bumptech.glide.Glide;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import fragments.LoadingFragment;
 import models.Contractor;
 import models.ModelBuilder;
 import munoz.pablo.directorio.R;
@@ -23,15 +25,21 @@ public class ContractorDetail extends AppCompatActivity {
     private ImageView portraitIv;
     private Contractor contractor;
     private ModelBuilder<Contractor> modelBuilder;
+    private FragmentManager fragmentManager;
+    private LoadingFragment loadingFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contractor_detail);
 
-        nameTv = (TextView) findViewById(R.id.contractor_detail_name);
-        idTv = (TextView) findViewById(R.id.contractor_detail_id);
-        portraitIv = (ImageView) findViewById(R.id.contractor_detail_img);
+        this.nameTv = (TextView) findViewById(R.id.contractor_detail_name);
+        this.idTv = (TextView) findViewById(R.id.contractor_detail_id);
+        this.portraitIv = (ImageView) findViewById(R.id.contractor_detail_img);
+
+        this.fragmentManager = this.getFragmentManager();
+        this.loadingFragment = LoadingFragment.newInstance("Cargando información del contratista");
+        this.loadingFragment.addToManager(this.fragmentManager, R.id.contractor_detail_container);
 
         this.modelBuilder = new ModelBuilder<>();
 
@@ -49,6 +57,7 @@ public class ContractorDetail extends AppCompatActivity {
                 try {
                     activity.contractor =  activity.modelBuilder.resourceFromJson(json);
                     activity.updateView();
+                    activity.loadingFragment.removeFromManager(activity.fragmentManager);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

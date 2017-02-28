@@ -2,6 +2,8 @@ package fragments;
 
 
 import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -79,6 +81,18 @@ public class LoadingFragment extends Fragment {
                 .into(this.imageIv);
 
         return view;
+    }
+
+    public void addToManager(FragmentManager manager, int containerId) {
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.add(containerId, this, "loading");
+        transaction.commit();
+    }
+
+    public void removeFromManager(FragmentManager manager) {
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.remove(this);
+        transaction.commit();
     }
 
 }

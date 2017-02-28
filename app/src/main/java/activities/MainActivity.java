@@ -1,8 +1,6 @@
 package activities;
 
-import android.app.Fragment;
 import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -35,8 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private ModelBuilder<ContractorCategory> modelBuilder;
 
     private FragmentManager fragmentManager;
-
-    private static String LOADING_FRAGMENT_TAG = "loadingfragment";
+    private LoadingFragment loadingFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,9 +41,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         this.fragmentManager = this.getFragmentManager();
-        FragmentTransaction transaction = this.fragmentManager.beginTransaction();
-        transaction.add(R.id.activity_main, LoadingFragment.newInstance("Cargando categorías..."), MainActivity.LOADING_FRAGMENT_TAG);
-        transaction.commit();
+        this.loadingFragment = LoadingFragment.newInstance("Cargando información de categorías");
+        this.loadingFragment.addToManager(this.fragmentManager, R.id.activity_main_container);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         this.setSupportActionBar(toolbar);
@@ -73,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
 
         this.pullContractorCategoriesData();
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -128,13 +125,8 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                FragmentTransaction transaction = activity.fragmentManager.beginTransaction();
-                Fragment fragment = activity.fragmentManager.findFragmentByTag(MainActivity.LOADING_FRAGMENT_TAG);
-                if (fragment != null) {
-                    transaction.remove(fragment);
-                }
-                transaction.commit();
 
+                activity.loadingFragment.removeFromManager(activity.fragmentManager);
                 activity.categoriesAdapter.addAll(activity.contractorCategoryList);
             }
 
@@ -146,4 +138,5 @@ public class MainActivity extends AppCompatActivity {
 
         apiRequest.execute(APIRequest.HTTP_GET, "http://192.168.33.10:3000/api/v1/contractor_category");
     }
+
 }
