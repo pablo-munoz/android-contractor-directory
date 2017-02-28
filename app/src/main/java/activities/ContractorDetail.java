@@ -22,6 +22,8 @@ import services.APIRequest;
 public class ContractorDetail extends AppCompatActivity {
     private TextView nameTv;
     private TextView idTv;
+    private TextView phoneTv;
+    private TextView emailTv;
     private ImageView portraitIv;
     private Contractor contractor;
     private ModelBuilder<Contractor> modelBuilder;
@@ -35,6 +37,8 @@ public class ContractorDetail extends AppCompatActivity {
 
         this.nameTv = (TextView) findViewById(R.id.contractor_detail_name);
         this.idTv = (TextView) findViewById(R.id.contractor_detail_id);
+        this.phoneTv = (TextView) findViewById(R.id.contractor_detail_phone);
+        this.emailTv = (TextView) findViewById(R.id.contractor_detail_email);
         this.portraitIv = (ImageView) findViewById(R.id.contractor_detail_img);
 
         this.fragmentManager = this.getFragmentManager();
@@ -73,8 +77,10 @@ public class ContractorDetail extends AppCompatActivity {
     }
 
     public void updateView() {
-        nameTv.setText(contractor.getFullName());
-        idTv.setText("" + contractor.getId());
+        this.nameTv.setText(contractor.getFullName());
+        this.idTv.setText("" + contractor.getId());
+        this.emailTv.setText(contractor.getEmail());
+        this.phoneTv.setText(contractor.getPhone());
 
         Glide.with(ContractorDetail.this)
                 .load(contractor.getPortrait())
