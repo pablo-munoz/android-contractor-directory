@@ -11,6 +11,17 @@
     android:orientation="vertical"
     tools:context="munoz.pablo.directorio.activities.ContractorRegistration">
 
+    <TextView
+        android:id="@+id/contractor_registration_category_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Categoría"/>
+
+    <Spinner
+        android:id="@+id/contractor_registration_category"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"></Spinner>
+
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -56,5 +67,6 @@
         android:layout_height="wrap_content"
         android:id="@+id/register_button"
         android:text="Registrar"/>
+
 
 </LinearLayout>

@@ -49,4 +49,8 @@ public class ContractorCategory {
     public void setShortName(String shortName) {
         this.shortName = shortName;
     }
+
+    public String toString() {
+        return this.name;
+    }
 }
