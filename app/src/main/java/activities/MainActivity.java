@@ -127,6 +127,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                 activity.loadingFragment.removeFromManager(activity.fragmentManager);
+                activity.categoriesAdapter.clear();
                 activity.categoriesAdapter.addAll(activity.contractorCategoryList);
             }
 

@@ -20,7 +20,7 @@ router.route('/')
               `AND map.contractor_category_id = '${request.query.contractor_category}'` :
               '';
         const query = `
-SELECT contractor.*
+SELECT DISTINCT contractor.*
 FROM contractor
 JOIN contractor_category_map AS map
   ON contractor.id = map.contractor_id
