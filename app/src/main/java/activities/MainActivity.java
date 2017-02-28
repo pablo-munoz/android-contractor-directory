@@ -1,5 +1,8 @@
 package activities;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +21,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import adapters.ContractorCategoryAdapter;
+import fragments.LoadingFragment;
 import models.ContractorCategory;
 import models.ModelBuilder;
 import munoz.pablo.directorio.R;
@@ -30,10 +34,19 @@ public class MainActivity extends AppCompatActivity {
     private ListView listView;
     private ModelBuilder<ContractorCategory> modelBuilder;
 
+    private FragmentManager fragmentManager;
+
+    private static String LOADING_FRAGMENT_TAG = "loadingfragment";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        this.fragmentManager = this.getFragmentManager();
+        FragmentTransaction transaction = this.fragmentManager.beginTransaction();
+        transaction.add(R.id.activity_main, LoadingFragment.newInstance("Cargando categorías..."), MainActivity.LOADING_FRAGMENT_TAG);
+        transaction.commit();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         this.setSupportActionBar(toolbar);
@@ -111,10 +124,18 @@ public class MainActivity extends AppCompatActivity {
 
                 try {
                     activity.contractorCategoryList = activity.modelBuilder.resourceListFromJson(json);
-                    activity.categoriesAdapter.addAll(activity.contractorCategoryList);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+
+                FragmentTransaction transaction = activity.fragmentManager.beginTransaction();
+                Fragment fragment = activity.fragmentManager.findFragmentByTag(MainActivity.LOADING_FRAGMENT_TAG);
+                if (fragment != null) {
+                    transaction.remove(fragment);
+                }
+                transaction.commit();
+
+                activity.categoriesAdapter.addAll(activity.contractorCategoryList);
             }
 
             @Override
