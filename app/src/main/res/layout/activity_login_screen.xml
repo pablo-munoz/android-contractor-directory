@@ -17,9 +17,9 @@
         android:ems="10"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="185dp"
+        android:layout_marginTop="150dp"
         android:hint="@string/login_email_hint"
-        android:id="@+id/login_screen_email_input" />
+        android:id="@+id/login_screen_email_input"/>
 
     <EditText
         android:layout_width="match_parent"
@@ -34,10 +34,14 @@
 
     <Button
         android:text="@string/login_button_text"
+        android:textColor="#FFF"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/login_screen_password_input"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="55dp"
-        android:id="@+id/login_screen_login_button" />
+        android:id="@+id/login_screen_login_button"
+        android:background="@drawable/rounded_button"
+        android:minHeight="40dip"
+        android:minWidth="200dip"/>
 </RelativeLayout>

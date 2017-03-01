@@ -6,6 +6,18 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
+        <!--OUR OWN PALLETTE-->
+        <item name="colorControlNormal">@color/button_default</item>
+        <item name="colorControlActivated">@color/button_pressed</item>
+        <item name="colorControlHighlight">@color/button_focused</item>
+    </style>
+
+    <!--CHANGE THE TOOLBAR TEXT COLOR OR COLORS IN GENERAL-->
+    <style name="ToolBarStyle" parent="AppTheme">
+        <item name="android:textColorPrimary">@color/colorAccent</item>
+        <item name="android:textColorSecondary">@android:color/white</item>
+        <item name="actionMenuTextColor">@android:color/white</item>
     </style>
 
 </resources>

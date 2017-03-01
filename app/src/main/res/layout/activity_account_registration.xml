@@ -15,6 +15,7 @@
         android:inputType="textEmailAddress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
         android:hint="Correo electrónico" />
 
     <EditText
@@ -23,6 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/account_registration_email"
+        android:layout_marginTop="15dp"
         android:hint="Contraseña" />
 
     <EditText
@@ -31,13 +33,20 @@
         android:inputType="textPassword"
         android:layout_height="wrap_content"
         android:layout_below="@id/account_registration_password"
+        android:layout_marginTop="15dp"
         android:hint="Confirmar contraseña" />
 
     <Button
+        android:text="Registrar"
+        android:textColor="#FFF"
         android:id="@+id/account_registration_button"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/account_registration_password_conf"
-        android:text="Registrar" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/rounded_button"
+        android:minHeight="40dip"
+        android:minWidth="200dip"/>
 
 </RelativeLayout>
