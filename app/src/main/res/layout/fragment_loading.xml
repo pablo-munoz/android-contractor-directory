@@ -5,11 +5,11 @@
     tools:context="fragments.LoadingFragment">
 
     <ImageView
-        android:layout_width="250dp"
-        android:layout_height="250dp"
+        android:layout_width="150dp"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:id="@+id/loading_fragment_image" />
+        android:id="@+id/loading_fragment_image"
+        android:layout_height="150dp" />
 
     <TextView
         android:layout_width="match_parent"
@@ -17,5 +17,6 @@
         android:textAlignment="center"
         android:textSize="20sp"
         android:layout_below="@+id/loading_fragment_image"
-        android:id="@+id/loading_fragment_message" />
+        android:id="@+id/loading_fragment_message"
+        android:visibility="invisible" />
 </RelativeLayout>

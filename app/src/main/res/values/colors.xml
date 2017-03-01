@@ -1,6 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--DEFAULT COLORS BY ANDROID STUDIO>
     <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimaryDark">#384066</color>
+    <color name="colorAccent">#F05D5E</color-->
+
+
+    <!--OUR COLOR PALLETTE-->
+    <color name="colorPrimary">#A8CA8D</color>
+    <color name="colorPrimaryDark">#81AD7B</color>
+    <color name="colorAccent">#5B714E</color>
+
+    <!--BUTTON COLLORS-->
+    <color name="button_default">#5B714E</color>
+    <!--color name="button_default">#23608C</color-->
+    <color name="button_pressed">#81AD7B</color>
+    <color name="button_focused">#81AD7B</color>
+
+    <!--LIST VIEW COLLORS-->
+    <color name="list_separator">#23647A</color>
+    <color name="list_selector_read">#BED0CA</color>
+    <color name="list_selector_unread">#97AEA7</color>
+    <color name="list_container_bg">#FAFAF5</color>
+
+
+
+
+
+
 </resources>

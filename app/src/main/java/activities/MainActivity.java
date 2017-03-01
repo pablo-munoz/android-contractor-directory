@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         this.fragmentManager = this.getFragmentManager();
-        this.loadingFragment = LoadingFragment.newInstance("Cargando información de categorías");
+        this.loadingFragment = LoadingFragment.newInstance("");
         this.loadingFragment.addToManager(this.fragmentManager, R.id.activity_main_container);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

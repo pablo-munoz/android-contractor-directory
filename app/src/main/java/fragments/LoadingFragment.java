@@ -74,7 +74,8 @@ public class LoadingFragment extends Fragment {
         this.messageTv.setText(this.message);
 
         Glide.with(view.getContext())
-                .load("https://s-media-cache-ak0.pinimg.com/originals/49/8f/77/498f7727ecf2a588d6c3eebac92a7c4b.gif")
+        //https://s-media-cache-ak0.pinimg.com/originals/49/8f/77/498f7727ecf2a588d6c3eebac92a7c4b.gif
+                .load("https://d13yacurqjgara.cloudfront.net/users/583436/screenshots/1686759/spherewave.gif")
                 .asGif()
                 .fitCenter()
                 .crossFade()
