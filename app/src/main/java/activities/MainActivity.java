@@ -91,7 +91,9 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_refresh:
-                MainActivity.this.loadingFragment.addToManager(MainActivity.this.fragmentManager, R.id.activity_main_container);
+                if (this.loadingFragment.isDetached()) {
+                    MainActivity.this.loadingFragment.addToManager(MainActivity.this.fragmentManager, R.id.activity_main_container);
+                }
                 MainActivity.this.pullContractorCategoriesData();
                 return true;
 

@@ -42,29 +42,7 @@
         creates=/home/ubuntu/.nvm/alias
 
     - name: Install app dependencies with npm
-      command: /bin/bash -c "cd /vagrant && source ~/.nvm/nvm.sh && {{ node_dir }}/bin/npm install"
-
-    - name: Ensure pm2 is installed globally
-      command: >
-        /bin/bash -c "source ~/.nvm/nvm.sh && {{ node_dir }}/bin/npm install pm2 --global"
-        creates={{ node_dir }}/bin/pm2
-
-    - name: Get the server daemon running
-      ignore_errors: yes
-      command: >
-        /bin/bash -c "source ~/.nvm/nvm.sh && {{ node_dir }}/bin/pm2 start /vagrant/api/api.js --watch"
-
-    - name: Make it so that app will start on o.s. startup
-      become: yes
-      command: >
-        /bin/bash -c "source /home/ubuntu/.nvm/nvm.sh && {{ node_dir }}/bin/pm2 startup upstart"
-
-    - name: Run command that pm2 requests
-      become: yes
-      command: >
-        env PATH=$PATH:/home/ubuntu/.nvm/versions/node/v7.5.0/bin /home/ubuntu/.nvm/versions/node/v7.5.0/lib/node_modules/pm2/bin/pm2 startup upstart -u ubuntu --hp /home/ubuntu
-        && touch /tmp/pm2startup
-        creates=pm2startup
+      command: /bin/bash -c "cd /vagrant && source ~/.nvm/nvm.sh && {{ node_dir }}/bin/npm install --no-bin-links"
 
     - name: Copy nginx configuration
       become: yes
