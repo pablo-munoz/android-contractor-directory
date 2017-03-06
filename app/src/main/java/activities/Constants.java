@@ -5,5 +5,6 @@ package activities;
  */
 
 public class Constants {
-    public static String API_URL = "http://192.168.33.10:3000/";
+    // For using your own phone make it http://<your ip>:3333
+    public static String API_URL = "http://192.168.33.10:3000";
 }
