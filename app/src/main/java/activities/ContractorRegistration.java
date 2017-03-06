@@ -90,7 +90,7 @@ public class ContractorRegistration extends AppCompatActivity {
             }
         });
 
-        apiRequest.execute(APIRequest.HTTP_GET, "http://192.168.33.10:3000/api/v1/contractor_category");
+        apiRequest.execute(APIRequest.HTTP_GET, Constants.API_URL + "/api/v1/contractor_category");
     }
 
     void populateCategorySpinner() {
@@ -147,6 +147,6 @@ public class ContractorRegistration extends AppCompatActivity {
             }
         });
 
-        apiRequest.execute(APIRequest.HTTP_POST, "http://192.168.33.10:3000/api/v1/contractor", json.toString());
+        apiRequest.execute(APIRequest.HTTP_POST, Constants.API_URL + "/api/v1/contractor", json.toString());
     }
 }

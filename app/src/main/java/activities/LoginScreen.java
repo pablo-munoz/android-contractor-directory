@@ -61,6 +61,6 @@ public class LoginScreen extends AppCompatActivity {
             }
         });
 
-        apiRequest.execute(APIRequest.HTTP_POST, "http://192.168.33.10:3000/api/v1/auth/login", body.toString());
+        apiRequest.execute(APIRequest.HTTP_POST, Constants.API_URL + "/api/v1/auth/login", body.toString());
     }
 }

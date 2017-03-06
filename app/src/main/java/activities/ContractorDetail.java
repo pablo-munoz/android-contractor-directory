@@ -73,7 +73,7 @@ public class ContractorDetail extends AppCompatActivity {
             }
         });
 
-        apiRequest.execute(APIRequest.HTTP_GET, "http://192.168.33.10:3000/api/v1/contractor/" + contractorId);
+        apiRequest.execute(APIRequest.HTTP_GET, Constants.API_URL + "/api/v1/contractor/" + contractorId);
     }
 
     public void updateView() {
