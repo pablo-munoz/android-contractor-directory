@@ -85,15 +85,19 @@ public class LoadingFragment extends Fragment {
     }
 
     public void addToManager(FragmentManager manager, int containerId) {
-        FragmentTransaction transaction = manager.beginTransaction();
-        transaction.add(containerId, this, "loading");
-        transaction.commit();
+        if (!this.isAdded()) {
+            FragmentTransaction transaction = manager.beginTransaction();
+            transaction.add(containerId, this, "loading");
+            transaction.commit();
+        }
     }
 
     public void removeFromManager(FragmentManager manager) {
-        FragmentTransaction transaction = manager.beginTransaction();
-        transaction.remove(this);
-        transaction.commit();
+        if (this.isAdded()) {
+            FragmentTransaction transaction = manager.beginTransaction();
+            transaction.remove(this);
+            transaction.commit();
+        }
     }
 
 }

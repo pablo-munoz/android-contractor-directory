@@ -15,3 +15,10 @@
   shuts down and doesn't consume resources.
 - In the future you will want to pull the changes from the repository with
   `git pull` and issue another `vagrant up`
+
+
+For the application to be previewable in your own device yout first
+have to determine what is the ip of the computer you are running the
+server on (ipconfig for windows or ifconfig for linux). Next you have
+to edit the Constants.java class in the android studio files. You have
+to paste your ip instead of the 192.168.33.10 and make the port 3333.
