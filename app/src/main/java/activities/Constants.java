@@ -5,5 +5,5 @@ package activities;
  */
 
 public class Constants {
-    public static String API_URL = "http://192.168.33.10:3000/";
+    public static String API_URL = "http://10.43.54.82:3333";
 }
