@@ -17,12 +17,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import fragments.ContractorCategoryMenu;
+import fragments.Login;
 import munoz.pablo.directorio.R;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String contentFragmentTag = "content";
+    private static final int MENU_LOGIN = Menu.FIRST;
+
+    private NavigationView navigationView;
 
     private FragmentManager fragmentManager;
 
@@ -48,13 +52,16 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        this.navigationView = (NavigationView) findViewById(R.id.nav_view);
+        this.navigationView.setNavigationItemSelectedListener(this);
 
         this.fragmentManager = this.getFragmentManager();
+
+        // Insert the first fragment directly, instead of using changeContentFragment method
+        // to enable history and backward navigation
         FragmentTransaction transaction = this.fragmentManager.beginTransaction();
-        transaction.add(R.id.main_activity_content, new ContractorCategoryMenu(), MainActivity.contentFragmentTag);
-        transaction.commit();
+        transaction.add(R.id.main_activity_content, new ContractorCategoryMenu(), contentFragmentTag)
+                .commit();
     }
 
     @Override
@@ -95,7 +102,9 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.nav_login) {
+            this.changeContentFragment(new Login());
+        } else if (id == R.id.nav_camera) {
             // Handle the camera action
         } else if (id == R.id.nav_gallery) {
 
@@ -116,9 +125,12 @@ public class MainActivity extends AppCompatActivity
 
     public void changeContentFragment(Fragment newFragment) {
         FragmentTransaction transaction = this.fragmentManager.beginTransaction();
-        transaction.remove(
-                this.fragmentManager.findFragmentByTag(contentFragmentTag));
-        transaction.add(R.id.main_activity_content, newFragment, contentFragmentTag);
-        transaction.commit();
+        if (this.fragmentManager.findFragmentByTag(contentFragmentTag) != null) {
+            transaction.remove(
+                    this.fragmentManager.findFragmentByTag(contentFragmentTag));
+        }
+        transaction.add(R.id.main_activity_content, newFragment, contentFragmentTag)
+                .addToBackStack(null)
+                .commit();
     }
 }
