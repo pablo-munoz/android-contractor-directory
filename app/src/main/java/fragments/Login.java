@@ -3,10 +3,9 @@ package fragments;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.Fragment;
 import android.os.Build;
 import android.os.Bundle;
-import android.app.Fragment;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -108,6 +107,16 @@ public class Login extends Fragment {
 
         this.mLoginFormView = view.findViewById(R.id.login_form);
         this.mProgressView = view.findViewById(R.id.login_progress);
+
+        Button goToRegistrationButton = (Button) view.findViewById(R.id.go_to_registration_button);
+        goToRegistrationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Login self = Login.this;
+                MainActivity mainActivity = (MainActivity) self.getActivity();
+                mainActivity.changeContentFragment(new RegistrationFragment());
+            }
+        });
 
         return view;
     }
