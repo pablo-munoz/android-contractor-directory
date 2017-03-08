@@ -137,8 +137,8 @@ public class ContractorRegistration extends AppCompatActivity {
 
             @Override
             public void onSuccess(JSONObject json, int code) {
-                Intent intent = new Intent(activity, MainActivity.class);
-                startActivity(intent);
+                // Intent intent = new Intent(activity, MainActivity2.class);
+                // startActivity(intent);
             }
 
             @Override

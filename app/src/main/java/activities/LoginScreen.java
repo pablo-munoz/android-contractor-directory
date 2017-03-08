@@ -50,9 +50,9 @@ public class LoginScreen extends AppCompatActivity {
         APIRequest apiRequest = new APIRequest(new APIRequest.APIRequestCallback() {
             @Override
             public void onSuccess(JSONObject json, int code) {
-                Toast.makeText(LoginScreen.this, "Login successful", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(LoginScreen.this, MainActivity.class);
-                startActivity(intent);
+                // Toast.makeText(LoginScreen.this, "Login successful", Toast.LENGTH_LONG).show();
+                // Intent intent = new Intent(LoginScreen.this, MainActivity2.class);
+                // startActivity(intent);
             }
 
             @Override

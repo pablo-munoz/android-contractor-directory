@@ -56,9 +56,9 @@ public class AccountRegistration extends AppCompatActivity {
                 APIRequest apiRequest = new APIRequest(new APIRequest.APIRequestCallback() {
                     @Override
                     public void onSuccess(JSONObject json, int code) {
-                        Toast.makeText(activity, "Registro exitoso.", Toast.LENGTH_LONG).show();
-                        Intent intent = new Intent(activity, MainActivity.class);
-                        startActivity(intent);
+                        // Toast.makeText(activity, "Registro exitoso.", Toast.LENGTH_LONG).show();
+                        // Intent intent = new Intent(activity, MainActivity2.class);
+                        // startActivity(intent);
                     }
 
                     @Override

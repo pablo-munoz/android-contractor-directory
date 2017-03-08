@@ -17,11 +17,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="activities.ContractorsByCategory" />
-        <activity android:name="activities.ContractorDetail" />
         <activity android:name="activities.ContractorRegistration" />
         <activity android:name="activities.LoginScreen" />
-        <activity android:name="activities.AccountRegistration"></activity>
+        <activity android:name="activities.AccountRegistration" />
+
     </application>
 
 </manifest>
