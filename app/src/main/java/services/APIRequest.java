@@ -15,6 +15,9 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Iterator;
+
+import munoz.pablo.directorio.AuthHelper;
 
 /**
  * Created by pablo on 2/14/2017.
@@ -33,63 +36,75 @@ public class APIRequest extends AsyncTask<String, Void, JSONObject> {
         this.listener = listener;
     }
 
+    private void setConnectionHeaders(HttpURLConnection connection, String headers) {
+        JSONObject jsonHeaders;
+
+        try {
+           jsonHeaders = new JSONObject(headers);
+
+            Iterator<String> headerNameIterator = jsonHeaders.keys();
+
+            String headerName;
+            while (headerNameIterator.hasNext()) {
+                headerName = headerNameIterator.next();
+                connection.setRequestProperty(headerName, jsonHeaders.getString(headerName));
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.e("APIRequest", "Must pass headers as a json valid string.");
+        }
+    }
+
     @Override
     protected JSONObject doInBackground(String... params) {
         JSONObject result = null;
+        JSONObject headers = null;
+
+        boolean hasHeaders = params.length >= 3 && params[2] != null;
+
         try {
             URL url = new URL(params[1]);
 
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+            if (hasHeaders) this.setConnectionHeaders(connection, params[2]);
+
             if (params[0].equals(APIRequest.HTTP_GET)) {
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-                this.code = connection.getResponseCode();
-
-                if (code == HttpURLConnection.HTTP_OK ||
-                        code == HttpURLConnection.HTTP_CREATED) {
-                    InputStream is = connection.getInputStream();
-                    BufferedReader br = new BufferedReader(new InputStreamReader(is));
-                    StringBuilder sb = new StringBuilder();
-                    String currentLine = "";
-
-                    while ((currentLine = br.readLine()) != null) {
-                        sb.append(currentLine);
-                    }
-
-                    result = new JSONObject(sb.toString());
-                } else {
-                    this.hasErrors = true;
-                }
             } else if (params[0].equals(APIRequest.HTTP_POST)) {
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("POST");
                 connection.setDoInput(true);
                 connection.setDoOutput(true);
+
                 connection.setRequestProperty("Content-Type", "application/json");
                 connection.setRequestProperty("Accept", "application/json");
-                connection.connect();
 
                 OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
-                wr.write(params[2]);
+                wr.write(params[3]);
                 wr.flush();
+            }
 
-                this.code = connection.getResponseCode();
-                Log.d("CODE", ""+this.code);
 
-                if (this.code == HttpURLConnection.HTTP_OK ||
-                        this.code == HttpURLConnection.HTTP_CREATED) {
-                                        InputStream is = connection.getInputStream();
-                    BufferedReader br = new BufferedReader(new InputStreamReader(is));
-                    StringBuilder sb = new StringBuilder();
-                    String currentLine = "";
+            connection.connect();
 
-                    while ((currentLine = br.readLine()) != null) {
-                        sb.append(currentLine);
-                    }
+            this.code = connection.getResponseCode();
+            Log.d("CODE", ""+this.code);
 
-                    result = new JSONObject(sb.toString());
-                } else {
-                    this.hasErrors = true;
+            if (this.code == HttpURLConnection.HTTP_OK ||
+                    this.code == HttpURLConnection.HTTP_CREATED) {
+                InputStream is = connection.getInputStream();
+                BufferedReader br = new BufferedReader(new InputStreamReader(is));
+                StringBuilder sb = new StringBuilder();
+                String currentLine = "";
+
+                while ((currentLine = br.readLine()) != null) {
+                    sb.append(currentLine);
                 }
+
+                result = new JSONObject(sb.toString());
+            } else {
+                this.hasErrors = true;
             }
         } catch(MalformedURLException e) {
             e.printStackTrace();

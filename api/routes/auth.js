@@ -3,6 +3,8 @@ const router = express.Router();
 const Promise = require('bluebird');
 
 const _ = require('lodash');
+const jwt = require('jsonwebtoken');
+
 const constants = require('../constants');
 const db = require('../db');
 const utils = require('../utils');
@@ -48,13 +50,16 @@ SELECT * FROM account WHERE email = lower('${body.email}') AND
             .then((result) => {
                 if (result.rows.length == 1) {
                     response.status(200).json({
-                        status: 'success'
+                        token: jwt.sign({
+                            account_id: result.rows[0].id,
+                        }, constants.AUTH_SECRET, { expiresIn: '2d' })
                     });
                 } else {
                     response.status(403).end();
                 }
             })
             .catch((error) => {
+                console.error(error);
                 response.status(400).json({
                     status: 'failure processing authentication'
                 });

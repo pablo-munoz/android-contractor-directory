@@ -11,6 +11,7 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
@@ -20,6 +21,7 @@ import org.json.JSONObject;
 import activities.Constants;
 import models.Contractor;
 import models.ModelBuilder;
+import munoz.pablo.directorio.AuthHelper;
 import munoz.pablo.directorio.R;
 import services.APIRequest;
 
@@ -34,7 +36,8 @@ public class ContractorDetail extends Fragment {
     private TextView phoneTv;
     private TextView emailTv;
     private ImageView portraitIv;
-    private RatingBar ratingBar;
+    private RatingBar overallRatingBar;
+    private RatingBar myRatingBar;
 
     private Contractor contractor;
     private ModelBuilder<Contractor> modelBuilder;
@@ -86,7 +89,38 @@ public class ContractorDetail extends Fragment {
         this.emailTv = (TextView) view.findViewById(R.id.contractor_detail_email);
         this.phoneTv = (TextView) view.findViewById(R.id.contractor_detail_phone);
         this.portraitIv = (ImageView) view.findViewById(R.id.contractor_detail_img);
-        this.ratingBar = (RatingBar) view.findViewById(R.id.contractor_detail_rating_bar);
+        this.overallRatingBar = (RatingBar) view.findViewById(R.id.contractor_detail_rating_bar);
+
+        this.myRatingBar = (RatingBar) view.findViewById(R.id.contractor_detail_my_rating_bar);
+        this.myRatingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                if (!fromUser) return;
+
+                String token = AuthHelper.getAuthToken(getActivity());
+
+                APIRequest apiRequest = new APIRequest(new APIRequest.APIRequestCallback() {
+                    @Override
+                    public void onSuccess(JSONObject json, int code) {
+                        Toast.makeText(getActivity(), "Rating updated succesfully.", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onError(String errorMessage, int code) {
+
+                    }
+                });
+
+                String url = Constants.API_URL + "/api/v1/contractor/" + contractorId + "/rate/" + rating;
+                Toast.makeText(getActivity(), url, Toast.LENGTH_SHORT).show();
+
+                apiRequest.execute(
+                        APIRequest.HTTP_POST,
+                        url,
+                        "{ \"Authorization\": \"Bearer " + token + "\" }",
+                        "{}");
+            }
+        });
 
         this.modelBuilder = new ModelBuilder<>();
 
@@ -123,7 +157,8 @@ public class ContractorDetail extends Fragment {
         this.idTv.setText("" + this.contractor.getId());
         this.emailTv.setText(this.contractor.getEmail());
         this.phoneTv.setText(this.contractor.getPhone());
-        this.ratingBar.setRating(this.contractor.getRating());
+        this.overallRatingBar.setRating(this.contractor.getRating());
+        this.myRatingBar.setRating(4);
 
         Glide.with(ContractorDetail.this)
                 .load(this.contractor.getPortrait())

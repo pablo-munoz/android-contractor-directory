@@ -4,6 +4,8 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Fragment;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -122,49 +124,6 @@ public class Login extends Fragment {
     }
 
 
-    // private void populateAutoComplete() {
-    //     if (!mayRequestContacts()) {
-    //         return;
-    //     }
-
-    //     getLoaderManager().initLoader(0, null, this);
-    // }
-
-    // private boolean mayRequestContacts() {
-    //     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-    //         return true;
-    //     }
-    //     if (checkSelfPermission(READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
-    //         return true;
-    //     }
-    //     if (shouldShowRequestPermissionRationale(READ_CONTACTS)) {
-    //         Snackbar.make(mEmailView, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
-    //                 .setAction(android.R.string.ok, new View.OnClickListener() {
-    //                     @Override
-    //                     @TargetApi(Build.VERSION_CODES.M)
-    //                     public void onClick(View v) {
-    //                         requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
-    //                     }
-    //                 });
-    //     } else {
-    //         requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
-    //     }
-    //     return false;
-    // }
-
-    /**
-     * Callback received when a permissions request has been completed.
-     */
-    // @Override
-    // public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-    //                                        @NonNull int[] grantResults) {
-    //     if (requestCode == REQUEST_READ_CONTACTS) {
-    //         if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-    //             populateAutoComplete();
-    //         }
-    //     }
-    // }
-
 
     /**
      * Attempts to sign in or register the account specified by the login form.
@@ -185,8 +144,19 @@ public class Login extends Fragment {
             @Override
             public void onSuccess(JSONObject json, int code) {
                 Toast.makeText(Login.this.getView().getContext(), "Login successful", Toast.LENGTH_LONG).show();
+
+                SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                try {
+                    editor.putString(getString(R.string.shared_preferences_token_attr_name), json.getString("token"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                editor.apply();
+
                 MainActivity mainActivity = (MainActivity) Login.this.getActivity();
                 mainActivity.changeContentFragment(new ContractorCategoryMenu());
+
             }
 
             @Override

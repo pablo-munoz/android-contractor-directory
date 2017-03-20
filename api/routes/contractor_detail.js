@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 
 const _ = require('lodash');
+const jwt = require('jsonwebtoken');
+
 const constants = require('../constants');
 const db = require('../db');
 const utils = require('../utils');
@@ -9,10 +11,9 @@ const dbconfig = require('../dbconfig');
 const route_utils = require('./route_utils');
 
 
-
 router.route('/:id')
 
-    // G E T
+// G E T
     .get((request, response) => {
         const contractor_id = request.params.id;
         const query = `
@@ -114,7 +115,7 @@ WHERE contractor_id = '${contractor_id}';
             });
     })
 
-    // D E L E T E
+// D E L E T E
     .delete((request, response) => {
         const contractor_id = request.params.id;
         const query = `
@@ -141,9 +142,32 @@ router.route('/:id/rate/:rating')
     .post((request, response) => {
         const rating = parseFloat(request.params.rating);
 
-        if (rating != parseFloat('nan')) {
+        function handler(error, decoded) {
+            if (error) response.status(400).end();
+            if (rating == parseFloat('nan')) {
+                console.log(`Rating attempt from ${decoded.account_id} of ${request.params.rating} with non numeric value.`);
+                response.status(400).end();
+            }
+
+            const query = `
+INSERT INTO contractor_rating (account_id, contractor_id, rating)
+VALUES ('${decoded.account_id}', '${request.params.id}', ${request.params.rating})
+ON CONFLICT (account_id, contractor_id) DO UPDATE
+SET rating = ${request.params.rating};
+`;
+
+            db.raw(query)
+                .then(result => response.status(200).end())
+                .catch(error => {
+                    console.error(error);
+                    response.status(400).send(error)
+                });
 
         }
+
+        jwt.verify(request.header('Authorization').split(' ')[1],
+                   constants.AUTH_SECRET,
+                   handler);
     });
 
 

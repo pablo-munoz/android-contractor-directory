@@ -46,11 +46,10 @@
             />
 
         <RatingBar
-            android:id="@+id/contractor_detail_your_rating_bar"
+            android:id="@+id/contractor_detail_my_rating_bar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:numStars="5"
-            android:isIndicator="true"
             />
 
         <ImageView
