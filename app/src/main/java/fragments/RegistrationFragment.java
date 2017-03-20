@@ -122,7 +122,7 @@ public class RegistrationFragment extends Fragment {
                     }
                 });
 
-                apiRequest.execute(APIRequest.HTTP_POST, Constants.API_URL + "/api/v1/auth/register", json.toString());
+                apiRequest.execute(APIRequest.HTTP_POST, Constants.API_URL + "/api/v1/auth/register", null, json.toString());
             }
         });
 

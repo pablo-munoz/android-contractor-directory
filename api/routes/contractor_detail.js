@@ -18,7 +18,7 @@ router.route('/:id')
         const contractor_id = request.params.id;
         const query = `
 SELECT *
-FROM contractor
+FROM contractor_summary
 WHERE id = '${contractor_id}';
 `;
 

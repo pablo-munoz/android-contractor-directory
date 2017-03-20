@@ -102,17 +102,14 @@ public class ContractorDetail extends Fragment {
                 APIRequest apiRequest = new APIRequest(new APIRequest.APIRequestCallback() {
                     @Override
                     public void onSuccess(JSONObject json, int code) {
-                        Toast.makeText(getActivity(), "Rating updated succesfully.", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     public void onError(String errorMessage, int code) {
-
                     }
                 });
 
                 String url = Constants.API_URL + "/api/v1/contractor/" + contractorId + "/rate/" + rating;
-                Toast.makeText(getActivity(), url, Toast.LENGTH_SHORT).show();
 
                 apiRequest.execute(
                         APIRequest.HTTP_POST,
@@ -157,7 +154,7 @@ public class ContractorDetail extends Fragment {
         this.idTv.setText("" + this.contractor.getId());
         this.emailTv.setText(this.contractor.getEmail());
         this.phoneTv.setText(this.contractor.getPhone());
-        this.overallRatingBar.setRating(this.contractor.getRating());
+        this.overallRatingBar.setRating((float) this.contractor.getRating());
         this.myRatingBar.setRating(4);
 
         Glide.with(ContractorDetail.this)

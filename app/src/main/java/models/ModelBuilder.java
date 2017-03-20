@@ -100,7 +100,7 @@ public class ModelBuilder<ModelType>  {
                     ModelBuilder.getJSONString(resourceAttributes, "phone"),
                     ModelBuilder.getJSONString(resourceAttributes, "website"),
                     "http://ewic.org/wp-content/themes/ewic/images/Construction%20Worker.png",
-                    3
+                    resourceAttributes.getDouble("avg_rating")
             );
         } else {
             throw new JSONException("I don't know how to parse the given model type.");

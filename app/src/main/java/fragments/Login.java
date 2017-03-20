@@ -165,7 +165,7 @@ public class Login extends Fragment {
             }
         });
 
-        apiRequest.execute(APIRequest.HTTP_POST, Constants.API_URL + "/api/v1/auth/login", body.toString());
+        apiRequest.execute(APIRequest.HTTP_POST, Constants.API_URL + "/api/v1/auth/login", null, body.toString());
     }
 
     private boolean isEmailValid(String email) {

@@ -15,11 +15,11 @@ public class Contractor{
     private String phone;
     private String website;
     private String portrait;
-    private int rating;
+    private double rating;
 
 
     public Contractor(String id, String firstName, String middleName, String lastName, String email,
-                      String phone, String website, String portrait, int rating) {
+                      String phone, String website, String portrait, double rating) {
         this.id = id;
         this.firstName = firstName;
         this.middleName = middleName;
@@ -91,7 +91,7 @@ public class Contractor{
         this.portrait = portrait;
     }
 
-    public int getRating() {
+    public double getRating() {
         return this.rating;
     }
 
