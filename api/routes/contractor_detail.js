@@ -137,5 +137,14 @@ WHERE contractor.id = '${contractor_id}';
     });
 
 
+router.route('/:id/rate/:rating')
+    .post((request, response) => {
+        const rating = parseFloat(request.params.rating);
+
+        if (rating != parseFloat('nan')) {
+
+        }
+    });
+
 
 module.exports = router;

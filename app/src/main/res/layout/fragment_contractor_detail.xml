@@ -27,6 +27,32 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+        <!-- The first rating bar is the overall rating of
+        the contractor. The second rating bar is the
+        rating that the user has given. -->
+        <RatingBar
+            android:id="@+id/contractor_detail_rating_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:numStars="5"
+            android:isIndicator="true"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:text="Your rating:"
+            />
+
+        <RatingBar
+            android:id="@+id/contractor_detail_your_rating_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:numStars="5"
+            android:isIndicator="true"
+            />
+
         <ImageView
             android:id="@+id/contractor_detail_img"
             android:layout_width="match_parent"

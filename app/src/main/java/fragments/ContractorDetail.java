@@ -7,7 +7,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -32,6 +34,8 @@ public class ContractorDetail extends Fragment {
     private TextView phoneTv;
     private TextView emailTv;
     private ImageView portraitIv;
+    private RatingBar ratingBar;
+
     private Contractor contractor;
     private ModelBuilder<Contractor> modelBuilder;
 
@@ -82,6 +86,7 @@ public class ContractorDetail extends Fragment {
         this.emailTv = (TextView) view.findViewById(R.id.contractor_detail_email);
         this.phoneTv = (TextView) view.findViewById(R.id.contractor_detail_phone);
         this.portraitIv = (ImageView) view.findViewById(R.id.contractor_detail_img);
+        this.ratingBar = (RatingBar) view.findViewById(R.id.contractor_detail_rating_bar);
 
         this.modelBuilder = new ModelBuilder<>();
 
@@ -114,14 +119,15 @@ public class ContractorDetail extends Fragment {
     }
 
     public void updateView() {
-        this.nameTv.setText(contractor.getFullName());
-        this.idTv.setText("" + contractor.getId());
-        this.emailTv.setText(contractor.getEmail());
-        this.phoneTv.setText(contractor.getPhone());
+        this.nameTv.setText(this.contractor.getFullName());
+        this.idTv.setText("" + this.contractor.getId());
+        this.emailTv.setText(this.contractor.getEmail());
+        this.phoneTv.setText(this.contractor.getPhone());
+        this.ratingBar.setRating(this.contractor.getRating());
 
         Glide.with(ContractorDetail.this)
-                .load(contractor.getPortrait())
+                .load(this.contractor.getPortrait())
                 .fitCenter()
-                .into(portraitIv);
+                .into(this.portraitIv);
     }
 }

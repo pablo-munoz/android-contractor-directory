@@ -46,7 +46,6 @@ public class ContractorAdapter extends ArrayAdapter<Contractor> {
 
         nameTv.setText(contractor.getFullName());
 
-        ratingBar.setNumStars(5);
         ratingBar.setRating(contractor.getRating());
 
         TextView phoneTv = (TextView) convertView.findViewById(R.id.contractor_card_phone);
