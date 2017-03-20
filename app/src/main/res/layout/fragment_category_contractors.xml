@@ -21,4 +21,10 @@
             android:layout_height="wrap_content"/>
     </RelativeLayout>
 
+    <TextView
+        android:id="@+id/category_contractors_empty_query_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"/>
+
 </RelativeLayout>

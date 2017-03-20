@@ -47,6 +47,7 @@ public class CategoryContractors extends Fragment {
     private ModelBuilder<Contractor> contractorModelBuilder;
 
     private TextView titleTv;
+    private TextView emptyQueryTv;
 
     public CategoryContractors() {
         // Required empty public constructor
@@ -82,6 +83,7 @@ public class CategoryContractors extends Fragment {
         View view = inflater.inflate(R.layout.fragment_category_contractors, container, false);
 
         this.titleTv = (TextView) view.findViewById(R.id.category_contractors_title);
+        this.emptyQueryTv = (TextView) view.findViewById(R.id.category_contractors_empty_query_label);
 
         this.contractorList = new ArrayList<>();
         this.categoryModelBuilder = new ModelBuilder<>();
@@ -143,8 +145,16 @@ public class CategoryContractors extends Fragment {
             @Override
             public void onSuccess(JSONObject json, int code) {
                 try {
-                    contractorList = contractorModelBuilder.resourceListFromJson(json);
-                    adapter.addAll(contractorList);
+                    int count = json.getJSONObject("meta").getInt("count");
+
+                    if (count !=0) {
+                        contractorList = contractorModelBuilder.resourceListFromJson(json);
+                        adapter.addAll(contractorList);
+                    } else {
+                        emptyQueryTv.setText("No se ha encontrado nada.");
+                    }
+
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

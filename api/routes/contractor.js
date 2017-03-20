@@ -34,10 +34,13 @@ ${ categoryFilter };
                 // demonstrating the loading screen during the
                 // presentation and should be removed before release.
                 setTimeout(() =>
-                response.json({
-                    data: route_utils.serialize_resource_list_to_json_api(
-                        dbconfig.contractor, result.rows)
-                }), 3000);
+                           response.json({
+                               meta: {
+                                   count: result.rows.length
+                               },
+                               data: route_utils.serialize_resource_list_to_json_api(
+                                   dbconfig.contractor, result.rows)
+                           }), 3000);
             })
             .catch((error) => {
                 console.error(error);
