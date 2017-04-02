@@ -58,6 +58,21 @@ WHERE contractor_id = '${contractor_id}';
                 const rows = result.rows;
                 response_obj.relationships.category.data =
                     _.map(rows, r => ({ type: 'contractor_category', id: r.contractor_category_id }));
+            })
+            .then((result) => {
+                const query3 = `
+SELECT * FROM contractor_comment
+WHERE contractor_id = '${contractor_id}'
+ORDER BY date_created;`;
+
+                return db.raw(query3);
+            })
+            .then((result) => {
+                response_obj.relationships.comment = {
+                    data: result.rows
+                };
+            })
+            .then((result) => {
                 response.json(response_obj);
             })
             .catch((error) => {
@@ -144,6 +159,7 @@ router.route('/:id/rate/:rating')
 
         function handler(error, decoded) {
             if (error) response.status(400).end();
+
             if (rating == parseFloat('nan')) {
                 console.log(`Rating attempt from ${decoded.account_id} of ${request.params.rating} with non numeric value.`);
                 response.status(400).end();
@@ -168,6 +184,32 @@ SET rating = ${request.params.rating};
         jwt.verify(request.header('Authorization').split(' ')[1],
                    constants.AUTH_SECRET,
                    handler);
+    });
+
+
+router.route('/:id/comment')
+    .post((request, response) => {
+
+        function handler(error, decoded) {
+            if (error) response.status(400).end();
+
+            const query = `
+INSERT INTO contractor_comment (account_id, contractor_id, content)
+VALUES ('${decoded.account_id}', '${request.params.id}', '${request.body.content}')
+RETURNING *;`
+
+            db.raw(query)
+                .then(result => response.json(result.rows[0]))
+                .catch(error => {
+                    console.error(error);
+                    response.status(400).end();
+                });
+        }
+
+        jwt.verify(request.header('Authorization').split(' ')[1],
+                   constants.AUTH_SECRET,
+                   handler);
+
     });
 
 

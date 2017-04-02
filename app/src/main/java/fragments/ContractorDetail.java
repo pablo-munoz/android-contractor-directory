@@ -8,17 +8,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityNodeInfo;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import activities.Constants;
+import adapters.JSONArrayAdapter;
 import models.Contractor;
 import models.ModelBuilder;
 import munoz.pablo.directorio.AuthHelper;
@@ -38,6 +42,9 @@ public class ContractorDetail extends Fragment {
     private ImageView portraitIv;
     private RatingBar overallRatingBar;
     private RatingBar myRatingBar;
+    private ListView commentsLv;
+
+    private JSONArrayAdapter commentsAdapter;
 
     private Contractor contractor;
     private ModelBuilder<Contractor> modelBuilder;
@@ -71,13 +78,14 @@ public class ContractorDetail extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if (getArguments() != null) {
             this.contractorId = getArguments().getString(ARG_contractorId);
         }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_contractor_detail, container, false);
@@ -90,6 +98,7 @@ public class ContractorDetail extends Fragment {
         this.phoneTv = (TextView) view.findViewById(R.id.contractor_detail_phone);
         this.portraitIv = (ImageView) view.findViewById(R.id.contractor_detail_img);
         this.overallRatingBar = (RatingBar) view.findViewById(R.id.contractor_detail_rating_bar);
+        this.commentsLv = (ListView) view.findViewById(R.id.contractor_detail_lv);
 
         this.myRatingBar = (RatingBar) view.findViewById(R.id.contractor_detail_my_rating_bar);
         this.myRatingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
@@ -123,6 +132,7 @@ public class ContractorDetail extends Fragment {
 
         this.pullContractorData(contractorId);
 
+
         return view;
     }
 
@@ -138,6 +148,8 @@ public class ContractorDetail extends Fragment {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+
+
             }
 
             @Override
@@ -161,5 +173,27 @@ public class ContractorDetail extends Fragment {
                 .load(this.contractor.getPortrait())
                 .fitCenter()
                 .into(this.portraitIv);
+
+                this.commentsAdapter = new JSONArrayAdapter(getActivity(), this.contractor.getComments(),
+                new JSONArrayAdapter.ViewBuilder() {
+            @Override
+            public View construct(JSONArray data, int position, View view, ViewGroup parent) {
+                if (view == null) {
+                    view = getActivity().getLayoutInflater().inflate(R.layout.contractor_detail_comment, parent, false);
+                }
+
+                TextView contentTv = (TextView) view.findViewById(R.id.contractor_detail_comment_content);
+                try {
+                    contentTv.setText(data.getJSONObject(position).getString("content"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                return view;
+            }
+        });
+
+        this.commentsLv.setAdapter(this.commentsAdapter);
+
     }
 }

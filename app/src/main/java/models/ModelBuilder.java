@@ -38,7 +38,14 @@ public class ModelBuilder<ModelType>  {
         ModelType modelInstance = null;
         String modelType = data.getString("type");
 
-        modelInstance =  this.instantiateModel(modelType, attributes);
+        JSONObject relationships = null;
+        try {
+            relationships = apiJson.getJSONObject("relationships");
+        } catch(JSONException e) {
+            e.printStackTrace();
+        }
+
+        modelInstance =  this.instantiateModel(modelType, attributes, relationships);
 
         return modelInstance;
     }
@@ -71,14 +78,22 @@ public class ModelBuilder<ModelType>  {
             attributes.put("id", instanceId);
             modelType = datum.getString("type");
 
-            modelInstanceList.add(this.instantiateModel(modelType, attributes));
+            JSONObject relationships = null;
+            try {
+                relationships = apiJson.getJSONObject("relationships");
+            } catch(JSONException e) {
+                e.printStackTrace();
+            }
+
+            modelInstanceList.add(this.instantiateModel(modelType, attributes, relationships));
         }
 
         return modelInstanceList;
     }
 
 
-    private ModelType instantiateModel(String modelType, JSONObject resourceAttributes) throws JSONException {
+    private ModelType instantiateModel(String modelType, JSONObject resourceAttributes, JSONObject relationships)
+            throws JSONException {
         Object modelInstance;
 
         if (modelType.equals("contractor_category")) {
@@ -91,6 +106,14 @@ public class ModelBuilder<ModelType>  {
         }
 
         else if (modelType.equals("contractor")) {
+            JSONArray comments = new JSONArray("[]");
+
+            try {
+                comments = relationships.getJSONObject("comment").getJSONArray("data");
+            } catch (NullPointerException e) {
+                e.printStackTrace();
+            }
+
             modelInstance = new Contractor(
                     ModelBuilder.getJSONString(resourceAttributes, "id"),
                     ModelBuilder.getJSONString(resourceAttributes, "first_name"),
@@ -100,7 +123,8 @@ public class ModelBuilder<ModelType>  {
                     ModelBuilder.getJSONString(resourceAttributes, "phone"),
                     ModelBuilder.getJSONString(resourceAttributes, "website"),
                     "http://ewic.org/wp-content/themes/ewic/images/Construction%20Worker.png",
-                    resourceAttributes.getDouble("avg_rating")
+                    resourceAttributes.getDouble("avg_rating"),
+                    comments
             );
         } else {
             throw new JSONException("I don't know how to parse the given model type.");
