@@ -63,7 +63,7 @@ WHERE contractor_id = '${contractor_id}';
                 const query3 = `
 SELECT * FROM contractor_comment
 WHERE contractor_id = '${contractor_id}'
-ORDER BY date_created;`;
+ORDER BY date_created DESC;`;
 
                 return db.raw(query3);
             })

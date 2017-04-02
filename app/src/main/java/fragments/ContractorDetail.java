@@ -1,14 +1,15 @@
 package fragments;
 
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.accessibility.AccessibilityNodeInfo;
-import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RatingBar;
@@ -43,6 +44,8 @@ public class ContractorDetail extends Fragment {
     private RatingBar overallRatingBar;
     private RatingBar myRatingBar;
     private ListView commentsLv;
+    private EditText commentEt;
+    private Button addCommentBtn;
 
     private JSONArrayAdapter commentsAdapter;
 
@@ -100,6 +103,24 @@ public class ContractorDetail extends Fragment {
         this.overallRatingBar = (RatingBar) view.findViewById(R.id.contractor_detail_rating_bar);
         this.commentsLv = (ListView) view.findViewById(R.id.contractor_detail_lv);
 
+        this.commentEt = (EditText) view.findViewById(R.id.contractor_detail_comment_edit);
+        this.commentEt.setVisibility(View.INVISIBLE);
+
+        this.addCommentBtn = (Button) view.findViewById(R.id.contractor_detail_add_comment_btn);
+
+        this.addCommentBtn.setOnClickListener(new View.OnClickListener() {
+            ContractorDetail fragment = ContractorDetail.this;
+
+            @Override
+            public void onClick(View v) {
+                if (fragment.commentEt.getVisibility() == View.VISIBLE) {
+                    ContractorDetail.this.publishComent();
+                } else {
+                    fragment.commentEt.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
         this.myRatingBar = (RatingBar) view.findViewById(R.id.contractor_detail_my_rating_bar);
         this.myRatingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
@@ -134,6 +155,41 @@ public class ContractorDetail extends Fragment {
 
 
         return view;
+    }
+
+    private void publishComent() {
+        final ContractorDetail fragment = ContractorDetail.this;
+        final Activity activity = fragment.getActivity();
+
+        APIRequest request = new APIRequest(new APIRequest.APIRequestCallback() {
+            @Override
+            public void onSuccess(JSONObject json, int code) {
+                fragment.pullContractorData(fragment.contractorId);
+                fragment.commentEt.setVisibility(View.INVISIBLE);
+                fragment.commentEt.setText("");
+            }
+
+            @Override
+            public void onError(String errorMessage, int code) {
+                Toast.makeText(activity, "No se pudo guardar tu comentario.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        String token = AuthHelper.getAuthToken(getActivity());
+
+        JSONObject payload = new JSONObject();
+        JSONObject headers = new JSONObject();
+        try {
+            headers.put("Authorization", "Bearer " + token);
+            payload.put("content", fragment.commentEt.getText().toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        request.execute(APIRequest.HTTP_POST,
+                Constants.API_URL + "/api/v1/contractor/" + fragment.contractorId + "/comment",
+                headers.toString(),
+                payload.toString());
     }
 
     private void pullContractorData(String contractorId) {
@@ -196,4 +252,5 @@ public class ContractorDetail extends Fragment {
         this.commentsLv.setAdapter(this.commentsAdapter);
 
     }
+
 }

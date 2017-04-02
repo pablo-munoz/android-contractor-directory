@@ -72,6 +72,17 @@
             android:layout_height="wrap_content"
             android:text="Comentarios"/>
 
+        <EditText
+            android:id="@+id/contractor_detail_comment_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/contractor_detail_add_comment_btn"
+            android:text="Agregar comentario"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
         <ListView
             android:id="@+id/contractor_detail_lv"
             android:layout_width="match_parent"

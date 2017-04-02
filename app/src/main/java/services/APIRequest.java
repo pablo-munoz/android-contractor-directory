@@ -57,6 +57,12 @@ public class APIRequest extends AsyncTask<String, Void, JSONObject> {
     }
 
     @Override
+    /**
+     * params[0] is the HTTP method (see this class's public constants)
+     * params[1] is the url (string)
+     * params[2] is the headers in string form, must be valid json.
+     * params[3] is the payload in string form, must be valid json.
+     */
     protected JSONObject doInBackground(String... params) {
         JSONObject result = null;
         JSONObject headers = null;
