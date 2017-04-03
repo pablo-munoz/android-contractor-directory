@@ -1,9 +1,20 @@
 package fragments;
 
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,10 +28,26 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.List;
 
 import activities.Constants;
 import adapters.JSONArrayAdapter;
@@ -35,7 +62,13 @@ import services.APIRequest;
  * Use the {@link ContractorDetail#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ContractorDetail extends Fragment {
+public class ContractorDetail extends Fragment implements
+        OnMapReadyCallback,
+        GoogleMap.OnMapClickListener,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        LocationListener
+{
     private TextView nameTv;
     private TextView idTv;
     private TextView phoneTv;
@@ -46,6 +79,7 @@ public class ContractorDetail extends Fragment {
     private ListView commentsLv;
     private EditText commentEt;
     private Button addCommentBtn;
+    private MapView mMapView;
 
     private JSONArrayAdapter commentsAdapter;
 
@@ -56,6 +90,11 @@ public class ContractorDetail extends Fragment {
     private static final String ARG_contractorId = "contractorId";
 
     private String contractorId;
+
+    private GoogleMap mMap;
+    private GoogleApiClient client;
+    private Location lastLocation;
+    private LocationRequest locationRequest;
 
 
     public ContractorDetail() {
@@ -85,6 +124,8 @@ public class ContractorDetail extends Fragment {
         if (getArguments() != null) {
             this.contractorId = getArguments().getString(ARG_contractorId);
         }
+
+
     }
 
     @Override
@@ -114,7 +155,7 @@ public class ContractorDetail extends Fragment {
             @Override
             public void onClick(View v) {
                 if (fragment.commentEt.getVisibility() == View.VISIBLE) {
-                    ContractorDetail.this.publishComent();
+                    ContractorDetail.this.publishComment();
                 } else {
                     fragment.commentEt.setVisibility(View.VISIBLE);
                 }
@@ -153,11 +194,30 @@ public class ContractorDetail extends Fragment {
 
         this.pullContractorData(contractorId);
 
+        MapsInitializer.initialize(this.getActivity());
+        this.mMapView = (MapView) view.findViewById(R.id.contractor_detail_map);
+        this.mMapView.onCreate(savedInstanceState);
+        this.mMapView.getMapAsync(this);
+
+        if (this.client == null) {
+
+            this.client = new GoogleApiClient.Builder(this.getActivity())
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
+
+        this.locationRequest = LocationRequest.create();
+        this.locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        this.locationRequest.setInterval(1000 * 5);
+        this.locationRequest.setFastestInterval(1000 * 3);
+
 
         return view;
     }
 
-    private void publishComent() {
+    private void publishComment() {
         final ContractorDetail fragment = ContractorDetail.this;
         final Activity activity = fragment.getActivity();
 
@@ -230,27 +290,136 @@ public class ContractorDetail extends Fragment {
                 .fitCenter()
                 .into(this.portraitIv);
 
-                this.commentsAdapter = new JSONArrayAdapter(getActivity(), this.contractor.getComments(),
+        this.commentsAdapter = new JSONArrayAdapter(getActivity(), this.contractor.getComments(),
                 new JSONArrayAdapter.ViewBuilder() {
-            @Override
-            public View construct(JSONArray data, int position, View view, ViewGroup parent) {
-                if (view == null) {
-                    view = getActivity().getLayoutInflater().inflate(R.layout.contractor_detail_comment, parent, false);
-                }
+                    @Override
+                    public View construct(JSONArray data, int position, View view, ViewGroup parent) {
+                        if (view == null) {
+                            view = getActivity().getLayoutInflater().inflate(R.layout.contractor_detail_comment, parent, false);
+                        }
 
-                TextView contentTv = (TextView) view.findViewById(R.id.contractor_detail_comment_content);
-                try {
-                    contentTv.setText(data.getJSONObject(position).getString("content"));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                        TextView contentTv = (TextView) view.findViewById(R.id.contractor_detail_comment_content);
+                        try {
+                            contentTv.setText(data.getJSONObject(position).getString("content"));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
 
-                return view;
-            }
-        });
+                        return view;
+                    }
+                });
 
         this.commentsLv.setAdapter(this.commentsAdapter);
 
+
     }
 
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        this.mMap = googleMap;
+
+
+        Geocoder coder = new Geocoder(this.getActivity());
+
+        List<Address> address = null;
+        try {
+            address = coder.getFromLocationName("Puebla 111, Guadalajara, Jalisco", 5);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (address != null) {
+            LatLng elSalon = new LatLng(address.get(0).getLatitude(), address.get(0).getLongitude());
+            mMap.addMarker(new MarkerOptions().position(elSalon).title(contractor.getFullName()));
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(elSalon, 18));
+        }
+
+
+        googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                Intent navigation = new Intent(Intent.ACTION_VIEW, Uri
+                        .parse("geo:0,0?q=" + Uri.encode("Calle Puebla #111, Guadalajara Jalisco")));
+                startActivity(navigation);
+            }
+        });
+
+    }
+
+    public void setMyLocation() {
+
+        if (ContextCompat.checkSelfPermission(this.getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this.getActivity(),
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    0);
+        } else {
+            mMap.setMyLocationEnabled(true);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+            setMyLocation();
+    }
+
+
+    @Override
+    public void onMapClick(LatLng latLng) {
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        client.connect();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        client.disconnect();
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
+        lastLocation = LocationServices.FusedLocationApi.getLastLocation(client);
+        if (lastLocation != null) {
+
+            Log.d("LAST LOCATION",
+                    lastLocation.getLatitude() + ", " + lastLocation.getLongitude());
+        }
+
+        if (ActivityCompat.checkSelfPermission(this.getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        LocationServices.FusedLocationApi.requestLocationUpdates(client, locationRequest, this);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        lastLocation = location;
+        Log.d("LOCATION CHANGED",
+                lastLocation.getLatitude() + ", " + lastLocation.getLongitude());
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
 }

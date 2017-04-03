@@ -31,4 +31,5 @@
     <!-- Strings related to authentication jsonwebtoken -->
     <string name="shared_preferences_filename">preferencesFile</string>
     <string name="shared_preferences_token_attr_name">auth_token</string>
+    <string name="title_activity_maps">Map</string>
 </resources>
