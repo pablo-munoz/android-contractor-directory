@@ -1,6 +1,7 @@
 package adapters;
 
 import android.content.Context;
+import android.media.Rating;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -40,22 +42,11 @@ public class ContractorAdapter extends ArrayAdapter<Contractor> {
 
         // Lookup view for data population
         TextView nameTv = (TextView) convertView.findViewById(R.id.contractor_card_name);
+        RatingBar ratingBar = (RatingBar) convertView.findViewById(R.id.contractor_card_rating);
+
         nameTv.setText(contractor.getFullName());
 
-        LinearLayout ratingLayout = (LinearLayout) convertView.findViewById(R.id.contractor_card_rating);
-        // Draw as many filled stars as the contractor rating
-        for (int i = 0; i < contractor.getRating(); i++) {
-            ImageView starIcon = new ImageView(this.mContext);
-            starIcon.setImageResource(R.drawable.ic_star_black_24dp);
-            ratingLayout.addView(starIcon);
-        }
-
-        // Draw any possible remaining stars blank
-        for (int i = 0; i < 5 - contractor.getRating(); i++) {
-            ImageView starIcon = new ImageView(this.mContext);
-            starIcon.setImageResource(R.drawable.ic_star_border_black_24dp);
-            ratingLayout.addView(starIcon);
-        }
+        ratingBar.setRating((float) contractor.getRating());
 
         TextView phoneTv = (TextView) convertView.findViewById(R.id.contractor_card_phone);
         phoneTv.setText(contractor.getPhone());

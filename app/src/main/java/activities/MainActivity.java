@@ -1,146 +1,136 @@
 package activities;
 
 import android.app.FragmentManager;
-import android.content.Intent;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.app.Fragment;
+import android.view.View;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.Toast;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-
-import adapters.ContractorCategoryAdapter;
-import fragments.LoadingFragment;
-import models.ContractorCategory;
-import models.ModelBuilder;
+import fragments.ContractorCategoryMenu;
+import fragments.Login;
 import munoz.pablo.directorio.R;
-import services.APIRequest;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener {
 
-    private ContractorCategoryAdapter categoriesAdapter;
-    private ArrayList<ContractorCategory> contractorCategoryList;
-    private ListView listView;
-    private ModelBuilder<ContractorCategory> modelBuilder;
+    private static final String contentFragmentTag = "content";
+    private static final int MENU_LOGIN = Menu.FIRST;
+
+    private NavigationView navigationView;
 
     private FragmentManager fragmentManager;
-    private LoadingFragment loadingFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        this.fragmentManager = this.getFragmentManager();
-        this.loadingFragment = LoadingFragment.newInstance("");
-        this.loadingFragment.addToManager(this.fragmentManager, R.id.activity_main_container);
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        this.setSupportActionBar(toolbar);
+        setSupportActionBar(toolbar);
 
-        this.modelBuilder = new ModelBuilder<>();
-
-        this.contractorCategoryList = new ArrayList<>();
-        this.categoriesAdapter = new ContractorCategoryAdapter(this, contractorCategoryList);
-
-        listView = (ListView) findViewById(R.id.main_categories);
-        listView.setAdapter(categoriesAdapter);
-
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ContractorCategory category = contractorCategoryList.get(position);
-
-                Intent intent = new Intent(MainActivity.this, ContractorsByCategory.class);
-                intent.putExtra("categoryId", category.getId()) ;
-
-                startActivity(intent);
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
             }
         });
 
-        this.pullContractorCategoriesData();
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        this.navigationView = (NavigationView) findViewById(R.id.nav_view);
+        this.navigationView.setNavigationItemSelectedListener(this);
+
+        this.fragmentManager = this.getFragmentManager();
+
+        // Insert the first fragment directly, instead of using changeContentFragment method
+        // to enable history and backward navigation
+        FragmentTransaction transaction = this.fragmentManager.beginTransaction();
+        transaction.add(R.id.main_activity_content, new ContractorCategoryMenu(), contentFragmentTag)
+                .commit();
     }
 
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_toolbar_menu, menu);
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent;
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
 
-        switch(item.getItemId()) {
-            case R.id.action_register:
-                this.goToContractorRegistrationActivity();
-                return true;
-
-            case R.id.action_settings:
-                Toast.makeText(this, "TODO: go to settings activity.", Toast.LENGTH_SHORT).show();
-                return true;
-
-            case R.id.action_refresh:
-                if (this.loadingFragment.isDetached()) {
-                    MainActivity.this.loadingFragment.addToManager(MainActivity.this.fragmentManager, R.id.activity_main_container);
-                }
-                MainActivity.this.pullContractorCategoriesData();
-                return true;
-
-            case R.id.action_login:
-                intent = new Intent(this, LoginScreen.class);
-                startActivity(intent);
-                return true;
-
-            case R.id.action_register_account:
-                intent = new Intent(this, AccountRegistration.class);
-                startActivity(intent);
-
-            default:
-                return super.onOptionsItemSelected(item);
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
         }
+
+        return super.onOptionsItemSelected(item);
     }
 
-    private void goToContractorRegistrationActivity() {
-        Intent intent = new Intent(this, ContractorRegistration.class);
-        startActivity(intent);
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_login) {
+            this.changeContentFragment(new Login());
+        } else if (id == R.id.nav_camera) {
+            // Handle the camera action
+        } else if (id == R.id.nav_gallery) {
+
+        } else if (id == R.id.nav_slideshow) {
+
+        } else if (id == R.id.nav_manage) {
+
+        } else if (id == R.id.nav_share) {
+
+        } else if (id == R.id.nav_send) {
+
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 
-    private void pullContractorCategoriesData() {
-        APIRequest apiRequest = new APIRequest(new APIRequest.APIRequestCallback() {
-            @Override
-            public void onSuccess(JSONObject json, int code) {
-                MainActivity activity = MainActivity.this;
-
-                try {
-                    activity.contractorCategoryList = activity.modelBuilder.resourceListFromJson(json);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-
-                activity.loadingFragment.removeFromManager(activity.fragmentManager);
-                activity.categoriesAdapter.clear();
-                activity.categoriesAdapter.addAll(activity.contractorCategoryList);
-            }
-
-            @Override
-            public void onError(String errorMessage, int code) {
-                Log.d("MainActivity", "Failed to retrieve contractor categories");
-            }
-        });
-
-        apiRequest.execute(APIRequest.HTTP_GET, Constants.API_URL + "/api/v1/contractor_category");
+    public void changeContentFragment(Fragment newFragment) {
+        FragmentTransaction transaction = this.fragmentManager.beginTransaction();
+        if (this.fragmentManager.findFragmentByTag(contentFragmentTag) != null) {
+            transaction.remove(
+                    this.fragmentManager.findFragmentByTag(contentFragmentTag));
+        }
+        transaction.add(R.id.main_activity_content, newFragment, contentFragmentTag)
+                .addToBackStack(null)
+                .commit();
     }
-
 }

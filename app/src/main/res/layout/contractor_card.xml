@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="150dp">
+    android:layout_height="150dp"
+    android:padding="@dimen/list_view_item_padding">
 
     <TextView
         android:id="@+id/contractor_card_name"
@@ -11,12 +12,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <LinearLayout
+    <RatingBar
         android:id="@+id/contractor_card_rating"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-    </LinearLayout>
+        android:numStars="5"
+        android:isIndicator="true"
+        />
 
     <TextView
         android:id="@+id/contractor_card_phone"

@@ -1,27 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<!-- A CardView that contains a TextView -->
+<RelativeLayout xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/category_card_height" >
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:padding="@dimen/list_view_item_padding">
 
-    <TextView
-        android:id="@+id/category_card_name"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="23dp"
-        android:textColor="@color/colorPrimaryDark"
-        android:text="Name" />
+        android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/category_card_num_contacts"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="# Contacts" />
+        <TextView
+            android:id="@+id/category_card_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="23dp"
+            android:textColor="@color/colorPrimaryDark"
+            android:text="Name" />
 
-    <ImageView
-        android:id="@+id/category_card_img"
-        android:layout_width="150dp"
-        android:layout_height="150dp" />
-
-</LinearLayout>
+        <TextView
+            android:id="@+id/category_card_num_contacts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="# Contacts" />
+    </LinearLayout>
+</RelativeLayout>

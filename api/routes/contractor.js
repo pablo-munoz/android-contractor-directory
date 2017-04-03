@@ -20,11 +20,11 @@ router.route('/')
               `AND map.contractor_category_id = '${request.query.contractor_category}'` :
               '';
         const query = `
-SELECT DISTINCT contractor.*
-FROM contractor
+SELECT DISTINCT contractor_summary.*
+FROM contractor_summary
 JOIN contractor_category_map AS map
-  ON contractor.id = map.contractor_id
-WHERE contractor.status = 'active'
+  ON contractor_summary.id = map.contractor_id
+WHERE contractor_summary.status = 'active'
 ${ categoryFilter };
 `;
 
@@ -34,10 +34,13 @@ ${ categoryFilter };
                 // demonstrating the loading screen during the
                 // presentation and should be removed before release.
                 setTimeout(() =>
-                response.json({
-                    data: route_utils.serialize_resource_list_to_json_api(
-                        dbconfig.contractor, result.rows)
-                }), 3000);
+                           response.json({
+                               meta: {
+                                   count: result.rows.length
+                               },
+                               data: route_utils.serialize_resource_list_to_json_api(
+                                   dbconfig.contractor, result.rows)
+                           }), 3000);
             })
             .catch((error) => {
                 console.error(error);

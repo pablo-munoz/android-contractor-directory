@@ -1,5 +1,7 @@
 package models;
 
+import org.json.JSONArray;
+
 import java.util.ArrayList;
 
 /**
@@ -15,11 +17,12 @@ public class Contractor{
     private String phone;
     private String website;
     private String portrait;
-    private int rating;
+    private double rating;
+    private JSONArray comments;
 
 
     public Contractor(String id, String firstName, String middleName, String lastName, String email,
-                      String phone, String website, String portrait, int rating) {
+                      String phone, String website, String portrait, double rating, JSONArray comments) {
         this.id = id;
         this.firstName = firstName;
         this.middleName = middleName;
@@ -29,6 +32,7 @@ public class Contractor{
         this.website = website;
         this.portrait = portrait;
         this.rating = rating;
+        this.comments = comments;
     }
 
     public String getId() {
@@ -91,7 +95,7 @@ public class Contractor{
         this.portrait = portrait;
     }
 
-    public int getRating() {
+    public double getRating() {
         return this.rating;
     }
 
@@ -105,5 +109,9 @@ public class Contractor{
         if (this.middleName != null) fullName += " " + this.middleName;
         if (this.lastName != null) fullName += " " + this.lastName;
         return fullName;
+    }
+
+    public JSONArray getComments() {
+        return this.comments;
     }
 }
