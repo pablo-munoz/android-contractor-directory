@@ -7,18 +7,28 @@
     android:layout_gravity="center"
     android:padding="@dimen/list_view_item_padding">
 
+    <ImageView
+        android:id="@+id/category_image"
+        android:layout_width="100px"
+        android:layout_height="100px"
+        card_view:srcCompat="@android:color/background_dark" />
+
     <LinearLayout
+        android:id="@+id/category_preview"
+        android:layout_toRightOf="@+id/category_image"
+        android:paddingLeft="10dp"
         android:orientation="vertical"
-        android:layout_width="match_parent"
+        android:layout_width="290dp"
         android:layout_height="wrap_content">
+
 
         <TextView
             android:id="@+id/category_card_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="23dp"
+            android:text="Name"
             android:textColor="@color/colorPrimaryDark"
-            android:text="Name" />
+            android:textSize="23dp" />
 
         <TextView
             android:id="@+id/category_card_num_contacts"
@@ -26,4 +36,13 @@
             android:layout_height="wrap_content"
             android:text="# Contacts" />
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/arrow"
+        android:layout_width="50px"
+        android:layout_height="50px"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/category_preview"
+        card_view:srcCompat="@drawable/cast_ic_mini_controller_play" />
 </RelativeLayout>

@@ -42,6 +42,7 @@ public class ContractorCategoryAdapter extends ArrayAdapter<ContractorCategory> 
         // Lookup view for data population
         TextView nameTv = (TextView) convertView.findViewById(R.id.category_card_name);
         TextView countTv = (TextView) convertView.findViewById(R.id.category_card_num_contacts);
+        ImageView categoryImg = (ImageView) convertView.findViewById(R.id.category_image);
 
         nameTv.setText(category.getName().toUpperCase());
 
