@@ -154,7 +154,10 @@ public class Login extends Fragment {
                 }
                 editor.apply();
 
+
+
                 MainActivity mainActivity = (MainActivity) Login.this.getActivity();
+                mainActivity.setUserName(mEmailView.getText().toString());
                 mainActivity.changeContentFragment(new ContractorCategoryMenu());
 
             }

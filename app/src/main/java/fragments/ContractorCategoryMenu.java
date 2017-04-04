@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ViewFlipper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,6 +39,7 @@ public class ContractorCategoryMenu extends Fragment {
     private ArrayList<ContractorCategory> contractorCategoryList;
     private ListView listView;
     private ModelBuilder<ContractorCategory> modelBuilder;
+    private ViewFlipper viewFlipper;
 
 
     // TODO: Rename and change types of parameters
@@ -97,6 +99,11 @@ public class ContractorCategoryMenu extends Fragment {
                 activity.changeContentFragment(categoryContractors);
             }
         });
+
+        this.viewFlipper = (ViewFlipper) view.findViewById(R.id.viewFlipper);
+        this.viewFlipper.setInAnimation(view.getContext(),R.anim.left_out);
+        this.viewFlipper.setOutAnimation(view.getContext(),R.anim.right_enter);
+        this.viewFlipper.startFlipping();
 
         this.pullContractorCategoriesData();
 

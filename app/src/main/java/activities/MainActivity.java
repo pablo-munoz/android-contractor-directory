@@ -15,6 +15,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
+import android.widget.ViewFlipper;
 
 import fragments.ContractorCategoryMenu;
 import fragments.Login;
@@ -29,6 +31,8 @@ public class MainActivity extends AppCompatActivity
     private NavigationView navigationView;
 
     private FragmentManager fragmentManager;
+
+    private TextView userName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +60,8 @@ public class MainActivity extends AppCompatActivity
         this.navigationView.setNavigationItemSelectedListener(this);
 
         this.fragmentManager = this.getFragmentManager();
+
+        this.userName = (TextView) findViewById(R.id.userName);
 
         // Insert the first fragment directly, instead of using changeContentFragment method
         // to enable history and backward navigation
@@ -106,16 +112,6 @@ public class MainActivity extends AppCompatActivity
             this.changeContentFragment(new Login());
         } else if (id == R.id.nav_camera) {
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -132,5 +128,9 @@ public class MainActivity extends AppCompatActivity
         transaction.add(R.id.main_activity_content, newFragment, contentFragmentTag)
                 .addToBackStack(null)
                 .commit();
+    }
+
+    public void setUserName(String userName){
+        this.userName.setText(userName);
     }
 }

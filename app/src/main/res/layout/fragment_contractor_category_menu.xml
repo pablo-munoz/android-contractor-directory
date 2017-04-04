@@ -5,9 +5,50 @@
     android:layout_height="wrap_content"
     android:background="@color/list_container_bg">
 
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="horizontal">
+
+        <ViewFlipper
+            android:id="@+id/viewFlipper"
+            android:layout_width="fill_parent"
+            android:layout_height="190dp">
+
+            <ImageView
+                android:id="@+id/image1"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:src="@drawable/wood" />
+
+            <ImageView
+                android:id="@+id/image2"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:src="@drawable/worker1" />
+
+            <ImageView
+                android:id="@+id/image3"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:src="@drawable/painter" />
+
+            <ImageView
+                android:id="@+id/image4"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:src="@drawable/electricalcontractor" />
+        </ViewFlipper>
+
+    </LinearLayout>
+
     <ListView
         android:id="@+id/category_list_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="194dp"
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>
