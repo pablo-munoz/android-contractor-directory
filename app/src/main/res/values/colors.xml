@@ -7,22 +7,23 @@
 
 
     <!--OUR COLOR PALLETTE-->
-    <color name="colorPrimary">#A8CA8D</color>
-    <color name="colorPrimaryDark">#81AD7B</color>
-    <color name="colorAccent">#5B714E</color>
+    <color name="colorPrimary">#518CA1</color>
+    <color name="colorPrimaryDark">#10627F</color>
+    <color name="colorAccent">#272932</color>
 
     <!--BUTTON COLLORS-->
-    <color name="button_default">#5B714E</color>
+    <color name="button_default">#BF8156</color>
     <!--color name="button_default">#23608C</color-->
-    <color name="button_pressed">#81AD7B</color>
-    <color name="button_focused">#81AD7B</color>
+    <color name="button_pressed">#D0A384</color>
+    <color name="button_focused">#FEBD01</color>
 
-    <!--LIST VIEW COLLORS-->
+    <!--LIST VIEW COLLORS
     <color name="list_separator">#23647A</color>
     <color name="list_selector_read">#BED0CA</color>
     <color name="list_selector_unread">#97AEA7</color>
-    <color name="list_container_bg">#FAFAF5</color>
 
+    -->
+    <color name="list_container_bg">#FAFAF5</color>
 
 
 
