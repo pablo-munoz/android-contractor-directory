@@ -2,6 +2,7 @@ package activities;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -20,6 +21,7 @@ import android.widget.ViewFlipper;
 
 import fragments.ContractorCategoryMenu;
 import fragments.Login;
+import fragments.RegistrationFragment;
 import munoz.pablo.directorio.R;
 
 public class MainActivity extends AppCompatActivity
@@ -41,14 +43,14 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        //FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        //fab.setOnClickListener(new View.OnClickListener() {
+            //@Override
+            //public void onClick(View view) {
+                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        //.setAction("Action", null).show();
+            //}
+        //});
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -110,8 +112,11 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_login) {
             this.changeContentFragment(new Login());
-        } else if (id == R.id.nav_camera) {
-            // Handle the camera action
+        } else if (id == R.id.nav_send) {
+            this.changeContentFragment(new RegistrationFragment());
+        } else if (id == R.id.add_contractor) {
+            Intent intent = new Intent(this, ContractorRegistration.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
