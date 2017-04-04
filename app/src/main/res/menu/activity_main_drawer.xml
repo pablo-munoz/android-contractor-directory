@@ -2,12 +2,26 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_login"
-            android:icon="@drawable/ic_person_outline_black_24dp"
-            android:title="Login" />
-        <item
             android:id="@+id/nav_camera"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Register" />
+            android:icon="@drawable/ic_list_black_24dp"
+            android:title="Directorio" />
+        <item
+            android:id="@+id/nav_gallery"
+            android:icon="@drawable/hamer"
+            android:title="Añadir Contratista" />
     </group>
+
+    <item android:title="Cuenta">
+        <menu>
+            <item
+                android:id="@+id/nav_login"
+                android:icon="@drawable/ic_person_outline_black_24dp"
+                android:title="Iniciar Sesión" />
+            <item
+                android:id="@+id/nav_send"
+                android:icon="@drawable/ic_menu_send"
+                android:title="Registrarse" />
+        </menu>
+    </item>
+
 </menu>
