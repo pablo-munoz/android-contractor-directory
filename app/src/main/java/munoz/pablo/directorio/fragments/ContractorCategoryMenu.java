@@ -1,4 +1,4 @@
-package fragments;
+package munoz.pablo.directorio.fragments;
 
 
 import android.app.Fragment;
@@ -15,13 +15,13 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import activities.Constants;
-import activities.MainActivity;
-import adapters.ContractorCategoryAdapter;
-import models.ContractorCategory;
-import models.ModelBuilder;
+import munoz.pablo.directorio.activities.MainActivity;
+import munoz.pablo.directorio.adapters.ContractorCategoryAdapter;
+import munoz.pablo.directorio.models.ContractorCategory;
+import munoz.pablo.directorio.models.ModelBuilder;
 import munoz.pablo.directorio.R;
-import services.APIRequest;
+import munoz.pablo.directorio.services.APIRequest;
+import munoz.pablo.directorio.utils.Constants;
 
 /**
  * A simple {@link Fragment} subclass.

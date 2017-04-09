@@ -1,4 +1,4 @@
-package services;
+package munoz.pablo.directorio.services;
 
 
 import android.os.AsyncTask;
@@ -16,8 +16,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
-
-import munoz.pablo.directorio.AuthHelper;
 
 /**
  * Created by pablo on 2/14/2017.

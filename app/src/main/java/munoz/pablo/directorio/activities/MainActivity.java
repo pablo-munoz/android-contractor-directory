@@ -1,13 +1,10 @@
-package activities;
+package munoz.pablo.directorio.activities;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.app.Fragment;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -17,11 +14,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
-import android.widget.ViewFlipper;
 
-import fragments.ContractorCategoryMenu;
-import fragments.Login;
-import fragments.RegistrationFragment;
+import munoz.pablo.directorio.fragments.ContractorCategoryMenu;
+import munoz.pablo.directorio.fragments.Login;
+import munoz.pablo.directorio.fragments.RegistrationFragment;
 import munoz.pablo.directorio.R;
 
 public class MainActivity extends AppCompatActivity

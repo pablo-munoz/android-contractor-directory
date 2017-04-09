@@ -1,4 +1,4 @@
-package adapters;
+package munoz.pablo.directorio.adapters;
 
 import android.app.Activity;
 import android.view.View;
@@ -7,8 +7,6 @@ import android.widget.BaseAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-
-import munoz.pablo.directorio.R;
 
 /**
  * Created by pablo on 4/2/2017.

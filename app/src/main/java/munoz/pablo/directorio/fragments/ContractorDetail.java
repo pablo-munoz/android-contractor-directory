@@ -1,4 +1,4 @@
-package fragments;
+package munoz.pablo.directorio.fragments;
 
 
 import android.Manifest;
@@ -38,7 +38,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -49,13 +48,13 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.List;
 
-import activities.Constants;
-import adapters.JSONArrayAdapter;
-import models.Contractor;
-import models.ModelBuilder;
-import munoz.pablo.directorio.AuthHelper;
+import munoz.pablo.directorio.adapters.JSONArrayAdapter;
+import munoz.pablo.directorio.models.Contractor;
+import munoz.pablo.directorio.models.ModelBuilder;
+import munoz.pablo.directorio.utils.AuthHelper;
 import munoz.pablo.directorio.R;
-import services.APIRequest;
+import munoz.pablo.directorio.services.APIRequest;
+import munoz.pablo.directorio.utils.Constants;
 
 /**
  * A simple {@link Fragment} subclass.

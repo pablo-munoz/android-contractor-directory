@@ -1,4 +1,4 @@
-package munoz.pablo.directorio;
+package munoz.pablo.directorio.utils;
 
 import android.app.Activity;
 import android.content.Context;

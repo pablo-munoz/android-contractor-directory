@@ -1,6 +1,4 @@
-package activities;
-
-import android.content.SharedPreferences;
+package munoz.pablo.directorio.utils;
 
 /**
  * Created by pablo on 3/6/2017.
@@ -9,5 +7,4 @@ import android.content.SharedPreferences;
 public class Constants {
     // For using your own phone make it http://<your ip>:3333
     public static String API_URL = "http://192.168.15.5:3333";
-    public static String PREFS_FILENAME = "prefsFile";
 }

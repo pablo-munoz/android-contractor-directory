@@ -1,4 +1,4 @@
-package munoz.pablo.directorio;
+package munoz.pablo.directorio.activities;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -31,6 +31,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import munoz.pablo.directorio.R;
 
 import static android.Manifest.permission.READ_CONTACTS;
 

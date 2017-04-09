@@ -10,8 +10,7 @@
     <ImageView
         android:id="@+id/category_image"
         android:layout_width="100px"
-        android:layout_height="100px"
-        card_view:srcCompat="@drawable/wood_icon" />
+        android:layout_height="100px"/>
         <!--card_view:srcCompat="@android:color/background_dark"-->
 
     <LinearLayout

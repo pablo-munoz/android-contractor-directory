@@ -1,4 +1,4 @@
-package fragments;
+package munoz.pablo.directorio.fragments;
 
 
 import android.app.Fragment;
@@ -12,8 +12,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-
-import org.w3c.dom.Text;
 
 import munoz.pablo.directorio.R;
 

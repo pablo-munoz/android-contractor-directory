@@ -1,4 +1,4 @@
-package fragments;
+package munoz.pablo.directorio.fragments;
 
 import android.os.Bundle;
 import android.app.Fragment;
@@ -12,9 +12,9 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import activities.Constants;
 import munoz.pablo.directorio.R;
-import services.APIRequest;
+import munoz.pablo.directorio.services.APIRequest;
+import munoz.pablo.directorio.utils.Constants;
 
 /**
  * A simple {@link Fragment} subclass.
