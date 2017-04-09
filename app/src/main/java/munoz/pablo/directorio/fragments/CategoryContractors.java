@@ -8,8 +8,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,6 +48,7 @@ public class CategoryContractors extends Fragment {
     private ModelBuilder<ContractorCategory> categoryModelBuilder;
     private ModelBuilder<Contractor> contractorModelBuilder;
 
+    private ImageView loadingIv;
     private TextView titleTv;
     private TextView emptyQueryTv;
 
@@ -71,7 +75,7 @@ public class CategoryContractors extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            this.contractorCategoryId = getArguments().getString(ARG_contractorCategoryId);
+            contractorCategoryId = getArguments().getString(ARG_contractorCategoryId);
         }
     }
 
@@ -81,39 +85,45 @@ public class CategoryContractors extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_category_contractors, container, false);
 
-        this.titleTv = (TextView) view.findViewById(R.id.category_contractors_title);
-        this.emptyQueryTv = (TextView) view.findViewById(R.id.category_contractors_empty_query_label);
+        loadingIv = (ImageView) view.findViewById(R.id.fgmt_category_contractors_loading);
+        titleTv = (TextView) view.findViewById(R.id.category_contractors_title);
+        emptyQueryTv = (TextView) view.findViewById(R.id.category_contractors_empty_query_label);
 
-        this.contractorList = new ArrayList<>();
-        this.categoryModelBuilder = new ModelBuilder<>();
-        this.contractorModelBuilder = new ModelBuilder<>();
+        Glide.with(getActivity())
+                .load("https://d13yacurqjgara.cloudfront.net/users/583436/screenshots/1686759/spherewave.gif")
+                .asGif()
+                .fitCenter()
+                .crossFade()
+                .into(loadingIv);
 
-        this.adapter = new ContractorAdapter(view.getContext(), contractorList);
+        contractorList = new ArrayList<>();
+        categoryModelBuilder = new ModelBuilder<>();
+        contractorModelBuilder = new ModelBuilder<>();
 
-        this.contractorListView = (ListView) view.findViewById(R.id.category_contractors_list_view);
-        this.contractorListView.setAdapter(this.adapter);
+        adapter = new ContractorAdapter(view.getContext(), contractorList);
 
-        this.contractorListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        contractorListView = (ListView) view.findViewById(R.id.category_contractors_list_view);
+        contractorListView.setAdapter(this.adapter);
+
+        contractorListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                CategoryContractors self = CategoryContractors.this;
 
-                Contractor contractor = self.contractorList.get(position);
+                Contractor contractor = contractorList.get(position);
                 ContractorDetail newFragment = ContractorDetail.newInstance(contractor.getId());
 
-                MainActivity mainActivity = (MainActivity) self.getActivity();
+                MainActivity mainActivity = (MainActivity) getActivity();
 
                 mainActivity.changeContentFragment(newFragment);
             }
         });
 
-        Log.d("CategoryContractors", "Fragment view created with contractorCategoryId = " + contractorCategoryId);
-        this.pullContractorCategoryData();
+        requestCategoryDataFromApi();
 
         return view;
     }
 
-    private void pullContractorCategoryData() {
+    private void requestCategoryDataFromApi() {
         APIRequest apiRequest = new APIRequest(new APIRequest.APIRequestCallback() {
             @Override
             public void onSuccess(JSONObject json, int code) {
@@ -136,7 +146,7 @@ public class CategoryContractors extends Fragment {
         });
 
         apiRequest.execute(APIRequest.HTTP_GET,
-                Constants.API_URL + "/api/v1/contractor_category/" + this.contractorCategoryId);
+                Constants.API_URL + "/api/v1/contractor_category/" + contractorCategoryId);
     }
 
     private void pullContractorsInCategoryData() {
@@ -153,6 +163,7 @@ public class CategoryContractors extends Fragment {
                         emptyQueryTv.setText("No se ha encontrado nada.");
                     }
 
+                    hideLoadingGif();
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -166,5 +177,10 @@ public class CategoryContractors extends Fragment {
         });
 
         apiRequest.execute(APIRequest.HTTP_GET, Constants.API_URL + "/api/v1/contractor?contractor_category=" + contractorCategory.getId());
+    }
+
+
+    private void hideLoadingGif() {
+        loadingIv.setVisibility(View.GONE);
     }
 }

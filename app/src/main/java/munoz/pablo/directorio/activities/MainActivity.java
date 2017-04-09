@@ -11,6 +11,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -39,31 +40,22 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        //fab.setOnClickListener(new View.OnClickListener() {
-            //@Override
-            //public void onClick(View view) {
-                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        //.setAction("Action", null).show();
-            //}
-        //});
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        this.navigationView = (NavigationView) findViewById(R.id.nav_view);
-        this.navigationView.setNavigationItemSelectedListener(this);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
 
-        this.fragmentManager = this.getFragmentManager();
+        fragmentManager = getFragmentManager();
 
-        this.userName = (TextView) findViewById(R.id.userName);
+        userName = (TextView) findViewById(R.id.userName);
 
         // Insert the first fragment directly, instead of using changeContentFragment method
         // to enable history and backward navigation
-        FragmentTransaction transaction = this.fragmentManager.beginTransaction();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.add(R.id.main_activity_content, new ContractorCategoryMenu(), contentFragmentTag)
                 .commit();
     }
@@ -107,9 +99,9 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_login) {
-            this.changeContentFragment(new Login());
+            changeContentFragment(new Login());
         } else if (id == R.id.nav_send) {
-            this.changeContentFragment(new RegistrationFragment());
+            changeContentFragment(new RegistrationFragment());
         } else if (id == R.id.add_contractor) {
             Intent intent = new Intent(this, ContractorRegistration.class);
             startActivity(intent);
@@ -121,17 +113,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void changeContentFragment(Fragment newFragment) {
-        FragmentTransaction transaction = this.fragmentManager.beginTransaction();
-        if (this.fragmentManager.findFragmentByTag(contentFragmentTag) != null) {
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        if (fragmentManager.findFragmentByTag(contentFragmentTag) != null) {
             transaction.remove(
-                    this.fragmentManager.findFragmentByTag(contentFragmentTag));
+                    fragmentManager.findFragmentByTag(contentFragmentTag));
         }
         transaction.add(R.id.main_activity_content, newFragment, contentFragmentTag)
                 .addToBackStack(null)
                 .commit();
-    }
-
-    public void setUserName(String userName){
-        this.userName.setText(userName);
     }
 }

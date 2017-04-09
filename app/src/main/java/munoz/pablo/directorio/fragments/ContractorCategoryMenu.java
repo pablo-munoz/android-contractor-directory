@@ -2,6 +2,7 @@ package munoz.pablo.directorio.fragments;
 
 
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,21 +30,11 @@ import munoz.pablo.directorio.utils.Constants;
  * create an instance of this fragment.
  */
 public class ContractorCategoryMenu extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
 
     private ContractorCategoryAdapter categoriesAdapter;
     private ArrayList<ContractorCategory> contractorCategoryList;
     private ListView listView;
     private ModelBuilder<ContractorCategory> modelBuilder;
-
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
 
     public ContractorCategoryMenu() {
         // Required empty public constructor
@@ -56,11 +47,9 @@ public class ContractorCategoryMenu extends Fragment {
      * @return A new instance of fragment ContractorCategoryMenu.
      */
     // TODO: Rename and change types and number of parameters
-    public static ContractorCategoryMenu newInstance(String param1, String param2) {
+    public static ContractorCategoryMenu newInstance() {
         ContractorCategoryMenu fragment = new ContractorCategoryMenu();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -68,10 +57,6 @@ public class ContractorCategoryMenu extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -80,16 +65,16 @@ public class ContractorCategoryMenu extends Fragment {
 
         View view =  inflater.inflate(R.layout.fragment_contractor_category_menu, container, false);
 
-        this.modelBuilder = new ModelBuilder<>();
 
-        this.contractorCategoryList = new ArrayList<>();
-        this.categoriesAdapter = new ContractorCategoryAdapter(view.getContext(), contractorCategoryList);
+        modelBuilder = new ModelBuilder<>();
+        contractorCategoryList = new ArrayList<>();
+        categoriesAdapter = new ContractorCategoryAdapter(view.getContext(), contractorCategoryList);
 
-        this.listView = (ListView) view.findViewById(R.id.category_list_view);
+        listView = (ListView) view.findViewById(R.id.category_list_view);
 
-        this.listView.setAdapter(categoriesAdapter);
+        listView.setAdapter(categoriesAdapter);
 
-        this.listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 MainActivity activity = (MainActivity) getActivity();
@@ -98,13 +83,12 @@ public class ContractorCategoryMenu extends Fragment {
             }
         });
 
-
-        this.pullContractorCategoriesData();
+        requestContractorCategoriesDataFromApi();
 
         return view;
     }
 
-    private void pullContractorCategoriesData() {
+    private void requestContractorCategoriesDataFromApi() {
         APIRequest apiRequest = new APIRequest(new APIRequest.APIRequestCallback() {
             @Override
             public void onSuccess(JSONObject json, int code) {

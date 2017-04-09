@@ -5,13 +5,16 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 
 import munoz.pablo.directorio.R;
 
@@ -56,7 +59,7 @@ public class LoadingFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            this.message = getArguments().getString(ARG_MESSAGE);
+            message = getArguments().getString(ARG_MESSAGE);
         }
     }
 
@@ -66,24 +69,20 @@ public class LoadingFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_loading, container, false);
 
-        this.imageIv = (ImageView) view.findViewById(R.id.loading_fragment_image);
-        this.messageTv = (TextView) view.findViewById(R.id.loading_fragment_message);
+        imageIv = (ImageView) view.findViewById(R.id.loading_fragment_image);
+        messageTv = (TextView) view.findViewById(R.id.loading_fragment_message);
 
-        this.messageTv.setText(this.message);
+        messageTv.setText(this.message);
 
-        Glide.with(view.getContext())
-        //https://s-media-cache-ak0.pinimg.com/originals/49/8f/77/498f7727ecf2a588d6c3eebac92a7c4b.gif
-                .load("https://d13yacurqjgara.cloudfront.net/users/583436/screenshots/1686759/spherewave.gif")
-                .asGif()
-                .fitCenter()
-                .crossFade()
-                .into(this.imageIv);
+        GlideDrawableImageViewTarget imageViewTarget = new GlideDrawableImageViewTarget(imageIv);
+        Glide.with(this).load(R.raw.spherewave).into(imageViewTarget);
+
 
         return view;
     }
 
     public void addToManager(FragmentManager manager, int containerId) {
-        if (!this.isAdded()) {
+        if (!isAdded()) {
             FragmentTransaction transaction = manager.beginTransaction();
             transaction.add(containerId, this, "loading");
             transaction.commit();
@@ -91,7 +90,7 @@ public class LoadingFragment extends Fragment {
     }
 
     public void removeFromManager(FragmentManager manager) {
-        if (this.isAdded()) {
+        if (isAdded()) {
             FragmentTransaction transaction = manager.beginTransaction();
             transaction.remove(this);
             transaction.commit();
