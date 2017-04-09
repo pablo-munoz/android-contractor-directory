@@ -79,6 +79,7 @@ public class ContractorDetail extends Fragment implements
     private EditText commentEt;
     private Button addCommentBtn;
     private MapView mMapView;
+    private Button callBtn;
 
     private JSONArrayAdapter commentsAdapter;
 
@@ -121,7 +122,7 @@ public class ContractorDetail extends Fragment implements
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            this.contractorId = getArguments().getString(ARG_contractorId);
+            contractorId = getArguments().getString(ARG_contractorId);
         }
 
 
@@ -133,36 +134,35 @@ public class ContractorDetail extends Fragment implements
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_contractor_detail, container, false);
 
-        Log.d("ContractorDetail", "Fragment created with contractorId = " + this.contractorId);
+        Log.d("ContractorDetail", "Fragment created with contractorId = " + contractorId);
 
-        this.nameTv = (TextView) view.findViewById(R.id.contractor_detail_name);
-        this.idTv = (TextView) view.findViewById(R.id.contractor_detail_id);
-        this.emailTv = (TextView) view.findViewById(R.id.contractor_detail_email);
-        this.phoneTv = (TextView) view.findViewById(R.id.contractor_detail_phone);
-        this.portraitIv = (ImageView) view.findViewById(R.id.contractor_detail_img);
-        this.overallRatingBar = (RatingBar) view.findViewById(R.id.contractor_detail_rating_bar);
-        this.commentsLv = (ListView) view.findViewById(R.id.contractor_detail_lv);
+        nameTv = (TextView) view.findViewById(R.id.contractor_detail_name);
+        idTv = (TextView) view.findViewById(R.id.contractor_detail_id);
+        emailTv = (TextView) view.findViewById(R.id.contractor_detail_email);
+        phoneTv = (TextView) view.findViewById(R.id.contractor_detail_phone);
+        portraitIv = (ImageView) view.findViewById(R.id.contractor_detail_img);
+        overallRatingBar = (RatingBar) view.findViewById(R.id.contractor_detail_rating_bar);
+        commentsLv = (ListView) view.findViewById(R.id.contractor_detail_lv);
+        callBtn = (Button) view.findViewById(R.id.contractor_detail_call_btn);
 
-        this.commentEt = (EditText) view.findViewById(R.id.contractor_detail_comment_edit);
-        this.commentEt.setVisibility(View.INVISIBLE);
+        commentEt = (EditText) view.findViewById(R.id.contractor_detail_comment_edit);
+        commentEt.setVisibility(View.INVISIBLE);
 
-        this.addCommentBtn = (Button) view.findViewById(R.id.contractor_detail_add_comment_btn);
+        addCommentBtn = (Button) view.findViewById(R.id.contractor_detail_add_comment_btn);
 
-        this.addCommentBtn.setOnClickListener(new View.OnClickListener() {
-            ContractorDetail fragment = ContractorDetail.this;
-
+        addCommentBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (fragment.commentEt.getVisibility() == View.VISIBLE) {
-                    ContractorDetail.this.publishComment();
+                if (commentEt.getVisibility() == View.VISIBLE) {
+                    publishComment();
                 } else {
-                    fragment.commentEt.setVisibility(View.VISIBLE);
+                    commentEt.setVisibility(View.VISIBLE);
                 }
             }
         });
 
-        this.myRatingBar = (RatingBar) view.findViewById(R.id.contractor_detail_my_rating_bar);
-        this.myRatingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+        myRatingBar = (RatingBar) view.findViewById(R.id.contractor_detail_my_rating_bar);
+        myRatingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
                 if (!fromUser) return;
@@ -189,28 +189,39 @@ public class ContractorDetail extends Fragment implements
             }
         });
 
-        this.modelBuilder = new ModelBuilder<>();
 
-        this.pullContractorData(contractorId);
+        callBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_CALL);
 
-        MapsInitializer.initialize(this.getActivity());
-        this.mMapView = (MapView) view.findViewById(R.id.contractor_detail_map);
-        this.mMapView.onCreate(savedInstanceState);
-        this.mMapView.getMapAsync(this);
+                intent.setData(Uri.parse("tel:" + contractor.getPhone()));
+                startActivity(intent);
+            }
+        });
 
-        if (this.client == null) {
+        modelBuilder = new ModelBuilder<>();
 
-            this.client = new GoogleApiClient.Builder(this.getActivity())
+        pullContractorData(contractorId);
+
+        MapsInitializer.initialize(getActivity());
+        mMapView = (MapView) view.findViewById(R.id.contractor_detail_map);
+        mMapView.onCreate(savedInstanceState);
+        mMapView.getMapAsync(this);
+
+        if (client == null) {
+
+            client = new GoogleApiClient.Builder(getActivity())
                     .addConnectionCallbacks(this)
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
                     .build();
         }
 
-        this.locationRequest = LocationRequest.create();
-        this.locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        this.locationRequest.setInterval(1000 * 5);
-        this.locationRequest.setFastestInterval(1000 * 3);
+        locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(1000 * 5);
+        locationRequest.setFastestInterval(1000 * 3);
 
 
         return view;
@@ -277,19 +288,19 @@ public class ContractorDetail extends Fragment implements
     }
 
     public void updateView() {
-        this.nameTv.setText(this.contractor.getFullName());
-        this.idTv.setText("" + this.contractor.getId());
-        this.emailTv.setText(this.contractor.getEmail());
-        this.phoneTv.setText(this.contractor.getPhone());
-        this.overallRatingBar.setRating((float) this.contractor.getRating());
-        this.myRatingBar.setRating(4);
+        nameTv.setText(contractor.getFullName());
+        idTv.setText("" + contractor.getId());
+        emailTv.setText(contractor.getEmail());
+        phoneTv.setText(contractor.getPhone());
+        overallRatingBar.setRating((float) contractor.getRating());
+        myRatingBar.setRating(4);
 
         Glide.with(ContractorDetail.this)
-                .load(this.contractor.getPortrait())
+                .load(contractor.getPortrait())
                 .fitCenter()
-                .into(this.portraitIv);
+                .into(portraitIv);
 
-        this.commentsAdapter = new JSONArrayAdapter(getActivity(), this.contractor.getComments(),
+        commentsAdapter = new JSONArrayAdapter(getActivity(), contractor.getComments(),
                 new JSONArrayAdapter.ViewBuilder() {
                     @Override
                     public View construct(JSONArray data, int position, View view, ViewGroup parent) {
@@ -308,17 +319,17 @@ public class ContractorDetail extends Fragment implements
                     }
                 });
 
-        this.commentsLv.setAdapter(this.commentsAdapter);
+        commentsLv.setAdapter(commentsAdapter);
 
 
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        this.mMap = googleMap;
+        mMap = googleMap;
 
 
-        Geocoder coder = new Geocoder(this.getActivity());
+        Geocoder coder = new Geocoder(getActivity());
 
         List<Address> address = null;
         try {
@@ -347,10 +358,10 @@ public class ContractorDetail extends Fragment implements
 
     public void setMyLocation() {
 
-        if (ContextCompat.checkSelfPermission(this.getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
 
-            ActivityCompat.requestPermissions(this.getActivity(),
+            ActivityCompat.requestPermissions(getActivity(),
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     0);
         } else {
@@ -392,7 +403,7 @@ public class ContractorDetail extends Fragment implements
                     lastLocation.getLatitude() + ", " + lastLocation.getLongitude());
         }
 
-        if (ActivityCompat.checkSelfPermission(this.getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
