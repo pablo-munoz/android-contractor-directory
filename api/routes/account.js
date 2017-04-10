@@ -43,7 +43,13 @@ JOIN favorites on contractor.id = favorites.contractor_id
 WHERE favorites.account_id = '${request.params.account_id}';
 `)
             .then((result) => {
-                response.json({ data: result.rows });
+                response.json({
+                    data: _.map(result.rows, row => ({
+                        "type": "contractor",
+                        "id": row.id,
+                        "attributes": _.omit(row, 'id')
+                    }))
+                });
             })
             .catch((error) => {
                 console.error(error);

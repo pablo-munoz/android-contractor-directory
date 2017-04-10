@@ -29,30 +29,14 @@ public class ContractorAdapter extends ArrayAdapter<Contractor> {
     @NonNull
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        // Get data item for this position
-        Contractor contractor = this.getItem(position);
-
         // Check if an existing view is being reused, otherwise inflate the view
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.contractor_card, parent, false);
         }
 
-        // Lookup view for data population
-        TextView nameTv = (TextView) convertView.findViewById(R.id.contractor_card_name);
-        RatingBar ratingBar = (RatingBar) convertView.findViewById(R.id.contractor_card_rating);
-
-        nameTv.setText(contractor.getFullName());
-
-        ratingBar.setRating((float) contractor.getRating());
-
-        TextView phoneTv = (TextView) convertView.findViewById(R.id.contractor_card_phone);
-        phoneTv.setText(contractor.getPhone());
-
-        TextView emailTv = (TextView) convertView.findViewById(R.id.contractor_card_email);
-        emailTv.setText(contractor.getEmail());
-
-        TextView websiteTv = (TextView) convertView.findViewById(R.id.contractor_card_website);
-        websiteTv.setText(contractor.getWebsite());
+        // Get data item for this position
+        Contractor contractor = this.getItem(position);
+        contractor.populateContractorCard(convertView);
 
         return convertView;
     }

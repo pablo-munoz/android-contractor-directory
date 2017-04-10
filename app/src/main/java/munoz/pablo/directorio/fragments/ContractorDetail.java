@@ -23,6 +23,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -70,6 +71,8 @@ public class ContractorDetail extends Fragment implements
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener
 {
+    private MainActivity mainActivity;
+
     private TextView nameTv;
     private TextView idTv;
     private TextView phoneTv;
@@ -83,7 +86,7 @@ public class ContractorDetail extends Fragment implements
     private MapView mMapView;
     private Button callBtn;
     private Button addToFavoritesBtn;
-    private MainActivity mainActivity;
+    private ProgressBar progressBar;
 
     private JSONArrayAdapter commentsAdapter;
 
@@ -149,6 +152,7 @@ public class ContractorDetail extends Fragment implements
         commentsLv = (ListView) view.findViewById(R.id.contractor_detail_lv);
         callBtn = (Button) view.findViewById(R.id.contractor_detail_call_btn);
         addToFavoritesBtn = (Button) view.findViewById(R.id.contractor_detail_add_favorites);
+        progressBar = (ProgressBar) view.findViewById(R.id.contractor_detail_loading);
 
         commentEt = (EditText) view.findViewById(R.id.contractor_detail_comment_edit);
         commentEt.setVisibility(View.INVISIBLE);
@@ -298,11 +302,10 @@ public class ContractorDetail extends Fragment implements
         APIRequest apiRequest = new APIRequest(new APIRequest.APIRequestCallback() {
             @Override
             public void onSuccess(JSONObject json, int code) {
-                ContractorDetail self = ContractorDetail.this;
-
                 try {
-                    self.contractor =  self.modelBuilder.resourceFromJson(json);
-                    self.updateView();
+                    contractor =  modelBuilder.resourceFromJson(json);
+                    updateView();
+                    progressBar.setVisibility(View.GONE);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

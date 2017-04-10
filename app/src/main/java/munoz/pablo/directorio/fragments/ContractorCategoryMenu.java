@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,6 +35,7 @@ public class ContractorCategoryMenu extends Fragment {
     private ContractorCategoryAdapter categoriesAdapter;
     private ArrayList<ContractorCategory> contractorCategoryList;
     private ListView listView;
+    private ProgressBar progressBar;
     private ModelBuilder<ContractorCategory> modelBuilder;
 
     public ContractorCategoryMenu() {
@@ -65,7 +67,7 @@ public class ContractorCategoryMenu extends Fragment {
 
         View view =  inflater.inflate(R.layout.fragment_contractor_category_menu, container, false);
 
-
+        progressBar = (ProgressBar) view.findViewById(R.id.category_list_loading);
         modelBuilder = new ModelBuilder<>();
         contractorCategoryList = new ArrayList<>();
         categoriesAdapter = new ContractorCategoryAdapter(view.getContext(), contractorCategoryList);
@@ -100,6 +102,7 @@ public class ContractorCategoryMenu extends Fragment {
 
                 categoriesAdapter.clear();
                 categoriesAdapter.addAll(contractorCategoryList);
+                progressBar.setVisibility(View.GONE);
             }
 
             @Override

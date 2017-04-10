@@ -5,8 +5,8 @@
     tools:context="munoz.pablo.directorio.fragments.CategoryContractors"
     android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/fgmt_category_contractors_loading"
+    <ProgressBar
+        android:id="@+id/category_contractors_loading"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

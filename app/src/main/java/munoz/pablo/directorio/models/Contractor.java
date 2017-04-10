@@ -2,8 +2,14 @@ package munoz.pablo.directorio.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
+import android.view.View;
+import android.widget.RatingBar;
+import android.widget.TextView;
 
 import org.json.JSONArray;
+
+import munoz.pablo.directorio.R;
 
 /**
  * Created by pablo on 1/28/2017.
@@ -151,5 +157,23 @@ public class Contractor implements Parcelable{
         dest.writeString(website);
         dest.writeString(portrait);
         dest.writeDouble(rating);
+    }
+
+    public void populateContractorCard(View view) {
+        if (view != null) {
+            TextView nameTv = (TextView) view.findViewById(R.id.contractor_card_name);
+            RatingBar ratingBar = (RatingBar) view.findViewById(R.id.contractor_card_rating);
+            TextView phoneTv = (TextView) view.findViewById(R.id.contractor_card_phone);
+            TextView emailTv = (TextView) view.findViewById(R.id.contractor_card_email);
+            TextView websiteTv = (TextView) view.findViewById(R.id.contractor_card_website);
+
+            nameTv.setText(this.getFullName());
+            ratingBar.setRating((float) this.getRating());
+            phoneTv.setText(this.getPhone());
+            emailTv.setText(this.getEmail());
+            websiteTv.setText(this.getWebsite());
+        } else {
+            Log.e("Contractor", "Attempted to call 'populateContractorCard' with a null view.");
+        }
     }
 }

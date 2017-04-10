@@ -8,11 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import com.bumptech.glide.Glide;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -48,7 +46,7 @@ public class CategoryContractors extends Fragment {
     private ModelBuilder<ContractorCategory> categoryModelBuilder;
     private ModelBuilder<Contractor> contractorModelBuilder;
 
-    private ImageView loadingIv;
+    private ProgressBar progressBar;
     private TextView titleTv;
     private TextView emptyQueryTv;
 
@@ -85,16 +83,9 @@ public class CategoryContractors extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_category_contractors, container, false);
 
-        loadingIv = (ImageView) view.findViewById(R.id.fgmt_category_contractors_loading);
         titleTv = (TextView) view.findViewById(R.id.category_contractors_title);
         emptyQueryTv = (TextView) view.findViewById(R.id.category_contractors_empty_query_label);
-
-        Glide.with(getActivity())
-                .load("https://d13yacurqjgara.cloudfront.net/users/583436/screenshots/1686759/spherewave.gif")
-                .asGif()
-                .fitCenter()
-                .crossFade()
-                .into(loadingIv);
+        progressBar = (ProgressBar) view.findViewById(R.id.category_contractors_loading);
 
         contractorList = new ArrayList<>();
         categoryModelBuilder = new ModelBuilder<>();
@@ -156,14 +147,14 @@ public class CategoryContractors extends Fragment {
                 try {
                     int count = json.getJSONObject("meta").getInt("count");
 
-                    if (count !=0) {
+                    if (count != 0) {
                         contractorList = contractorModelBuilder.resourceListFromJson(json);
                         adapter.addAll(contractorList);
                     } else {
                         emptyQueryTv.setText("No se ha encontrado nada.");
                     }
 
-                    hideLoadingGif();
+                    progressBar.setVisibility(View.GONE);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -177,10 +168,5 @@ public class CategoryContractors extends Fragment {
         });
 
         apiRequest.execute(APIRequest.HTTP_GET, Constants.API_URL + "/api/v1/contractor?contractor_category=" + contractorCategory.getId());
-    }
-
-
-    private void hideLoadingGif() {
-        loadingIv.setVisibility(View.GONE);
     }
 }

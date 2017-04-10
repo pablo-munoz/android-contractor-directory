@@ -9,14 +9,17 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 import munoz.pablo.directorio.R;
 import munoz.pablo.directorio.activities.MainActivity;
 import munoz.pablo.directorio.adapters.FavoritesAdapter;
 import munoz.pablo.directorio.models.Account;
+import munoz.pablo.directorio.models.Contractor;
+import munoz.pablo.directorio.models.ModelBuilder;
 import munoz.pablo.directorio.services.APIRequest;
 import munoz.pablo.directorio.utils.Constants;
 
@@ -29,7 +32,7 @@ public class Favorites extends Fragment {
     private View view;
     private MainActivity mainActivity;
 
-    private JSONArray favoritesData;
+    private ArrayList<Contractor> favoriteContractors;
     private FavoritesAdapter favoritesAdapter;
     private ListView listView;
 
@@ -55,7 +58,7 @@ public class Favorites extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mainActivity = (MainActivity) getActivity();
-        favoritesData = new JSONArray();
+        favoriteContractors = new ArrayList<>();
     }
 
     @Override
@@ -68,15 +71,15 @@ public class Favorites extends Fragment {
         APIRequest requestToGetFavorites = new APIRequest(new APIRequest.APIRequestCallback() {
             @Override
             public void onSuccess(JSONObject json, int code) {
-                favoritesData = null;
+                ModelBuilder<Contractor> modelBuilder = new ModelBuilder<>();
 
                 try {
-                    favoritesData = json.getJSONArray("data");
+                    favoriteContractors = modelBuilder.resourceListFromJson(json);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
 
-                favoritesAdapter = new FavoritesAdapter(favoritesData, getActivity());
+                favoritesAdapter = new FavoritesAdapter(favoriteContractors, getActivity());
                 listView.setAdapter(favoritesAdapter);
             }
 
@@ -96,14 +99,8 @@ public class Favorites extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String contractor_id = null;
-
-                try {
-                    contractor_id = favoritesData.getJSONObject(position).getString("id");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
+                String contractor_id;
+                contractor_id = favoriteContractors.get(position).getId();
                 ContractorDetail newFragment = ContractorDetail.newInstance(contractor_id);
                 MainActivity mainActivity = (MainActivity) getActivity();
                 mainActivity.changeContentFragment(newFragment);
