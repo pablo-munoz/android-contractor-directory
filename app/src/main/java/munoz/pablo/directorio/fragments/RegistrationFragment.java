@@ -2,17 +2,30 @@ package munoz.pablo.directorio.fragments;
 
 import android.os.Bundle;
 import android.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 import munoz.pablo.directorio.R;
+import munoz.pablo.directorio.activities.MainActivity;
+import munoz.pablo.directorio.models.Contractor;
+import munoz.pablo.directorio.models.ContractorCategory;
+import munoz.pablo.directorio.models.ModelBuilder;
 import munoz.pablo.directorio.services.APIRequest;
 import munoz.pablo.directorio.utils.Constants;
 
@@ -24,19 +37,19 @@ import munoz.pablo.directorio.utils.Constants;
  * create an instance of this fragment.
  */
 public class RegistrationFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
     private EditText emailEt;
     private EditText passwordEt;
     private EditText passwordConfEt;
+    private CheckBox isContractorCb;
+    private LinearLayout contractorOnlyInputs;
+    private EditText firstNameEt;
+    private EditText middleNameEt;
+    private EditText lastNamesEt;
+    private Spinner categoriesSp;
+    private EditText phoneEt;
+    private EditText websiteEt;
     private Button registerButton;
+    private ArrayList<ContractorCategory> contractorCategoryList;
 
     public RegistrationFragment() {
         // Required empty public constructor
@@ -46,16 +59,12 @@ public class RegistrationFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
      * @return A new instance of fragment RegistrationFragment.
      */
     // TODO: Rename and change types and number of parameters
     public static RegistrationFragment newInstance(String param1, String param2) {
         RegistrationFragment fragment = new RegistrationFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -63,10 +72,6 @@ public class RegistrationFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -79,53 +84,143 @@ public class RegistrationFragment extends Fragment {
         this.passwordEt = (EditText) view.findViewById(R.id.account_registration_password);
         this.passwordConfEt = (EditText) view.findViewById(R.id.account_registration_password_conf);
         this.registerButton = (Button) view.findViewById(R.id.account_registration_button);
+        this.isContractorCb = (CheckBox) view.findViewById(R.id.account_registration_contractor_checkbox);
+        this.contractorOnlyInputs = (LinearLayout) view.findViewById(R.id.account_registration_contractor_only) ;
+        this.firstNameEt = (EditText) view.findViewById(R.id.account_registration_first_name);
+        this.middleNameEt = (EditText) view.findViewById(R.id.account_registration_middle_name);
+        this.lastNamesEt = (EditText) view.findViewById(R.id.account_registration_last_names);
+        this.categoriesSp = (Spinner) view.findViewById(R.id.account_registration_category_select);
+        this.phoneEt = (EditText) view.findViewById(R.id.account_registration_phone);
+        this.websiteEt = (EditText) view.findViewById(R.id.account_registration_website) ;
 
-        this.registerButton.setOnClickListener(new View.OnClickListener() {
-            RegistrationFragment self = RegistrationFragment.this;
+        contractorOnlyInputs.setVisibility(View.GONE);
 
+        // Show or hide the extra, contractor only inputs.
+        this.isContractorCb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View v) {
-                String email = self.emailEt.getText().toString();
-                String password = self.passwordEt.getText().toString();
-                String passwordConf = self.passwordConfEt.getText().toString();
-
-                if (!password.equals(passwordConf)) {
-                    Toast.makeText(
-                            getView().getContext(),
-                            "Las contraseñas no coinciden.",
-                            Toast.LENGTH_LONG).show();
-                    return;
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    contractorOnlyInputs.setVisibility(View.VISIBLE);
+                } else {
+                    contractorOnlyInputs.setVisibility(View.GONE);
                 }
-
-                JSONObject json = new JSONObject();
-                try {
-                    json.put("email", email);
-                    json.put("password", password);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                APIRequest apiRequest = new APIRequest(new APIRequest.APIRequestCallback() {
-                    @Override
-                    public void onSuccess(JSONObject json, int code) {
-                        // Toast.makeText(activity, "Registro exitoso.", Toast.LENGTH_LONG).show();
-                        // Intent intent = new Intent(activity, MainActivity2.class);
-                        // startActivity(intent);
-                    }
-
-                    @Override
-                    public void onError(String errorMessage, int code) {
-                        Toast.makeText(
-                                getView().getContext(),
-                                "Error en el registro, favor de intentar más tarde.",
-                                Toast.LENGTH_LONG).show();
-                    }
-                });
-
-                apiRequest.execute(APIRequest.HTTP_POST, Constants.API_URL + "/api/v1/auth/register", null, json.toString());
             }
         });
 
+        this.registerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                attemptAccountCreation();
+            }
+        });
+
+        pullContractorCategoryData();
+
         return view;
+    }
+
+    void pullContractorCategoryData() {
+        APIRequest apiRequest = new APIRequest(new APIRequest.APIRequestCallback() {
+
+            @Override
+            public void onSuccess(JSONObject json, int code) {
+                ModelBuilder<ContractorCategory> modelBuilder = new ModelBuilder<>();
+                try {
+                    contractorCategoryList = modelBuilder.resourceListFromJson(json);
+                    populateCategorySpinner();
+                    Log.d("GET CATEGORIES", ""+ contractorCategoryList.size());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onError(String errorMessage, int code) {
+                Log.e("RegistrationFragment", "Could not retrieve contractor category data");
+                Log.e("RegistrationFragment", errorMessage);
+            }
+        });
+
+        apiRequest.execute(APIRequest.HTTP_GET, Constants.API_URL + "/api/v1/contractor_category");
+    }
+
+    void populateCategorySpinner() {
+        ContractorCategory category;
+        ArrayAdapter<ContractorCategory> adapter = new ArrayAdapter<ContractorCategory>(
+                getActivity(), R.layout.contractor_category_spinner, this.contractorCategoryList);
+        categoriesSp.setAdapter(adapter);
+        categoriesSp.setSelection(0);
+    }
+
+    void attemptAccountCreation() {
+        String email = emailEt.getText().toString();
+        String password = passwordEt.getText().toString();
+        String passwordConf = passwordConfEt.getText().toString();
+
+        boolean isContractor = isContractorCb.isChecked();
+
+        if (!password.equals(passwordConf)) {
+            Toast.makeText(
+                    getView().getContext(),
+                    "Las contraseñas no coinciden.",
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        JSONObject json = new JSONObject();
+        JSONObject data = new JSONObject();
+        JSONObject relationships = new JSONObject();
+        JSONObject contractorRelationship = new JSONObject();
+
+        try {
+            data.put("email", email);
+            data.put("password", password);
+            json.put("type", "account");
+            json.put("data", data);
+
+            if (isContractor) {
+                String firstName = firstNameEt.getText().toString();
+                String middleName = middleNameEt.getText().toString();
+                String lastNames = lastNamesEt.getText().toString();
+                String category = ((ContractorCategory) categoriesSp.getSelectedItem()).getId();
+                String phone = phoneEt.getText().toString();
+                String website = websiteEt.getText().toString();
+
+                contractorRelationship.put("first_name", firstName);
+                contractorRelationship.put("middle_name", middleName);
+                contractorRelationship.put("last_names", lastNames);
+                contractorRelationship.put("phone", phone);
+                contractorRelationship.put("website", website);
+
+                relationships.put("contractor", contractorRelationship);
+
+                JSONArray categories = new JSONArray();
+                categories.put(category);
+
+                relationships.put("contractor_category", categories);
+
+                json.put("relationships", relationships);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        APIRequest apiRequest = new APIRequest(new APIRequest.APIRequestCallback() {
+            @Override
+            public void onSuccess(JSONObject json, int code) {
+                MainActivity mainActivity = (MainActivity) getActivity();
+                mainActivity.changeContentFragment(new Login());
+            }
+
+            @Override
+            public void onError(String errorMessage, int code) {
+                Toast.makeText(
+                        getView().getContext(),
+                        "Error en el registro, favor de intentar más tarde.",
+                        Toast.LENGTH_LONG).show();
+            }
+        });
+
+        apiRequest.execute(APIRequest.HTTP_POST, Constants.API_URL + "/api/v1/auth/register", null, json.toString());
     }
 }
