@@ -48,7 +48,9 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.List;
 
+import munoz.pablo.directorio.activities.MainActivity;
 import munoz.pablo.directorio.adapters.JSONArrayAdapter;
+import munoz.pablo.directorio.models.Account;
 import munoz.pablo.directorio.models.Contractor;
 import munoz.pablo.directorio.models.ModelBuilder;
 import munoz.pablo.directorio.utils.AuthHelper;
@@ -80,6 +82,8 @@ public class ContractorDetail extends Fragment implements
     private Button addCommentBtn;
     private MapView mMapView;
     private Button callBtn;
+    private Button addToFavoritesBtn;
+    private MainActivity mainActivity;
 
     private JSONArrayAdapter commentsAdapter;
 
@@ -125,7 +129,7 @@ public class ContractorDetail extends Fragment implements
             contractorId = getArguments().getString(ARG_contractorId);
         }
 
-
+        mainActivity = (MainActivity) getActivity();
     }
 
     @Override
@@ -144,6 +148,7 @@ public class ContractorDetail extends Fragment implements
         overallRatingBar = (RatingBar) view.findViewById(R.id.contractor_detail_rating_bar);
         commentsLv = (ListView) view.findViewById(R.id.contractor_detail_lv);
         callBtn = (Button) view.findViewById(R.id.contractor_detail_call_btn);
+        addToFavoritesBtn = (Button) view.findViewById(R.id.contractor_detail_add_favorites);
 
         commentEt = (EditText) view.findViewById(R.id.contractor_detail_comment_edit);
         commentEt.setVisibility(View.INVISIBLE);
@@ -158,6 +163,33 @@ public class ContractorDetail extends Fragment implements
                 } else {
                     commentEt.setVisibility(View.VISIBLE);
                 }
+            }
+        });
+
+        addToFavoritesBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                APIRequest addToFavoritesRequest = new APIRequest(new APIRequest.APIRequestCallback() {
+                    @Override
+                    public void onSuccess(JSONObject json, int code) {
+                        Toast.makeText(mainActivity, contractor.getFirstName() + " añadido a favoritos.", Toast.LENGTH_SHORT)
+                                .show();
+                    }
+
+                    @Override
+                    public void onError(String errorMessage, int code) {
+
+                    }
+                });
+
+                Account userAccount = mainActivity.getUserAccount();
+
+                String endpoint = String.format("%s/%s/account/%s/favorites/%s/add",
+                        Constants.API_URL, Constants.API_VERSION, userAccount.getId(), contractor.getId());
+
+                String headers = String.format("{ \"%s\": \"%s\" }", "Authorization", userAccount.getToken());
+
+                addToFavoritesRequest.execute(APIRequest.HTTP_POST, endpoint, headers, "{}");
             }
         });
 

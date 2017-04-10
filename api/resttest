@@ -31,3 +31,6 @@ Authorization: Bearer :token
 {
     "content": "10/10, buen trabajo a un precio justo."
 }
+
+## a221a051-6387-4ef0-87f0-0ebe4ed859be
+GET http://192.168.33.10:3000/api/v1/account/a221a051-6387-4ef0-87f0-0ebe4ed859be/favorites

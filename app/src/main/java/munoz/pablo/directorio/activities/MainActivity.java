@@ -20,6 +20,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import munoz.pablo.directorio.fragments.ContractorCategoryMenu;
+import munoz.pablo.directorio.fragments.Favorites;
 import munoz.pablo.directorio.fragments.Login;
 import munoz.pablo.directorio.fragments.RegistrationFragment;
 import munoz.pablo.directorio.R;
@@ -120,6 +121,12 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_logout) {
             userAccount = Account.getAnonymous();
             updateNavigation();
+        } else if (id == R.id.nav_favorites) {
+            if (userAccount.isAnonymous()) {
+                changeContentFragment(new Login());
+            } else {
+                changeContentFragment(new Favorites());
+            }
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -133,8 +140,13 @@ public class MainActivity extends AppCompatActivity
         if (fragmentManager.findFragmentByTag(contentFragmentTag) != null) {
             transaction.remove(fragmentManager.findFragmentByTag(contentFragmentTag));
         }
-        transaction.add(R.id.main_activity_content, newFragment, contentFragmentTag)
-                .addToBackStack(null);
+
+
+        transaction.add(R.id.main_activity_content, newFragment, contentFragmentTag);
+
+        if (!(newFragment instanceof Login || newFragment instanceof RegistrationFragment)) {
+            transaction.addToBackStack(null);
+        }
 
         transaction.commit();
     }

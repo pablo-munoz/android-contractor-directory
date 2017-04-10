@@ -60,6 +60,12 @@
                 android:layout_height="wrap_content"
                 android:text="Llamar ahora"/>
 
+            <Button
+                android:id="@+id/contractor_detail_add_favorites"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Añadir a favoritos"/>
+
             <ImageView
                 android:id="@+id/contractor_detail_img"
                 android:layout_width="match_parent"

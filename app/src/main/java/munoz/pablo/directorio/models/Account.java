@@ -96,4 +96,8 @@ public class Account implements Parcelable {
         return this == anonymous;
     }
 
+    public String getToken() {
+        return token;
+    }
+
 }

@@ -1,16 +1,22 @@
 package munoz.pablo.directorio.fragments;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import munoz.pablo.directorio.R;
+import munoz.pablo.directorio.activities.MainActivity;
+import munoz.pablo.directorio.adapters.FavoritesAdapter;
+import munoz.pablo.directorio.models.Account;
 import munoz.pablo.directorio.services.APIRequest;
 import munoz.pablo.directorio.utils.Constants;
 
@@ -21,6 +27,11 @@ import munoz.pablo.directorio.utils.Constants;
  */
 public class Favorites extends Fragment {
     private View view;
+    private MainActivity mainActivity;
+
+    private JSONArray favoritesData;
+    private FavoritesAdapter favoritesAdapter;
+    private ListView listView;
 
     public Favorites() {
         // Required empty public constructor
@@ -43,6 +54,8 @@ public class Favorites extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mainActivity = (MainActivity) getActivity();
+        favoritesData = new JSONArray();
     }
 
     @Override
@@ -50,18 +63,50 @@ public class Favorites extends Fragment {
                              Bundle savedInstanceState) {
 
         view = inflater.inflate(R.layout.fragment_favorites, container, false);
-
-
+        listView = (ListView) view.findViewById(R.id.favorites_list_view);
 
         APIRequest requestToGetFavorites = new APIRequest(new APIRequest.APIRequestCallback() {
             @Override
             public void onSuccess(JSONObject json, int code) {
+                favoritesData = null;
 
+                try {
+                    favoritesData = json.getJSONArray("data");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                favoritesAdapter = new FavoritesAdapter(favoritesData, getActivity());
+                listView.setAdapter(favoritesAdapter);
             }
 
             @Override
             public void onError(String errorMessage, int code) {
 
+            }
+        });
+
+        Account userAccount = mainActivity.getUserAccount();
+
+        String endpoint = String.format("%s/%s/account/%s/favorites",
+                Constants.API_URL, Constants.API_VERSION, userAccount.getId());
+
+        requestToGetFavorites.execute(APIRequest.HTTP_GET, endpoint, null, null);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String contractor_id = null;
+
+                try {
+                    contractor_id = favoritesData.getJSONObject(position).getString("id");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                ContractorDetail newFragment = ContractorDetail.newInstance(contractor_id);
+                MainActivity mainActivity = (MainActivity) getActivity();
+                mainActivity.changeContentFragment(newFragment);
             }
         });
 
