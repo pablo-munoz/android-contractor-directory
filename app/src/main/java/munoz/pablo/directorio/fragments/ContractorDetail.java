@@ -300,7 +300,7 @@ public class ContractorDetail extends Fragment implements
                 .fitCenter()
                 .into(portraitIv);
 
-        commentsAdapter = new JSONArrayAdapter(getActivity(), contractor.getComments(),
+        commentsAdapter = new JSONArrayAdapter(getActivity(), new JSONArray(),
                 new JSONArrayAdapter.ViewBuilder() {
                     @Override
                     public View construct(JSONArray data, int position, View view, ViewGroup parent) {

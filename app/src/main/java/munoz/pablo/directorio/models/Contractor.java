@@ -1,12 +1,15 @@
 package munoz.pablo.directorio.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import org.json.JSONArray;
 
 /**
  * Created by pablo on 1/28/2017.
  */
 
-public class Contractor{
+public class Contractor implements Parcelable{
     private String id;
     private String firstName;
     private String middleName;
@@ -20,7 +23,7 @@ public class Contractor{
 
 
     public Contractor(String id, String firstName, String middleName, String lastName, String email,
-                      String phone, String website, String portrait, double rating, JSONArray comments) {
+                      String phone, String website, String portrait, double rating) {
         this.id = id;
         this.firstName = firstName;
         this.middleName = middleName;
@@ -30,8 +33,31 @@ public class Contractor{
         this.website = website;
         this.portrait = portrait;
         this.rating = rating;
-        this.comments = comments;
     }
+
+    protected Contractor(Parcel in) {
+        id = in.readString();
+        firstName = in.readString();
+        middleName = in.readString();
+        lastName = in.readString();
+        email = in.readString();
+        phone = in.readString();
+        website = in.readString();
+        portrait = in.readString();
+        rating = in.readDouble();
+    }
+
+    public static final Creator<Contractor> CREATOR = new Creator<Contractor>() {
+        @Override
+        public Contractor createFromParcel(Parcel in) {
+            return new Contractor(in);
+        }
+
+        @Override
+        public Contractor[] newArray(int size) {
+            return new Contractor[size];
+        }
+    };
 
     public String getId() {
         return this.id;
@@ -109,7 +135,21 @@ public class Contractor{
         return fullName;
     }
 
-    public JSONArray getComments() {
-        return this.comments;
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(firstName);
+        dest.writeString(middleName);
+        dest.writeString(lastName);
+        dest.writeString(email);
+        dest.writeString(phone);
+        dest.writeString(website);
+        dest.writeString(portrait);
+        dest.writeDouble(rating);
     }
 }

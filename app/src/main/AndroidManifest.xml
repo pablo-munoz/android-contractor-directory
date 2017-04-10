@@ -29,14 +29,10 @@
         <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name=".activities.ContractorRegistration" />
-        <activity
-            android:name=".activities.LoginActivity"
-            android:label="@string/title_activity_login" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -48,7 +44,6 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
-
     </application>
 
 </manifest>

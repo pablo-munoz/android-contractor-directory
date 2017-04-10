@@ -16,22 +16,31 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import munoz.pablo.directorio.fragments.ContractorCategoryMenu;
 import munoz.pablo.directorio.fragments.Login;
 import munoz.pablo.directorio.fragments.RegistrationFragment;
 import munoz.pablo.directorio.R;
+import munoz.pablo.directorio.models.Account;
+import munoz.pablo.directorio.models.Contractor;
+import munoz.pablo.directorio.services.APIRequest;
+import munoz.pablo.directorio.utils.Constants;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String contentFragmentTag = "content";
-    private static final int MENU_LOGIN = Menu.FIRST;
+
+    // The account of the currently logged in user or an Anonymous account.
+    private Account userAccount;
 
     private NavigationView navigationView;
-
     private FragmentManager fragmentManager;
 
-    private TextView userName;
+    private TextView drawerEmailTv;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,18 +49,24 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        Intent intent = getIntent();
+
+        if (userAccount == null) {
+            userAccount = Account.getAnonymous();
+        }
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        // drawer.setDrawerListener(toggle);
         toggle.syncState();
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        fragmentManager = getFragmentManager();
+        updateNavigation();
 
-        userName = (TextView) findViewById(R.id.userName);
+        fragmentManager = getFragmentManager();
 
         // Insert the first fragment directly, instead of using changeContentFragment method
         // to enable history and backward navigation
@@ -100,11 +115,11 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.nav_login) {
             changeContentFragment(new Login());
-        } else if (id == R.id.nav_send) {
+        } else if (id == R.id.nav_register) {
             changeContentFragment(new RegistrationFragment());
-        } else if (id == R.id.add_contractor) {
-            Intent intent = new Intent(this, ContractorRegistration.class);
-            startActivity(intent);
+        } else if (id == R.id.nav_logout) {
+            userAccount = Account.getAnonymous();
+            updateNavigation();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -114,12 +129,100 @@ public class MainActivity extends AppCompatActivity
 
     public void changeContentFragment(Fragment newFragment) {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
+
         if (fragmentManager.findFragmentByTag(contentFragmentTag) != null) {
-            transaction.remove(
-                    fragmentManager.findFragmentByTag(contentFragmentTag));
+            transaction.remove(fragmentManager.findFragmentByTag(contentFragmentTag));
         }
         transaction.add(R.id.main_activity_content, newFragment, contentFragmentTag)
-                .addToBackStack(null)
-                .commit();
+                .addToBackStack(null);
+
+        transaction.commit();
+    }
+
+    public Account getUserAccount() {
+        return userAccount;
+    }
+
+    public void setUserAccount(Account account) {
+        userAccount = account;
+    }
+
+    public boolean attemptLogin(String email, String password) {
+        boolean wasLoginSuccesful = false;
+        final String endpoint = Constants.API_URL + "/" + Constants.API_VERSION + "/auth/login";
+
+        APIRequest loginRequest = new APIRequest(new APIRequest.APIRequestCallback() {
+            @Override
+            public void onSuccess(JSONObject json, int code) {
+                try {
+                    String accountId = json.getString("id");
+                    String email = json.getString("email");
+                    boolean isContractor = false;
+                    String token = json.getString("token");
+
+                    if (json.has("contractor")) {
+                        isContractor = true;
+                    }
+
+                    userAccount = new Account(accountId, email, isContractor, token);
+
+                    JSONObject contractorData = null;
+
+                    if (json.has("contractor")) {
+                        contractorData = json.getJSONObject("contractor");
+                        userAccount.setContractor(new Contractor(
+                                contractorData.getString("id"),
+                                contractorData.getString("first_name"),
+                                contractorData.getString("middle_name"),
+                                contractorData.getString("last_names"),
+                                contractorData.getString("phone"),
+                                contractorData.getString("email"),
+                                contractorData.getString("website"),
+                                contractorData.getString("portrait"),
+                                5
+                        ));
+                    }
+
+                    updateNavigation();
+                    changeContentFragment(new ContractorCategoryMenu());
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Log.d("MainActivity", "Errors encountered when parsing authentication response.");
+                }
+            }
+
+            @Override
+            public void onError(String errorMessage, int code) {
+                Log.d("MainActivity", "Login request failed with code: " + code);
+                Log.d("MainActivity", "Endpoint: " + endpoint);
+                Log.d("MainActivity", errorMessage);
+            }
+        });
+
+        String payload = String.format("{ \"email\": \"%s\", \"password\": \"%s\" }", email, password);
+        loginRequest.execute("POST", endpoint, null, payload);
+
+        return wasLoginSuccesful;
+    }
+
+    private void updateNavigation() {
+        Menu menu = navigationView.getMenu();
+        MenuItem loginMenuItem = menu.findItem(R.id.nav_login);
+        MenuItem registrationMenuItem = menu.findItem(R.id.nav_register);
+        MenuItem accountMenuItem = menu.findItem(R.id.nav_account);
+        MenuItem logoutMenuItem = menu.findItem(R.id.nav_logout);
+
+        if (!userAccount.isAnonymous()) {
+            loginMenuItem.setVisible(false);
+            registrationMenuItem.setVisible(false);
+            accountMenuItem.setVisible(true);
+            logoutMenuItem.setVisible(true);
+        } else {
+            loginMenuItem.setVisible(true);
+            registrationMenuItem.setVisible(true);
+            accountMenuItem.setVisible(false);
+            logoutMenuItem.setVisible(false);
+        }
     }
 }

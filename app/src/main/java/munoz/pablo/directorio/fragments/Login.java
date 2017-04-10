@@ -131,50 +131,18 @@ public class Login extends Fragment {
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
-        JSONObject body = new JSONObject();
+        String email = this.mEmailView.getText().toString();
+        String password = this.mPasswordView.getText().toString();
 
-        try {
-            body.put("email", this.mEmailView.getText().toString());
-            body.put("password", this.mPasswordView.getText().toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        APIRequest apiRequest = new APIRequest(new APIRequest.APIRequestCallback() {
-            @Override
-            public void onSuccess(JSONObject json, int code) {
-                Toast.makeText(Login.this.getView().getContext(), "Login successful", Toast.LENGTH_LONG).show();
-
-                SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPref.edit();
-                try {
-                    editor.putString(getString(R.string.shared_preferences_token_attr_name), json.getString("token"));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                editor.apply();
-
-                MainActivity mainActivity = (MainActivity) Login.this.getActivity();
-                mainActivity.changeContentFragment(new ContractorCategoryMenu());
-
-            }
-
-            @Override
-            public void onError(String errorMessage, int code) {
-                Toast.makeText(Login.this.getView().getContext(), "Invalid email or password", Toast.LENGTH_LONG).show();
-            }
-        });
-
-        apiRequest.execute(APIRequest.HTTP_POST, Constants.API_URL + "/api/v1/auth/login", null, body.toString());
+        MainActivity mainActivity = (MainActivity) getActivity();
+        mainActivity.attemptLogin(email, password);
     }
 
     private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
         return email.contains("@");
     }
 
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
         return password.length() > 4;
     }
 
