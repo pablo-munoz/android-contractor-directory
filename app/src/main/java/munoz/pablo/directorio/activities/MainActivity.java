@@ -19,6 +19,7 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import munoz.pablo.directorio.fragments.Chat;
 import munoz.pablo.directorio.fragments.ContractorCategoryMenu;
 import munoz.pablo.directorio.fragments.Favorites;
 import munoz.pablo.directorio.fragments.Login;
@@ -127,6 +128,8 @@ public class MainActivity extends AppCompatActivity
             } else {
                 changeContentFragment(new Favorites());
             }
+        } else if (id == R.id.nav_chat) {
+            changeContentFragment(new Chat());
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

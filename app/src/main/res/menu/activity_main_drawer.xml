@@ -33,6 +33,10 @@
                 android:id="@+id/nav_favorites"
                 android:icon="@drawable/ic_bookmark_black_24dp"
                 android:title="Mis favoritos" />
+            <item
+                android:id="@+id/nav_chat"
+                android:icon="@drawable/ic_chat_bubble_outline_black_24dp"
+                android:title="Mensajes"/>
         </menu>
     </item>
 
