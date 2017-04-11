@@ -37,6 +37,36 @@ app.use(constants.api_version + '/auth', require('./routes/auth'));
 app.use(constants.api_version + '/account', require('./routes/account'));
 
 
-http.createServer(app).listen(+process.argv[2] || 8080, function() {
+const server = http.createServer(app).listen(+process.argv[2] || 8080, function() {
     console.log('App running on 192.168.33.10:3000');
+});
+
+const io = require('socket.io')(server);
+
+
+
+const interlocutors = {};
+
+
+io.on('connection', function(socket) {
+    console.log('A user connected');
+
+    socket.on('disconnect', function() {
+        console.log('A user has disconnected');
+    });
+
+    socket.on('identify', function(payload) {
+        payload = JSON.parse(payload);
+        interlocutors[payload.id] = socket;
+        socket.m_id = payload.id;
+        socket.join(payload.id);
+    });
+
+    socket.on('send message', function(payload) {
+        payload = JSON.parse(payload);
+        console.log(payload);
+        const recipient = payload.recipient;
+        const message = payload.message;
+        io.to(recipient).emit('new message', payload);
+    });
 });

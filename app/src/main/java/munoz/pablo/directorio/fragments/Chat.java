@@ -2,7 +2,6 @@ package munoz.pablo.directorio.fragments;
 
 import android.app.Activity;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.os.Handler;
@@ -36,6 +35,7 @@ import io.socket.emitter.Emitter;
 import munoz.pablo.directorio.R;
 import munoz.pablo.directorio.activities.MainActivity;
 import munoz.pablo.directorio.adapters.MessageAdapter;
+import munoz.pablo.directorio.models.Account;
 import munoz.pablo.directorio.models.Message;
 import munoz.pablo.directorio.utils.ChatApplication;
 
@@ -47,6 +47,8 @@ import munoz.pablo.directorio.utils.ChatApplication;
  * create an instance of this fragment.
  */
 public class Chat extends Fragment {
+    private static final String ARG_recipientId = "recipient_id";
+
     private static final String TAG = "ChatFragment";
 
     private static final int REQUEST_LOGIN = 0;
@@ -65,6 +67,10 @@ public class Chat extends Fragment {
 
     private Boolean isConnected = true;
 
+    private Account userAccount;
+
+    private String recipientId;
+
 
     public Chat() {
         super();
@@ -76,9 +82,10 @@ public class Chat extends Fragment {
      *
      * @return A new instance of fragment Chat.
      */
-    public static Chat newInstance() {
+    public static Chat newInstance(String recipientId) {
         Chat fragment = new Chat();
         Bundle args = new Bundle();
+        args.putString(ARG_recipientId, recipientId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -87,7 +94,13 @@ public class Chat extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (getArguments() != null) {
+            recipientId = getArguments().getString(ARG_recipientId);
+        }
+
         setHasOptionsMenu(true);
+
+        userAccount = ((MainActivity) getActivity()).getUserAccount();
 
         ChatApplication app = (ChatApplication) getActivity().getApplication();
         mSocket = app.getSocket();
@@ -95,6 +108,7 @@ public class Chat extends Fragment {
         mSocket.on(Socket.EVENT_DISCONNECT, onDisconnect);
         mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
         mSocket.on(Socket.EVENT_CONNECT_TIMEOUT, onConnectError);
+        mSocket.emit("identify", String.format("{ \"id\": \"%s\" }", userAccount.getId()));
         mSocket.on("new message", onNewMessage);
         mSocket.on("user joined", onUserJoined);
         mSocket.on("user left", onUserLeft);
@@ -285,12 +299,20 @@ public class Chat extends Fragment {
         addMessage(mUsername, message);
 
         // perform the sending message attempt.
-        mSocket.emit("new message", message);
+        mSocket.emit("send message", String.format("{ \"from\": \"%s\", \"recipient\": \"%s\", \"username\": \"%s\", \"message\": \"%s\" }",
+                userAccount.getId(), recipientId, userAccount.getIsContractor() ? userAccount.getContractor().getFullName() : userAccount.getEmail(), message));
     }
 
     private void startSignIn() {
-        mUsername = "pablomh";
-        // ((MainActivity) getActivity()).changeContentFragment(new Login());
+        if (userAccount.isAnonymous()) {
+            ((MainActivity) getActivity()).changeContentFragment(new Login());
+        } else {
+            if (userAccount.getIsContractor()) {
+                mUsername = userAccount.getContractor().getFullName();
+            } else {
+                mUsername = userAccount.getEmail();
+            }
+        }
     }
 
     private void leave() {

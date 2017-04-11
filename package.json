@@ -10,7 +10,8 @@
     "jsonwebtoken": "^7.3.0",
     "knex": "^0.12.6",
     "lodash": "^4.17.4",
-    "pg": "^6.1.2"
+    "pg": "^6.1.2",
+    "socket.io": "^1.7.3"
   },
   "devDependencies": {},
   "scripts": {

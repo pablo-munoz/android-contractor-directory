@@ -24,12 +24,13 @@ public class Contractor implements Parcelable{
     private String phone;
     private String website;
     private String portrait;
+    private String accountId;
     private double rating;
     private JSONArray comments;
 
 
     public Contractor(String id, String firstName, String middleName, String lastName, String email,
-                      String phone, String website, String portrait, double rating) {
+                      String phone, String website, String portrait, double rating, String accountId) {
         this.id = id;
         this.firstName = firstName;
         this.middleName = middleName;
@@ -39,6 +40,7 @@ public class Contractor implements Parcelable{
         this.website = website;
         this.portrait = portrait;
         this.rating = rating;
+        this.accountId = accountId;
     }
 
     protected Contractor(Parcel in) {
@@ -51,6 +53,7 @@ public class Contractor implements Parcelable{
         website = in.readString();
         portrait = in.readString();
         rating = in.readDouble();
+        accountId = in.readString();
     }
 
     public static final Creator<Contractor> CREATOR = new Creator<Contractor>() {
@@ -141,6 +144,10 @@ public class Contractor implements Parcelable{
         return fullName;
     }
 
+    public String getAccountId() {
+        return this.accountId;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -157,6 +164,7 @@ public class Contractor implements Parcelable{
         dest.writeString(website);
         dest.writeString(portrait);
         dest.writeDouble(rating);
+        dest.writeString(accountId);
     }
 
     public void populateContractorCard(View view) {

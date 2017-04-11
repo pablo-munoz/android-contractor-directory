@@ -194,7 +194,8 @@ public class MainActivity extends AppCompatActivity
                                 contractorData.getString("email"),
                                 contractorData.getString("website"),
                                 contractorData.getString("portrait"),
-                                5
+                                contractorData.getDouble("avg_rating"),
+                                contractorData.getString("account_id")
                         ));
                     }
 

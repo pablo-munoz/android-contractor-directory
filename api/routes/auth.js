@@ -101,7 +101,7 @@ SELECT * FROM account WHERE email = lower('${body.email}') AND
             })
             .then((account_id) => {
                 return db.raw(`
-SELECT * FROM contractor WHERE account_id = '${account_id}';
+SELECT * FROM contractor_summary WHERE account_id = '${account_id}';
 `);
             })
             .then((result) => {

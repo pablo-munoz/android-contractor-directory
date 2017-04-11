@@ -8,5 +8,5 @@ public class Constants {
     // For using your own phone make it http://<your ip>:3333
     public static final String API_URL = "http://192.168.15.5:3333";
     public static final String API_VERSION = "api/v1";
-    public static final String CHAT_SERVER_URL = "https://socketio-chat.now.sh/";
+    public static final String CHAT_SERVER_URL = "http://192.168.15.5:3333";
 }

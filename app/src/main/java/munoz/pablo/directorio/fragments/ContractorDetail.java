@@ -86,6 +86,7 @@ public class ContractorDetail extends Fragment implements
     private MapView mMapView;
     private Button callBtn;
     private Button addToFavoritesBtn;
+    private Button sendMessageBtn;
     private ProgressBar progressBar;
 
     private JSONArrayAdapter commentsAdapter;
@@ -194,6 +195,15 @@ public class ContractorDetail extends Fragment implements
                 String headers = String.format("{ \"%s\": \"%s\" }", "Authorization", userAccount.getToken());
 
                 addToFavoritesRequest.execute(APIRequest.HTTP_POST, endpoint, headers, "{}");
+            }
+        });
+
+        sendMessageBtn = (Button) view.findViewById(R.id.contractor_detail_send_message);
+        sendMessageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Chat chat = Chat.newInstance(contractor.getAccountId());
+                ((MainActivity) getActivity()).changeContentFragment(chat);
             }
         });
 
