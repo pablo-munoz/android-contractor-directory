@@ -202,8 +202,8 @@ public class ContractorDetail extends Fragment implements
         sendMessageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Chat chat = Chat.newInstance(contractor.getAccountId());
-                ((MainActivity) getActivity()).changeContentFragment(chat);
+                ChatConversation chatConversation = ChatConversation.newInstance(contractor.getAccountId());
+                ((MainActivity) getActivity()).changeContentFragment(chatConversation);
             }
         });
 

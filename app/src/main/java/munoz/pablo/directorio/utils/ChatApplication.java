@@ -4,9 +4,15 @@ package munoz.pablo.directorio.utils;
 import android.app.Application;
 
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import io.socket.client.IO;
 import io.socket.client.Socket;
+import munoz.pablo.directorio.models.Account;
+import munoz.pablo.directorio.models.Conversation;
 
 /**
  * Created by pablo on 4/11/2017.
@@ -24,5 +30,25 @@ public class ChatApplication extends Application {
 
     public Socket getSocket() {
         return mSocket;
+    }
+
+    private Account userAccount = Account.getAnonymous();
+
+    public Account getUserAccount() {
+        return userAccount;
+    }
+
+    public void setUserAccount(Account account) {
+        userAccount = account;
+    }
+
+    private Map<String, Conversation> conversations = new HashMap<>();
+
+    public void setConversation(String conversationId, Conversation conversation) {
+        conversations.put(conversationId, conversation);
+    }
+
+    public ArrayList<Conversation> getConversationList() {
+        return new ArrayList<Conversation>(conversations.values());
     }
 }

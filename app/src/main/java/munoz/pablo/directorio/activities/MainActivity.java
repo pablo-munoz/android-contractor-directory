@@ -19,7 +19,9 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import munoz.pablo.directorio.fragments.Chat;
+import io.socket.client.Socket;
+import munoz.pablo.directorio.fragments.ChatConversation;
+import munoz.pablo.directorio.fragments.ChatConversationSelector;
 import munoz.pablo.directorio.fragments.ContractorCategoryMenu;
 import munoz.pablo.directorio.fragments.Favorites;
 import munoz.pablo.directorio.fragments.Login;
@@ -28,6 +30,7 @@ import munoz.pablo.directorio.R;
 import munoz.pablo.directorio.models.Account;
 import munoz.pablo.directorio.models.Contractor;
 import munoz.pablo.directorio.services.APIRequest;
+import munoz.pablo.directorio.utils.ChatApplication;
 import munoz.pablo.directorio.utils.Constants;
 
 public class MainActivity extends AppCompatActivity
@@ -43,6 +46,7 @@ public class MainActivity extends AppCompatActivity
 
     private TextView drawerEmailTv;
 
+    private Socket mSocket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +71,8 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         updateNavigation();
+
+        mSocket = ((ChatApplication) getApplication()).getSocket();
 
         fragmentManager = getFragmentManager();
 
@@ -129,7 +135,7 @@ public class MainActivity extends AppCompatActivity
                 changeContentFragment(new Favorites());
             }
         } else if (id == R.id.nav_chat) {
-            changeContentFragment(new Chat());
+            changeContentFragment(new ChatConversationSelector());
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -180,6 +186,7 @@ public class MainActivity extends AppCompatActivity
                     }
 
                     userAccount = new Account(accountId, email, isContractor, token);
+                    ((ChatApplication) getApplication()).setUserAccount(userAccount);
 
                     JSONObject contractorData = null;
 

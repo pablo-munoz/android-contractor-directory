@@ -33,7 +33,7 @@
     <string name="shared_preferences_token_attr_name">auth_token</string>
     <string name="title_activity_maps">Map</string>
 
-    <!-- Chat related strings -->
+    <!-- ChatConversation related strings -->
     <string name="action_leave">Leave</string>
     <string name="action_send">Send</string>
     <string name="prompt_message">Message</string>

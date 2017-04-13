@@ -43,10 +43,10 @@ import munoz.pablo.directorio.utils.ChatApplication;
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
  * to handle interaction events.
- * Use the {@link Chat#newInstance} factory method to
+ * Use the {@link ChatConversation#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class Chat extends Fragment {
+public class ChatConversation extends Fragment {
     private static final String ARG_recipientId = "recipient_id";
 
     private static final String TAG = "ChatFragment";
@@ -72,7 +72,7 @@ public class Chat extends Fragment {
     private String recipientId;
 
 
-    public Chat() {
+    public ChatConversation() {
         super();
     }
 
@@ -80,10 +80,10 @@ public class Chat extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @return A new instance of fragment Chat.
+     * @return A new instance of fragment ChatConversation.
      */
-    public static Chat newInstance(String recipientId) {
-        Chat fragment = new Chat();
+    public static ChatConversation newInstance(String recipientId) {
+        ChatConversation fragment = new ChatConversation();
         Bundle args = new Bundle();
         args.putString(ARG_recipientId, recipientId);
         fragment.setArguments(args);
@@ -299,8 +299,19 @@ public class Chat extends Fragment {
         addMessage(mUsername, message);
 
         // perform the sending message attempt.
-        mSocket.emit("send message", String.format("{ \"from\": \"%s\", \"recipient\": \"%s\", \"username\": \"%s\", \"message\": \"%s\" }",
-                userAccount.getId(), recipientId, userAccount.getIsContractor() ? userAccount.getContractor().getFullName() : userAccount.getEmail(), message));
+        JSONObject payload = new JSONObject();
+        try {
+            payload.put("from", userAccount.getId());
+            payload.put("to", recipientId);
+            payload.put("username", userAccount.getIsContractor() ? userAccount.getContractor().getFullName() : userAccount.getEmail());
+            payload.put("message", message);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        mSocket.emit("send message", payload);
+        //mSocket.emit("send message", String.format("{ \"from\": \"%s\", \"to\": \"%s\", \"username\": \"%s\", \"message\": \"%s\" }",
+        //        userAccount.getId(), recipientId, userAccount.getIsContractor() ? userAccount.getContractor().getFullName() : userAccount.getEmail(), message));
     }
 
     private void startSignIn() {

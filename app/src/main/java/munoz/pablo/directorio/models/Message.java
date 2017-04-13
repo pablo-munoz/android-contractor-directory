@@ -1,5 +1,7 @@
 package munoz.pablo.directorio.models;
 
+import java.util.Date;
+
 /**
  * Created by pablo on 4/11/2017.
  */
@@ -12,6 +14,7 @@ public class Message {
     private int mType;
     private String mMessage;
     private String mUsername;
+    private Date mDate;
 
     private Message() {}
 
@@ -52,6 +55,7 @@ public class Message {
             message.mType = mType;
             message.mUsername = mUsername;
             message.mMessage = mMessage;
+            message.mDate = new Date();
             return message;
         }
     }
