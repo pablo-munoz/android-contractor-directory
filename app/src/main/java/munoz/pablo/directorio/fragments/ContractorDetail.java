@@ -326,6 +326,7 @@ public class ContractorDetail extends Fragment implements OnMapReadyCallback {
         JSONObject payload = new JSONObject();
 
         try {
+            headers.put("Content-Type", "application/json");
             payload.put("content", commentEt.getText().toString());
         } catch (JSONException e) {
             e.printStackTrace();

@@ -3,7 +3,6 @@ package munoz.pablo.directorio.fragments;
 
 import android.app.Fragment;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +22,7 @@ import munoz.pablo.directorio.models.Contractor;
 import munoz.pablo.directorio.models.ContractorCategory;
 import munoz.pablo.directorio.models.ModelBuilder;
 import munoz.pablo.directorio.R;
-import munoz.pablo.directorio.services.APIRequest;
+import munoz.pablo.directorio.services.APIRequest2;
 import munoz.pablo.directorio.utils.Constants;
 
 /**
@@ -32,11 +31,8 @@ import munoz.pablo.directorio.utils.Constants;
  * create an instance of this fragment.
  */
 public class CategoryContractors extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_contractorCategoryId = "contractorCategoryId";
 
-    // Fragment parameters
     private String contractorCategoryId;
 
     private ContractorCategory contractorCategory;
@@ -60,7 +56,6 @@ public class CategoryContractors extends Fragment {
      *
      * @param contractorCategoryId The id of a contractor category.
      */
-    // TODO: Rename and change types and number of parameters
     public static CategoryContractors newInstance(String contractorCategoryId) {
         CategoryContractors fragment = new CategoryContractors();
         Bundle args = new Bundle();
@@ -86,6 +81,7 @@ public class CategoryContractors extends Fragment {
         titleTv = (TextView) view.findViewById(R.id.category_contractors_title);
         emptyQueryTv = (TextView) view.findViewById(R.id.category_contractors_empty_query_label);
         progressBar = (ProgressBar) view.findViewById(R.id.category_contractors_loading);
+        contractorListView = (ListView) view.findViewById(R.id.category_contractors_list_view);
 
         contractorList = new ArrayList<>();
         categoryModelBuilder = new ModelBuilder<>();
@@ -93,7 +89,6 @@ public class CategoryContractors extends Fragment {
 
         adapter = new ContractorAdapter(view.getContext(), contractorList);
 
-        contractorListView = (ListView) view.findViewById(R.id.category_contractors_list_view);
         contractorListView.setAdapter(this.adapter);
 
         contractorListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -115,58 +110,55 @@ public class CategoryContractors extends Fragment {
     }
 
     private void requestCategoryDataFromApi() {
-        APIRequest apiRequest = new APIRequest(new APIRequest.APIRequestCallback() {
-            @Override
-            public void onSuccess(JSONObject json, int code) {
-                try {
-                    contractorCategory = categoryModelBuilder.resourceFromJson(json);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+        APIRequest2 req = new APIRequest2.Builder()
+                .url(Constants.API_URL + "/api/v1/contractor_category/" + contractorCategoryId)
+                .method(APIRequest2.METHOD_GET)
+                .callback(new APIRequest2.Callback() {
+                    @Override
+                    public void onResult(int responseCode, JSONObject response) {
+                        if (responseCode == 200) {
+                            contractorCategory = categoryModelBuilder.instantiateOne(response);
 
-                if (contractorCategory != null) {
-                    titleTv.setText(contractorCategory.getName());
-                    pullContractorsInCategoryData();
-                }
-            }
+                            if (contractorCategory != null) {
+                                titleTv.setText(contractorCategory.getName());
+                                requestContractorInCategoryDataFromApi();
+                            }
+                        }
+                    }
+                })
+                .build();
 
-            @Override
-            public void onError(String errorMessage, int code) {
-                Log.e("ContractorsByCategory", "Error loading contractor category data.");
-            }
-        });
-
-        apiRequest.execute(APIRequest.HTTP_GET,
-                Constants.API_URL + "/api/v1/contractor_category/" + contractorCategoryId);
+        req.execute();
     }
 
-    private void pullContractorsInCategoryData() {
-        APIRequest apiRequest = new APIRequest(new APIRequest.APIRequestCallback() {
-            @Override
-            public void onSuccess(JSONObject json, int code) {
-                try {
-                    int count = json.getJSONObject("meta").getInt("count");
+    private void requestContractorInCategoryDataFromApi() {
+        APIRequest2 req = new APIRequest2.Builder()
+                .url(Constants.API_URL + "/api/v1/contractor?contractor_category=" + contractorCategory.getId())
+                .method(APIRequest2.METHOD_GET)
+                .callback(new APIRequest2.Callback() {
+                    @Override
+                    public void onResult(int responseCode, JSONObject response) {
+                        if (responseCode == 200) {
+                            int count = 0;
+                            try {
+                                count = response.getJSONObject("meta").getInt("count");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
 
-                    if (count != 0) {
-                        contractorList = contractorModelBuilder.resourceListFromJson(json);
-                        adapter.addAll(contractorList);
-                    } else {
-                        emptyQueryTv.setText("No se ha encontrado nada.");
+                            if (count != 0) {
+                                contractorList = contractorModelBuilder.instantiateMany(response);
+                                adapter.addAll(contractorList);
+                            } else {
+                                emptyQueryTv.setText("No se ha encontrado nada.");
+                            }
+
+                            progressBar.setVisibility(View.GONE);
+                        }
                     }
+                })
+                .build();
 
-                    progressBar.setVisibility(View.GONE);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onError(String errorMessage, int code) {
-                Log.e("ContractorsByCategory", "Error loading contractor data.");
-            }
-        });
-
-        apiRequest.execute(APIRequest.HTTP_GET, Constants.API_URL + "/api/v1/contractor?contractor_category=" + contractorCategory.getId());
+        req.execute();
     }
 }

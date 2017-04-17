@@ -50,7 +50,6 @@ public class ChatConversationSelector extends Fragment {
      *
      * @return A new instance of fragment ChatConversationSelector.
      */
-    // TODO: Rename and change types and number of parameters
     public static ChatConversationSelector newInstance() {
         ChatConversationSelector fragment = new ChatConversationSelector();
         Bundle args = new Bundle();

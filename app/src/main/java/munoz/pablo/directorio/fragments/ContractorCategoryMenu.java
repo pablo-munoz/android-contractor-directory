@@ -2,7 +2,6 @@ package munoz.pablo.directorio.fragments;
 
 
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,6 +22,7 @@ import munoz.pablo.directorio.models.ContractorCategory;
 import munoz.pablo.directorio.models.ModelBuilder;
 import munoz.pablo.directorio.R;
 import munoz.pablo.directorio.services.APIRequest;
+import munoz.pablo.directorio.services.APIRequest2;
 import munoz.pablo.directorio.utils.Constants;
 
 /**
@@ -70,7 +70,6 @@ public class ContractorCategoryMenu extends Fragment {
         modelBuilder = new ModelBuilder<>();
         contractorCategoryList = new ArrayList<>();
         categoriesAdapter = new ContractorCategoryAdapter(view.getContext(), contractorCategoryList);
-
         listView = (ListView) view.findViewById(R.id.category_list_view);
 
         listView.setAdapter(categoriesAdapter);
@@ -90,26 +89,23 @@ public class ContractorCategoryMenu extends Fragment {
     }
 
     private void requestContractorCategoriesDataFromApi() {
-        APIRequest apiRequest = new APIRequest(new APIRequest.APIRequestCallback() {
-            @Override
-            public void onSuccess(JSONObject json, int code) {
-                try {
-                    contractorCategoryList = modelBuilder.resourceListFromJson(json);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+        APIRequest2 req = new APIRequest2.Builder()
+                .url(Constants.API_URL + "/api/v1/contractor_category")
+                .method(APIRequest2.METHOD_GET)
+                .callback(new APIRequest2.Callback() {
+                    @Override
+                    public void onResult(int responseCode, JSONObject response) {
+                        if (responseCode != 200) return;
 
-                categoriesAdapter.clear();
-                categoriesAdapter.addAll(contractorCategoryList);
-                progressBar.setVisibility(View.GONE);
-            }
+                        contractorCategoryList = modelBuilder.instantiateMany(response);
 
-            @Override
-            public void onError(String errorMessage, int code) {
-                Log.d("MainActivity", "Failed to retrieve contractor categories");
-            }
-        });
+                        categoriesAdapter.clear();
+                        categoriesAdapter.addAll(contractorCategoryList);
+                        progressBar.setVisibility(View.GONE);
+                    }
+                })
+                .build();
 
-        apiRequest.execute(APIRequest.HTTP_GET, Constants.API_URL + "/api/v1/contractor_category");
+        req.execute();
     }
 }

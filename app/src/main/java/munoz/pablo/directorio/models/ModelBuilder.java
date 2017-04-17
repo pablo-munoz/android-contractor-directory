@@ -36,6 +36,7 @@ public class ModelBuilder<ModelType>  {
                 dummyRelationships.getJSONObject("comment").put("data", new JSONArray());
 
                 ModelType nextInstance = instantiate(type, id, attributes, dummyRelationships);
+                instances.add(nextInstance);
             }
 
         } catch (JSONException e) {
@@ -46,15 +47,18 @@ public class ModelBuilder<ModelType>  {
     }
 
     public ModelType instantiateOne(JSONObject apiResponseJson) {
-        JSONObject data;
-        JSONObject relationships;
-        JSONObject attributes;
+        JSONObject data = null;
+        JSONObject relationships = null;
+        JSONObject attributes = null;
         String type;
         String id;
 
         try {
             data = apiResponseJson.getJSONObject("data");
-            relationships = apiResponseJson.getJSONObject("relationships");
+
+            if (apiResponseJson.has("relationships"))
+                relationships = apiResponseJson.getJSONObject("relationships");
+
             attributes = data.getJSONObject("attributes");
             type = data.getString("type");
             id = data.getString("id");
