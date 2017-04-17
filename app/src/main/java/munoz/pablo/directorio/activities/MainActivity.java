@@ -16,11 +16,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import io.socket.client.Socket;
-import munoz.pablo.directorio.fragments.ChatConversation;
 import munoz.pablo.directorio.fragments.ChatConversationSelector;
 import munoz.pablo.directorio.fragments.ContractorCategoryMenu;
 import munoz.pablo.directorio.fragments.Favorites;
@@ -30,7 +30,7 @@ import munoz.pablo.directorio.R;
 import munoz.pablo.directorio.models.Account;
 import munoz.pablo.directorio.models.Contractor;
 import munoz.pablo.directorio.services.APIRequest;
-import munoz.pablo.directorio.utils.ChatApplication;
+import munoz.pablo.directorio.utils.AndroidContractorDirectoryApp;
 import munoz.pablo.directorio.utils.Constants;
 
 public class MainActivity extends AppCompatActivity
@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity
 
         updateNavigation();
 
-        mSocket = ((ChatApplication) getApplication()).getSocket();
+        mSocket = ((AndroidContractorDirectoryApp) getApplication()).getSocket();
 
         fragmentManager = getFragmentManager();
 
@@ -186,7 +186,7 @@ public class MainActivity extends AppCompatActivity
                     }
 
                     userAccount = new Account(accountId, email, isContractor, token);
-                    ((ChatApplication) getApplication()).setUserAccount(userAccount);
+                    ((AndroidContractorDirectoryApp) getApplication()).setUserAccount(userAccount);
 
                     JSONObject contractorData = null;
 
@@ -202,7 +202,8 @@ public class MainActivity extends AppCompatActivity
                                 contractorData.getString("website"),
                                 contractorData.getString("portrait"),
                                 contractorData.getDouble("avg_rating"),
-                                contractorData.getString("account_id")
+                                contractorData.getString("account_id"),
+                                new JSONArray()
                         ));
                     }
 

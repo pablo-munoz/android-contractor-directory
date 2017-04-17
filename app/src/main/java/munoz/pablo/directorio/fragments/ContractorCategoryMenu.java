@@ -48,7 +48,6 @@ public class ContractorCategoryMenu extends Fragment {
      *
      * @return A new instance of fragment ContractorCategoryMenu.
      */
-    // TODO: Rename and change types and number of parameters
     public static ContractorCategoryMenu newInstance() {
         ContractorCategoryMenu fragment = new ContractorCategoryMenu();
         Bundle args = new Bundle();

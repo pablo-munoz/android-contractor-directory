@@ -1,20 +1,11 @@
 package munoz.pablo.directorio.fragments;
 
-
-import android.Manifest;
-import android.app.Activity;
+import android.app.Fragment;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,11 +20,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -49,28 +35,26 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.List;
 
+import munoz.pablo.directorio.R;
 import munoz.pablo.directorio.activities.MainActivity;
 import munoz.pablo.directorio.adapters.JSONArrayAdapter;
 import munoz.pablo.directorio.models.Account;
 import munoz.pablo.directorio.models.Contractor;
 import munoz.pablo.directorio.models.ModelBuilder;
-import munoz.pablo.directorio.utils.AuthHelper;
-import munoz.pablo.directorio.R;
 import munoz.pablo.directorio.services.APIRequest;
+import munoz.pablo.directorio.services.APIRequest2;
+import munoz.pablo.directorio.utils.AndroidContractorDirectoryApp;
 import munoz.pablo.directorio.utils.Constants;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link ContractorDetail#newInstance} factory method to
  * create an instance of this fragment.
+ *
+ * TODO: Make it so that the your rating stars reflect the actual rating you have given.
+ *
  */
-public class ContractorDetail extends Fragment implements
-        OnMapReadyCallback,
-        GoogleMap.OnMapClickListener,
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
-        LocationListener
-{
+public class ContractorDetail extends Fragment implements OnMapReadyCallback {
     private MainActivity mainActivity;
 
     private TextView nameTv;
@@ -83,11 +67,14 @@ public class ContractorDetail extends Fragment implements
     private ListView commentsLv;
     private EditText commentEt;
     private Button addCommentBtn;
-    private MapView mMapView;
+    private MapView mapView;
     private Button callBtn;
     private Button addToFavoritesBtn;
     private Button sendMessageBtn;
     private ProgressBar progressBar;
+    private Geocoder geocoder;
+    private LatLng addressLatLng;
+    private GoogleMap googleMap;
 
     private JSONArrayAdapter commentsAdapter;
 
@@ -96,13 +83,11 @@ public class ContractorDetail extends Fragment implements
 
     // the fragment initialization parameters
     private static final String ARG_contractorId = "contractorId";
+    private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
 
     private String contractorId;
 
-    private GoogleMap mMap;
-    private GoogleApiClient client;
-    private Location lastLocation;
-    private LocationRequest locationRequest;
+    private AndroidContractorDirectoryApp application;
 
 
     public ContractorDetail() {
@@ -116,7 +101,6 @@ public class ContractorDetail extends Fragment implements
      * @param contractorId Parameter 1.
      * @return A new instance of fragment ContractorDetail.
      */
-    // TODO: Rename and change types and number of parameters
     public static ContractorDetail newInstance(String contractorId) {
         ContractorDetail fragment = new ContractorDetail();
         Bundle args = new Bundle();
@@ -134,6 +118,10 @@ public class ContractorDetail extends Fragment implements
         }
 
         mainActivity = (MainActivity) getActivity();
+
+        application = (AndroidContractorDirectoryApp) mainActivity.getApplication();
+
+        geocoder = new Geocoder(getActivity().getApplicationContext());
     }
 
     @Override
@@ -142,63 +130,24 @@ public class ContractorDetail extends Fragment implements
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_contractor_detail, container, false);
 
-        Log.d("ContractorDetail", "Fragment created with contractorId = " + contractorId);
+        this.obtainViewReferences(view);
 
-        nameTv = (TextView) view.findViewById(R.id.contractor_detail_name);
-        idTv = (TextView) view.findViewById(R.id.contractor_detail_id);
-        emailTv = (TextView) view.findViewById(R.id.contractor_detail_email);
-        phoneTv = (TextView) view.findViewById(R.id.contractor_detail_phone);
-        portraitIv = (ImageView) view.findViewById(R.id.contractor_detail_img);
-        overallRatingBar = (RatingBar) view.findViewById(R.id.contractor_detail_rating_bar);
-        commentsLv = (ListView) view.findViewById(R.id.contractor_detail_lv);
-        callBtn = (Button) view.findViewById(R.id.contractor_detail_call_btn);
-        addToFavoritesBtn = (Button) view.findViewById(R.id.contractor_detail_add_favorites);
-        progressBar = (ProgressBar) view.findViewById(R.id.contractor_detail_loading);
-
-        commentEt = (EditText) view.findViewById(R.id.contractor_detail_comment_edit);
         commentEt.setVisibility(View.INVISIBLE);
-
-        addCommentBtn = (Button) view.findViewById(R.id.contractor_detail_add_comment_btn);
 
         addCommentBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (commentEt.getVisibility() == View.VISIBLE) {
-                    publishComment();
-                } else {
-                    commentEt.setVisibility(View.VISIBLE);
-                }
+                toggleCommentInputVisibility();
             }
         });
 
         addToFavoritesBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                APIRequest addToFavoritesRequest = new APIRequest(new APIRequest.APIRequestCallback() {
-                    @Override
-                    public void onSuccess(JSONObject json, int code) {
-                        Toast.makeText(mainActivity, contractor.getFirstName() + " añadido a favoritos.", Toast.LENGTH_SHORT)
-                                .show();
-                    }
-
-                    @Override
-                    public void onError(String errorMessage, int code) {
-
-                    }
-                });
-
-                Account userAccount = mainActivity.getUserAccount();
-
-                String endpoint = String.format("%s/%s/account/%s/favorites/%s/add",
-                        Constants.API_URL, Constants.API_VERSION, userAccount.getId(), contractor.getId());
-
-                String headers = String.format("{ \"%s\": \"%s\" }", "Authorization", userAccount.getToken());
-
-                addToFavoritesRequest.execute(APIRequest.HTTP_POST, endpoint, headers, "{}");
+                addContractorToFavorites();
             }
         });
 
-        sendMessageBtn = (Button) view.findViewById(R.id.contractor_detail_send_message);
         sendMessageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -207,31 +156,11 @@ public class ContractorDetail extends Fragment implements
             }
         });
 
-        myRatingBar = (RatingBar) view.findViewById(R.id.contractor_detail_my_rating_bar);
         myRatingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
                 if (!fromUser) return;
-
-                String token = AuthHelper.getAuthToken(getActivity());
-
-                APIRequest apiRequest = new APIRequest(new APIRequest.APIRequestCallback() {
-                    @Override
-                    public void onSuccess(JSONObject json, int code) {
-                    }
-
-                    @Override
-                    public void onError(String errorMessage, int code) {
-                    }
-                });
-
-                String url = Constants.API_URL + "/api/v1/contractor/" + contractorId + "/rate/" + rating;
-
-                apiRequest.execute(
-                        APIRequest.HTTP_POST,
-                        url,
-                        "{ \"Authorization\": \"Bearer " + token + "\" }",
-                        "{}");
+                rateContractor(rating);
             }
         });
 
@@ -248,233 +177,268 @@ public class ContractorDetail extends Fragment implements
 
         modelBuilder = new ModelBuilder<>();
 
-        pullContractorData(contractorId);
+        requestContractorDataFromApi(contractorId);
 
-        MapsInitializer.initialize(getActivity());
-        mMapView = (MapView) view.findViewById(R.id.contractor_detail_map);
-        mMapView.onCreate(savedInstanceState);
-        mMapView.getMapAsync(this);
-
-        if (client == null) {
-
-            client = new GoogleApiClient.Builder(getActivity())
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-        }
-
-        locationRequest = LocationRequest.create();
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        locationRequest.setInterval(1000 * 5);
-        locationRequest.setFastestInterval(1000 * 3);
-
+        setUpMap(savedInstanceState);
 
         return view;
     }
 
-    private void publishComment() {
-        final ContractorDetail fragment = ContractorDetail.this;
-        final Activity activity = fragment.getActivity();
-
-        APIRequest request = new APIRequest(new APIRequest.APIRequestCallback() {
-            @Override
-            public void onSuccess(JSONObject json, int code) {
-                fragment.pullContractorData(fragment.contractorId);
-                fragment.commentEt.setVisibility(View.INVISIBLE);
-                fragment.commentEt.setText("");
-            }
-
-            @Override
-            public void onError(String errorMessage, int code) {
-                Toast.makeText(activity, "No se pudo guardar tu comentario.", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        String token = AuthHelper.getAuthToken(getActivity());
-
-        JSONObject payload = new JSONObject();
-        JSONObject headers = new JSONObject();
-        try {
-            headers.put("Authorization", "Bearer " + token);
-            payload.put("content", fragment.commentEt.getText().toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        request.execute(APIRequest.HTTP_POST,
-                Constants.API_URL + "/api/v1/contractor/" + fragment.contractorId + "/comment",
-                headers.toString(),
-                payload.toString());
-    }
-
-    private void pullContractorData(String contractorId) {
-        APIRequest apiRequest = new APIRequest(new APIRequest.APIRequestCallback() {
-            @Override
-            public void onSuccess(JSONObject json, int code) {
-                try {
-                    contractor =  modelBuilder.resourceFromJson(json);
-                    updateView();
-                    progressBar.setVisibility(View.GONE);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-
-            }
-
-            @Override
-            public void onError(String errorMessage, int code) {
-                Log.e("ContractorDetail", "Error pulling contractor data from the API");
-            }
-        });
-
-        apiRequest.execute(APIRequest.HTTP_GET, Constants.API_URL + "/api/v1/contractor/" + contractorId);
-    }
-
-    public void updateView() {
-        nameTv.setText(contractor.getFullName());
-        idTv.setText("" + contractor.getId());
-        emailTv.setText(contractor.getEmail());
-        phoneTv.setText(contractor.getPhone());
-        overallRatingBar.setRating((float) contractor.getRating());
-        myRatingBar.setRating(4);
-
-        Glide.with(ContractorDetail.this)
-                .load(contractor.getPortrait())
-                .fitCenter()
-                .into(portraitIv);
-
-        commentsAdapter = new JSONArrayAdapter(getActivity(), new JSONArray(),
-                new JSONArrayAdapter.ViewBuilder() {
-                    @Override
-                    public View construct(JSONArray data, int position, View view, ViewGroup parent) {
-                        if (view == null) {
-                            view = getActivity().getLayoutInflater().inflate(R.layout.contractor_detail_comment, parent, false);
-                        }
-
-                        TextView contentTv = (TextView) view.findViewById(R.id.contractor_detail_comment_content);
-                        try {
-                            contentTv.setText(data.getJSONObject(position).getString("content"));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                        return view;
-                    }
-                });
-
-        commentsLv.setAdapter(commentsAdapter);
-
-
-    }
-
     @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-
-
-        Geocoder coder = new Geocoder(getActivity());
-
-        List<Address> address = null;
-        try {
-            address = coder.getFromLocationName("Puebla 111, Guadalajara, Jalisco", 5);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        if (address != null) {
-            LatLng elSalon = new LatLng(address.get(0).getLatitude(), address.get(0).getLongitude());
-            mMap.addMarker(new MarkerOptions().position(elSalon).title(contractor.getFullName()));
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(elSalon, 18));
-        }
-
-
-        googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng latLng) {
-                Intent navigation = new Intent(Intent.ACTION_VIEW, Uri
-                        .parse("geo:0,0?q=" + Uri.encode("Calle Puebla #111, Guadalajara Jalisco")));
-                startActivity(navigation);
-            }
-        });
-
-    }
-
-    public void setMyLocation() {
-
-        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    0);
-        } else {
-            mMap.setMyLocationEnabled(true);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-            setMyLocation();
-    }
-
-
-    @Override
-    public void onMapClick(LatLng latLng) {
-
+    public void onResume() {
+        super.onResume();
+        mapView.onResume();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        client.connect();
+        mapView.onStart();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        client.disconnect();
+        mapView.onStop();
     }
 
     @Override
-    public void onConnected(@Nullable Bundle bundle) {
+    public void onMapReady(GoogleMap googleMap) {
+        googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                Uri openMapIntent = Uri.parse(String.format("geo:%f, %f", addressLatLng.longitude, addressLatLng.latitude));
+                Intent intent = new Intent(Intent.ACTION_VIEW, openMapIntent);
+                intent.setPackage("com.google.android.apps.maps");
+                if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                    startActivity(intent);
+                }
+            }
+        });
+        this.googleMap = googleMap;
+        updateView();
+    }
 
-        lastLocation = LocationServices.FusedLocationApi.getLastLocation(client);
-        if (lastLocation != null) {
+    @Override
+    public void onPause() {
+        mapView.onPause();
+        super.onPause();
+    }
 
-            Log.d("LAST LOCATION",
-                    lastLocation.getLatitude() + ", " + lastLocation.getLongitude());
+    @Override
+    public void onDestroy() {
+        mapView.onDestroy();
+        super.onDestroy();
+    }
+
+    @Override
+    public void onLowMemory() {
+        mapView.onLowMemory();
+        super.onLowMemory();
+    }
+
+    private void obtainViewReferences(View view) {
+        nameTv = (TextView) view.findViewById(R.id.contractor_detail_name);
+        idTv = (TextView) view.findViewById(R.id.contractor_detail_id);
+        emailTv = (TextView) view.findViewById(R.id.contractor_detail_email);
+        phoneTv = (TextView) view.findViewById(R.id.contractor_detail_phone);
+        portraitIv = (ImageView) view.findViewById(R.id.contractor_detail_img);
+        overallRatingBar = (RatingBar) view.findViewById(R.id.contractor_detail_rating_bar);
+        commentsLv = (ListView) view.findViewById(R.id.contractor_detail_lv);
+        callBtn = (Button) view.findViewById(R.id.contractor_detail_call_btn);
+        addToFavoritesBtn = (Button) view.findViewById(R.id.contractor_detail_add_favorites);
+        progressBar = (ProgressBar) view.findViewById(R.id.contractor_detail_loading);
+        commentEt = (EditText) view.findViewById(R.id.contractor_detail_comment_edit);
+        addCommentBtn = (Button) view.findViewById(R.id.contractor_detail_add_comment_btn);
+        sendMessageBtn = (Button) view.findViewById(R.id.contractor_detail_send_message);
+        myRatingBar = (RatingBar) view.findViewById(R.id.contractor_detail_my_rating_bar);
+        mapView = (MapView) view.findViewById(R.id.contractor_detail_map);
+    }
+
+    private void toggleCommentInputVisibility() {
+        if (commentEt.getVisibility() == View.VISIBLE) {
+            publishCommentAboutContractor();
+        } else {
+            commentEt.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void setUpMap(Bundle savedInstanceState) {
+        MapsInitializer.initialize(getActivity());
+        // *** IMPORTANT ***
+        // MapView requires that the Bundle you pass contain _ONLY_ MapView SDK
+        // objects or sub-Bundles.
+        Bundle mapViewBundle = null;
+        if (savedInstanceState != null) {
+            mapViewBundle = savedInstanceState.getBundle(MAPVIEW_BUNDLE_KEY);
         }
 
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
+        mapView.onCreate(mapViewBundle);
+        mapView.getMapAsync(this);
+    }
+
+    private void addContractorToFavorites() {
+        String endpoint = String.format("%s/%s/account/%s/favorites/%s/add",
+                Constants.API_URL, Constants.API_VERSION, application.getUserAccount().getId(), contractor.getId());
+
+        JSONObject headers = new JSONObject();
+        application.injectAuthorizationHeader(headers);
+
+        APIRequest2 req = new APIRequest2.Builder()
+                .url(endpoint)
+                .method(APIRequest2.METHOD_POST)
+                .headers(headers)
+                .callback(new APIRequest2.Callback() {
+                    @Override
+                    public void onResult(int responseCode, JSONObject response) {
+                        Toast.makeText(mainActivity, contractor.getFirstName() + " añadido a favoritos.", Toast.LENGTH_SHORT)
+                                .show();
+                    }
+                })
+                .build();
+
+        req.execute();
+    }
+
+    private void rateContractor(float rating) {
+        JSONObject headers = new JSONObject();
+        application.injectAuthorizationHeader(headers);
+
+        APIRequest2 req = new APIRequest2.Builder()
+                .url(Constants.API_URL + "/api/v1/contractor/" + contractorId + "/rate/" + rating)
+                .method(APIRequest2.METHOD_POST)
+                .headers(headers)
+                .callback(new APIRequest2.Callback() {
+                    @Override
+                    public void onResult(int responseCode, JSONObject response) {
+                        requestContractorDataFromApi(contractorId);
+                    }
+                })
+                .build();
+
+        req.execute();
+    }
+
+    private void publishCommentAboutContractor() {
+        JSONObject headers = new JSONObject();
+        application.injectAuthorizationHeader(headers);
+
+        JSONObject payload = new JSONObject();
+
+        try {
+            payload.put("content", commentEt.getText().toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-        LocationServices.FusedLocationApi.requestLocationUpdates(client, locationRequest, this);
+
+
+        APIRequest2 req = new APIRequest2.Builder()
+                .url(Constants.API_URL + "/api/v1/contractor/" + contractorId + "/comment")
+                .method(APIRequest2.METHOD_POST)
+                .headers(headers)
+                .payload(payload)
+                .callback(new APIRequest2.Callback() {
+                    @Override
+                    public void onResult(int responseCode, JSONObject response) {
+                        if (responseCode == 200) {
+                            requestContractorDataFromApi(contractorId);
+                            commentEt.setVisibility(View.INVISIBLE);
+                            commentEt.setText("");
+                        } else {
+                            Log.e("ContractorDetail", ""+responseCode);
+                            Toast.makeText(getActivity(), "No se pudo guardar tu comentario.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                })
+                .build();
+
+        req.execute();
     }
 
-    @Override
-    public void onConnectionSuspended(int i) {
+    private void requestContractorDataFromApi(String contractorId) {
+        APIRequest2 req = new APIRequest2.Builder()
+                .url(Constants.API_URL + "/api/v1/contractor/" + contractorId)
+                .method(APIRequest2.METHOD_GET)
+                .callback(new APIRequest2.Callback() {
+                    @Override
+                    public void onResult(int responseCode, JSONObject response) {
+                        if (responseCode == 200) {
+                            contractor = modelBuilder.instantiateOne(response);
+                            updateView();
+                            progressBar.setVisibility(View.GONE);
+                        }
+                    }
+                })
+                .build();
 
+        req.execute();
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
-        lastLocation = location;
-        Log.d("LOCATION CHANGED",
-                lastLocation.getLatitude() + ", " + lastLocation.getLongitude());
+    private void updateView() {
+        if (contractor != null) {
+            nameTv.setText(contractor.getFullName());
+            idTv.setText("" + contractor.getId());
+            emailTv.setText(contractor.getEmail());
+            phoneTv.setText(contractor.getPhone());
+            overallRatingBar.setRating((float) contractor.getRating());
+            myRatingBar.setRating(4);
+
+            Glide.with(ContractorDetail.this)
+                    .load(contractor.getPortrait())
+                    .fitCenter()
+                    .into(portraitIv);
+
+            commentsAdapter = new JSONArrayAdapter(getActivity(), contractor.getComments(),
+                    new JSONArrayAdapter.ViewBuilder() {
+                        @Override
+                        public View construct(JSONArray data, int position, View view, ViewGroup parent) {
+                            if (view == null) {
+                                view = getActivity().getLayoutInflater().inflate(R.layout.contractor_detail_comment, parent, false);
+                            }
+
+                            TextView contentTv = (TextView) view.findViewById(R.id.contractor_detail_comment_content);
+                            try {
+                                contentTv.setText(data.getJSONObject(position).getString("content"));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                            return view;
+                        }
+                    });
+
+            commentsLv.setAdapter(commentsAdapter);
+
+            if (googleMap != null) {
+                displayContractorAddressInMap();
+            }
+        }
     }
 
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+    private void displayContractorAddressInMap() {
+        // Get the LatLng corresponding to the string address that the
+        // contractor wrote in their profile.
+        List<Address> address;
+        addressLatLng = null;
+        try {
+            address = geocoder.getFromLocationName("Rubén Darío 989, Guadalajara, Jalisco, México", 5);
 
+            if (address != null) {
+                Address location = address.get(0);
+                addressLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if (addressLatLng != null) {
+            googleMap.addMarker(new MarkerOptions().position(addressLatLng).title(contractor.getFullName()));
+            // Focus around added marker
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(addressLatLng, 15));
+            // Second argument is zoom level, the bigger the closer.
+        } else {
+            Toast.makeText(getActivity(), "No se pudo mostrar la ubicación del contratista.", Toast.LENGTH_SHORT).show();
+        }
     }
+
 }

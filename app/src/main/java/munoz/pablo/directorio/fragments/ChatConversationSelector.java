@@ -15,12 +15,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.security.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import munoz.pablo.directorio.R;
 import munoz.pablo.directorio.activities.MainActivity;
@@ -29,7 +25,7 @@ import munoz.pablo.directorio.models.Account;
 import munoz.pablo.directorio.models.Conversation;
 import munoz.pablo.directorio.models.Message;
 import munoz.pablo.directorio.services.APIRequest;
-import munoz.pablo.directorio.utils.ChatApplication;
+import munoz.pablo.directorio.utils.AndroidContractorDirectoryApp;
 import munoz.pablo.directorio.utils.Constants;
 
 /**
@@ -66,7 +62,7 @@ public class ChatConversationSelector extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final ChatApplication application = (ChatApplication) getActivity().getApplication();
+        final AndroidContractorDirectoryApp application = (AndroidContractorDirectoryApp) getActivity().getApplication();
 
         conversationAdapter = new ConversationAdapter(new ArrayList<Conversation>(), getActivity());
 
@@ -135,7 +131,7 @@ public class ChatConversationSelector extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        final ChatApplication application = (ChatApplication) getActivity().getApplication();
+        final AndroidContractorDirectoryApp application = (AndroidContractorDirectoryApp) getActivity().getApplication();
 
         view = inflater.inflate(R.layout.fragment_chat_conversation_selector, container, false);
 
@@ -176,7 +172,7 @@ public class ChatConversationSelector extends Fragment {
     }
 
     private void updateView() {
-        final ChatApplication application = (ChatApplication) getActivity().getApplication();
+        final AndroidContractorDirectoryApp application = (AndroidContractorDirectoryApp) getActivity().getApplication();
 
         conversationAdapter = new ConversationAdapter(application.getConversationList(), getActivity());
         Log.d("Size of", ""+application.getConversationList().size());

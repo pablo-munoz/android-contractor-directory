@@ -30,7 +30,8 @@ public class Contractor implements Parcelable{
 
 
     public Contractor(String id, String firstName, String middleName, String lastName, String email,
-                      String phone, String website, String portrait, double rating, String accountId) {
+                      String phone, String website, String portrait, double rating, String accountId,
+                      JSONArray comments) {
         this.id = id;
         this.firstName = firstName;
         this.middleName = middleName;
@@ -41,6 +42,7 @@ public class Contractor implements Parcelable{
         this.portrait = portrait;
         this.rating = rating;
         this.accountId = accountId;
+        this.comments = comments;
     }
 
     protected Contractor(Parcel in) {
@@ -183,5 +185,9 @@ public class Contractor implements Parcelable{
         } else {
             Log.e("Contractor", "Attempted to call 'populateContractorCard' with a null view.");
         }
+    }
+
+    public JSONArray getComments() {
+        return this.comments;
     }
 }

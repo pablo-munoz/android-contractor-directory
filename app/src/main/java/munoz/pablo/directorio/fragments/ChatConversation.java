@@ -37,7 +37,7 @@ import munoz.pablo.directorio.activities.MainActivity;
 import munoz.pablo.directorio.adapters.MessageAdapter;
 import munoz.pablo.directorio.models.Account;
 import munoz.pablo.directorio.models.Message;
-import munoz.pablo.directorio.utils.ChatApplication;
+import munoz.pablo.directorio.utils.AndroidContractorDirectoryApp;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -102,7 +102,7 @@ public class ChatConversation extends Fragment {
 
         userAccount = ((MainActivity) getActivity()).getUserAccount();
 
-        ChatApplication app = (ChatApplication) getActivity().getApplication();
+        AndroidContractorDirectoryApp app = (AndroidContractorDirectoryApp) getActivity().getApplication();
         mSocket = app.getSocket();
         mSocket.on(Socket.EVENT_CONNECT, onConnect);
         mSocket.on(Socket.EVENT_DISCONNECT, onDisconnect);

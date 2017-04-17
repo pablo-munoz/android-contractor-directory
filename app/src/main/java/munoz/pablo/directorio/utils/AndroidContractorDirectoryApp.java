@@ -3,6 +3,9 @@ package munoz.pablo.directorio.utils;
 
 import android.app.Application;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,7 +20,7 @@ import munoz.pablo.directorio.models.Conversation;
 /**
  * Created by pablo on 4/11/2017.
  */
-public class ChatApplication extends Application {
+public class AndroidContractorDirectoryApp extends Application {
 
     private Socket mSocket;
     {
@@ -50,5 +53,13 @@ public class ChatApplication extends Application {
 
     public ArrayList<Conversation> getConversationList() {
         return new ArrayList<Conversation>(conversations.values());
+    }
+
+    public void injectAuthorizationHeader(JSONObject json) {
+        try {
+            json.put("Authorization", "Bearer " + userAccount.getToken());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }
