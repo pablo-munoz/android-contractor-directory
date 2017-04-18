@@ -40,11 +40,11 @@ RETURNING *;
 
                 return db.raw(`
 INSERT INTO contractor (first_name, middle_name, last_names, phone,
-    website, account_id)
+    website, account_id, address)
 VALUES
     ('${contractor_data.first_name}', '${contractor_data.middle_name}',
      '${contractor_data.last_names}', '${contractor_data.phone}',
-     '${contractor_data.website}', '${account.id}')
+     '${contractor_data.website}', '${account.id}', '${contractor_data.address}')
 RETURNING *;
 `);
             })

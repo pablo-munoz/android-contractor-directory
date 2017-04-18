@@ -53,6 +53,8 @@ ${ categoryFilter };
         utils.debug_log("BODY: ");
         utils.debug_log(request.body);
 
+        console.log(request.body);
+
         const body = request.body;
         let categoriesAssociated = [];
         let hasCategoriesAssociated = false;
@@ -71,6 +73,7 @@ ${ categoryFilter };
             request, dbconfig.contractor.schema);
         utils.debug_log("DATA:");
         utils.debug_log(data);
+        console.log(data);
 
         const validated_data = route_utils.validate_data(data, dbconfig.contractor.schema);
         utils.debug_log("VALIDATED DATA:");
@@ -91,6 +94,8 @@ ${ categoryFilter };
         }
 
         let new_contractor;
+
+        console.log(validated_data.data);
 
         db.transaction((trx) => {
             return trx.insert(validated_data.data)

@@ -203,7 +203,8 @@ public class MainActivity extends AppCompatActivity
                                 contractorData.getString("portrait"),
                                 contractorData.getDouble("avg_rating"),
                                 contractorData.getString("account_id"),
-                                new JSONArray()
+                                new JSONArray(),
+                                contractorData.getString("address")
                         ));
                     }
 

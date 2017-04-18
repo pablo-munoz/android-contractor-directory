@@ -207,7 +207,7 @@ public class ContractorDetail extends Fragment implements OnMapReadyCallback {
         googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                Uri openMapIntent = Uri.parse(String.format("geo:%f, %f", addressLatLng.longitude, addressLatLng.latitude));
+                Uri openMapIntent = Uri.parse(String.format("geo:%f, %f", addressLatLng.latitude, addressLatLng.longitude));
                 Intent intent = new Intent(Intent.ACTION_VIEW, openMapIntent);
                 intent.setPackage("com.google.android.apps.maps");
                 if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
@@ -216,7 +216,10 @@ public class ContractorDetail extends Fragment implements OnMapReadyCallback {
             }
         });
         this.googleMap = googleMap;
-        updateView();
+
+        if (contractor != null) {
+            displayContractorAddressInMap();
+        }
     }
 
     @Override
@@ -422,7 +425,8 @@ public class ContractorDetail extends Fragment implements OnMapReadyCallback {
         List<Address> address;
         addressLatLng = null;
         try {
-            address = geocoder.getFromLocationName("Rubén Darío 989, Guadalajara, Jalisco, México", 5);
+            Log.d("THE ADDR", contractor.getAddress());
+            address = geocoder.getFromLocationName(contractor.getAddress(), 5);
 
             if (address != null) {
                 Address location = address.get(0);

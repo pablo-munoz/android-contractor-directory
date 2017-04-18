@@ -72,13 +72,7 @@ public class Favorites extends Fragment {
             @Override
             public void onSuccess(JSONObject json, int code) {
                 ModelBuilder<Contractor> modelBuilder = new ModelBuilder<>();
-
-                try {
-                    favoriteContractors = modelBuilder.resourceListFromJson(json);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
+                favoriteContractors = modelBuilder.instantiateMany(json);
                 favoritesAdapter = new FavoritesAdapter(favoriteContractors, getActivity());
                 listView.setAdapter(favoritesAdapter);
             }

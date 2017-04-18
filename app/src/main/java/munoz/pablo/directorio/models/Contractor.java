@@ -27,11 +27,12 @@ public class Contractor implements Parcelable{
     private String accountId;
     private double rating;
     private JSONArray comments;
+    private String address;
 
 
     public Contractor(String id, String firstName, String middleName, String lastName, String email,
                       String phone, String website, String portrait, double rating, String accountId,
-                      JSONArray comments) {
+                      JSONArray comments, String address) {
         this.id = id;
         this.firstName = firstName;
         this.middleName = middleName;
@@ -43,6 +44,7 @@ public class Contractor implements Parcelable{
         this.rating = rating;
         this.accountId = accountId;
         this.comments = comments;
+        this.address = address;
     }
 
     protected Contractor(Parcel in) {
@@ -148,6 +150,10 @@ public class Contractor implements Parcelable{
 
     public String getAccountId() {
         return this.accountId;
+    }
+
+    public String getAddress() {
+        return this.address;
     }
 
     @Override

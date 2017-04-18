@@ -1,7 +1,7 @@
 package munoz.pablo.directorio.fragments;
 
-import android.os.Bundle;
 import android.app.Fragment;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,10 +23,10 @@ import java.util.ArrayList;
 
 import munoz.pablo.directorio.R;
 import munoz.pablo.directorio.activities.MainActivity;
-import munoz.pablo.directorio.models.Contractor;
 import munoz.pablo.directorio.models.ContractorCategory;
 import munoz.pablo.directorio.models.ModelBuilder;
 import munoz.pablo.directorio.services.APIRequest;
+import munoz.pablo.directorio.services.APIRequest2;
 import munoz.pablo.directorio.utils.Constants;
 
 /**
@@ -48,6 +48,7 @@ public class RegistrationFragment extends Fragment {
     private Spinner categoriesSp;
     private EditText phoneEt;
     private EditText websiteEt;
+    private EditText addressEt;
     private Button registerButton;
     private ArrayList<ContractorCategory> contractorCategoryList;
 
@@ -92,6 +93,7 @@ public class RegistrationFragment extends Fragment {
         this.categoriesSp = (Spinner) view.findViewById(R.id.account_registration_category_select);
         this.phoneEt = (EditText) view.findViewById(R.id.account_registration_phone);
         this.websiteEt = (EditText) view.findViewById(R.id.account_registration_website) ;
+        this.addressEt = (EditText) view.findViewById(R.id.account_registration_address);
 
         contractorOnlyInputs.setVisibility(View.GONE);
 
@@ -120,32 +122,27 @@ public class RegistrationFragment extends Fragment {
     }
 
     void pullContractorCategoryData() {
-        APIRequest apiRequest = new APIRequest(new APIRequest.APIRequestCallback() {
+        APIRequest2 req = new APIRequest2.Builder()
+                .url(Constants.API_URL + "/api/v1/contractor_category")
+                .method(APIRequest2.METHOD_GET)
+                .callback(new APIRequest2.Callback() {
+                    @Override
+                    public void onResult(int responseCode, JSONObject response) {
+                        if (responseCode == 200) {
+                            ModelBuilder<ContractorCategory> modelBuilder = new ModelBuilder<>();
+                            contractorCategoryList = modelBuilder.instantiateMany(response);
+                            populateCategorySpinner();
+                        } else {
+                            Log.e("RegistrationFragment", "Could not retrieve contractor category data");
+                        }
+                    }
+                })
+                .build();
 
-            @Override
-            public void onSuccess(JSONObject json, int code) {
-                ModelBuilder<ContractorCategory> modelBuilder = new ModelBuilder<>();
-                try {
-                    contractorCategoryList = modelBuilder.resourceListFromJson(json);
-                    populateCategorySpinner();
-                    Log.d("GET CATEGORIES", ""+ contractorCategoryList.size());
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onError(String errorMessage, int code) {
-                Log.e("RegistrationFragment", "Could not retrieve contractor category data");
-                Log.e("RegistrationFragment", errorMessage);
-            }
-        });
-
-        apiRequest.execute(APIRequest.HTTP_GET, Constants.API_URL + "/api/v1/contractor_category");
+        req.execute();
     }
 
     void populateCategorySpinner() {
-        ContractorCategory category;
         ArrayAdapter<ContractorCategory> adapter = new ArrayAdapter<ContractorCategory>(
                 getActivity(), R.layout.contractor_category_spinner, this.contractorCategoryList);
         categoriesSp.setAdapter(adapter);
@@ -185,12 +182,14 @@ public class RegistrationFragment extends Fragment {
                 String category = ((ContractorCategory) categoriesSp.getSelectedItem()).getId();
                 String phone = phoneEt.getText().toString();
                 String website = websiteEt.getText().toString();
+                String address = addressEt.getText().toString();
 
                 contractorRelationship.put("first_name", firstName);
                 contractorRelationship.put("middle_name", middleName);
                 contractorRelationship.put("last_names", lastNames);
                 contractorRelationship.put("phone", phone);
                 contractorRelationship.put("website", website);
+                contractorRelationship.put("address", address);
 
                 relationships.put("contractor", contractorRelationship);
 
