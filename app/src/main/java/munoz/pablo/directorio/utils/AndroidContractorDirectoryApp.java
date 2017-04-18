@@ -52,7 +52,7 @@ public class AndroidContractorDirectoryApp extends Application {
     }
 
     public ArrayList<Conversation> getConversationList() {
-        return new ArrayList<Conversation>(conversations.values());
+        return new ArrayList<>(conversations.values());
     }
 
     public void injectAuthorizationHeader(JSONObject json) {
