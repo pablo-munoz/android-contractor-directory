@@ -157,7 +157,7 @@ public class Login extends Fragment {
 
 
                 MainActivity mainActivity = (MainActivity) Login.this.getActivity();
-                mainActivity.setUserName(mEmailView.getText().toString());
+                //mainActivity.setUserName(mEmailView.getText().toString());
                 mainActivity.changeContentFragment(new ContractorCategoryMenu());
 
             }
