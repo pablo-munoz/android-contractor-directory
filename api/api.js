@@ -4,6 +4,7 @@ const _ = require('lodash');
 
 const express = require('express');
 const app = express();
+const jwt = require('jsonwebtoken');
 
 const dbconfig = require('./dbconfig.js');
 const db = require('./db');
@@ -34,8 +35,101 @@ app.use(
 app.use(constants.api_version + '/contractor', require('./routes/contractor'));
 app.use(constants.api_version + '/contractor', require('./routes/contractor_detail'));
 app.use(constants.api_version + '/auth', require('./routes/auth'));
+app.use(constants.api_version + '/account', require('./routes/account'));
 
 
-http.createServer(app).listen(+process.argv[2] || 8080, function() {
+const server = http.createServer(app).listen(+process.argv[2] || 8080, function() {
     console.log('App running on 192.168.33.10:3000');
+});
+
+const io = require('socket.io')(server);
+
+
+
+const interlocutors = {};
+
+
+const conversation_db = {};
+
+
+function get_conversation_id(account_id_1, account_id_2) {
+    if (account_id_1 <= account_id_2) return account_id_1 + account_id_2;
+    else return account_id_2 + account_id_1;
+}
+
+
+app.route(constants.api_version + '/conversation')
+    .get((request, response) => {
+        function handler(error, decoded) {
+            if (error) {
+                response.status(400).end();
+                return;
+            }
+
+            const conversations = _.filter(
+                _.values(conversation_db),
+                convo => _.includes(convo.interlocutors, decoded.account_id));
+
+            response.json({
+                data: conversations
+            });
+        }
+
+        jwt.verify(request.header('Authorization').split(' ')[1],
+                   constants.AUTH_SECRET,
+                   handler);
+    });
+
+
+io.on('connection', function(socket) {
+    console.log('A user connected');
+
+    socket.on('disconnect', function() {
+        console.log('user disconnected');
+        // interlocutors[socket.account_id].socket = null;
+    });
+
+    socket.on('identify', function(payload) {
+        payload = JSON.parse(payload);
+        const account_id = payload.id;
+
+        interlocutors[account_id] = {
+            socket: socket,
+            conversations: {}
+        };
+
+        // Each account joins a room with its id.
+        socket.join(account_id);
+        socket.account_id = account_id;
+    });
+
+    // On connection, send the conversation history
+    io.to(socket.account_id).emit(
+        'conversation history',
+        _.filter(_.values(conversation_db), (conversation) => _.includes(conversation.interlocutors, socket.account_id)));
+
+    socket.on('send message', function(payload) {
+
+        const author_id = payload.from;
+        const recipient_id = payload.to;
+        const message = payload.message;
+
+        const conversation_id = get_conversation_id(author_id, recipient_id);
+        let conversation = conversation_db[conversation_id];
+
+        if (_.isUndefined(conversation)) {
+            conversation_db[conversation_id] = {
+                id: conversation_id,
+                interlocutors: [author_id, recipient_id],
+                messages: []
+            };
+
+            conversation = conversation_db[conversation_id];
+        }
+
+        conversation.last_message_date = new Date();
+        conversation.messages.push(payload);
+
+        io.to(recipient_id).emit('new message', payload);
+    });
 });
