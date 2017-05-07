@@ -207,7 +207,9 @@ public class ContractorDetail extends Fragment implements OnMapReadyCallback {
         googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                Uri openMapIntent = Uri.parse(String.format("geo:%f, %f", addressLatLng.latitude, addressLatLng.longitude));
+                Uri openMapIntent = Uri.parse(String.format("geo:%f,%f?q=%f,%f(%s)",
+                        addressLatLng.latitude, addressLatLng.longitude,
+                        addressLatLng.latitude, addressLatLng.longitude, contractor.getFullName()));
                 Intent intent = new Intent(Intent.ACTION_VIEW, openMapIntent);
                 intent.setPackage("com.google.android.apps.maps");
                 if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
