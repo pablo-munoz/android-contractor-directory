@@ -3,7 +3,6 @@
 
 POST http://192.168.33.10:3000/api/v1/auth/login
 Content-Type: application/json
-
 {
     "email": "pablosdesk@gmail.com",
     "password": "abc123"
