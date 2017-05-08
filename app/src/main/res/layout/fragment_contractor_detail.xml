@@ -98,6 +98,11 @@
                 android:layout_height="wrap_content" />
 
             <TextView
+                android:id="@+id/contractor_detail_website"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
                 android:id="@+id/contractor_detail_email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
