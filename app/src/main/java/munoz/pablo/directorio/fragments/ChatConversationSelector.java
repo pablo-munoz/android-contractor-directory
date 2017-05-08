@@ -144,14 +144,16 @@ public class ChatConversationSelector extends Fragment {
                 Conversation conversation = conversationList.get(position);
 
                 String recipientId = null;
+                String conversationId = null;
 
                 for (int i = 0; i < 2; i++) {
                     if (!conversation.interlocutorIdList.get(i).equals(application.getUserAccount().getId())) {
                         recipientId = conversation.interlocutorIdList.get(i);
+                        conversationId = conversation.getId();
                     }
                 }
 
-                ChatConversation chatConversation = ChatConversation.newInstance(recipientId);
+                ChatConversation chatConversation = ChatConversation.newInstance(recipientId, conversationId);
 
                 ((MainActivity) getActivity()).changeContentFragment(chatConversation);
             }

@@ -81,6 +81,26 @@ app.route(constants.api_version + '/conversation')
     });
 
 
+app.route(constants.api_version + '/conversation/:conversation_id')
+    .get((request, response) => {
+        function handler(error, decoded) {
+            if (error) {
+                response.status(400).end();
+                return;
+            }
+
+            response.json({
+                data: conversation_db[request.params.conversation_id]
+            });
+        }
+
+        jwt.verify(request.header('Authorization').split(' ')[1],
+                   constants.AUTH_SECRET,
+                   handler);
+    });
+
+
+
 io.on('connection', function(socket) {
     console.log('A user connected');
 

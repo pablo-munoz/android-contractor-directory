@@ -151,7 +151,7 @@ public class ContractorDetail extends Fragment implements OnMapReadyCallback {
         sendMessageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ChatConversation chatConversation = ChatConversation.newInstance(contractor.getAccountId());
+                ChatConversation chatConversation = ChatConversation.newInstance(contractor.getAccountId(), null);
                 ((MainActivity) getActivity()).changeContentFragment(chatConversation);
             }
         });
