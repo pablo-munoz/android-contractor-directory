@@ -78,6 +78,7 @@ public class ChatConversationSelector extends Fragment {
                         String dateString = conversationData.getString("last_message_date");
                         Date lastMessageDate = new Date();
                         JSONArray interlocutorIdJsonList = conversationData.getJSONArray("interlocutors");
+                        JSONObject interlocutorData = conversationData.getJSONObject("interlocutor_data");
 
                         ArrayList<String> interlocutorIdList = new ArrayList<>();
 
@@ -101,7 +102,8 @@ public class ChatConversationSelector extends Fragment {
                                 conversationId,
                                 lastMessageDate,
                                 interlocutorIdList,
-                                messageList
+                                messageList,
+                                interlocutorData
                         );
 
                         application.setConversation(conversationId, conversation);
@@ -144,14 +146,16 @@ public class ChatConversationSelector extends Fragment {
                 Conversation conversation = conversationList.get(position);
 
                 String recipientId = null;
+                String conversationId = null;
 
                 for (int i = 0; i < 2; i++) {
                     if (!conversation.interlocutorIdList.get(i).equals(application.getUserAccount().getId())) {
                         recipientId = conversation.interlocutorIdList.get(i);
+                        conversationId = conversation.getId();
                     }
                 }
 
-                ChatConversation chatConversation = ChatConversation.newInstance(recipientId);
+                ChatConversation chatConversation = ChatConversation.newInstance(recipientId, conversationId);
 
                 ((MainActivity) getActivity()).changeContentFragment(chatConversation);
             }

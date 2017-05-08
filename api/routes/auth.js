@@ -36,9 +36,10 @@ RETURNING *;
                 }
             })
             .then((account) => {
-                const contractor_data = body.relationships.contractor;
+                const contractor_data = _.get(body, 'relationships.contractor', null);
 
-                return db.raw(`
+                if (contractor_data) {
+                    return db.raw(`
 INSERT INTO contractor (first_name, middle_name, last_names, phone,
     website, account_id, address)
 VALUES
@@ -47,8 +48,13 @@ VALUES
      '${contractor_data.website}', '${account.id}', '${contractor_data.address}')
 RETURNING *;
 `);
+                } else {
+                    return null;
+                }
             })
             .then((result) => {
+                if (!result) return;
+
                 const contractor = result.rows[0];
                 const contractor_category_id = body.relationships.contractor_category[0];
 

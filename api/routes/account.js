@@ -14,6 +14,41 @@ const route_utils = require('./route_utils');
 
 // TODO authenticate so only users can update themselves
 
+router.route('/')
+    .patch((request, response) => {
+        function handler(error, decoded) {
+            if (error) {
+                response.status(400).end();
+                return;
+            }
+
+            const contractor_data = _.omit(request.body, 'password');
+
+            db('contractor')
+                .update(contractor_data)
+                .where({
+                    account_id: decoded.account_id
+                })
+                .then(() => {
+                    response.json({
+                        msg: "success"
+                    });
+                    return;
+                })
+                .catch((error) => {
+                    console.error(error);
+                    response.status(400).json({
+                        error: "could not update contractor data"
+                    });
+                    return;
+                });
+        }
+
+        jwt.verify(request.header('Authorization').split(' ')[1],
+                   constants.AUTH_SECRET,
+                   handler);
+    });
+
 router.route('/:account_id/favorites/:contractor_id/add')
     .post((request, response) => {
         const body = request.body;

@@ -21,6 +21,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import io.socket.client.Socket;
+import munoz.pablo.directorio.fragments.AccountDetail;
 import munoz.pablo.directorio.fragments.ChatConversationSelector;
 import munoz.pablo.directorio.fragments.ContractorCategoryMenu;
 import munoz.pablo.directorio.fragments.Favorites;
@@ -128,6 +129,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_logout) {
             userAccount = Account.getAnonymous();
             updateNavigation();
+            changeContentFragment(new ContractorCategoryMenu());
         } else if (id == R.id.nav_favorites) {
             if (userAccount.isAnonymous()) {
                 changeContentFragment(new Login());
@@ -136,6 +138,8 @@ public class MainActivity extends AppCompatActivity
             }
         } else if (id == R.id.nav_chat) {
             changeContentFragment(new ChatConversationSelector());
+        } else if (id == R.id.nav_account) {
+            changeContentFragment(new AccountDetail());
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -190,15 +194,15 @@ public class MainActivity extends AppCompatActivity
 
                     JSONObject contractorData = null;
 
-                    if (json.has("contractor")) {
+                    if (json.has("contractor") && !json.getString("contractor").equals("null")) {
                         contractorData = json.getJSONObject("contractor");
                         userAccount.setContractor(new Contractor(
                                 contractorData.getString("id"),
                                 contractorData.getString("first_name"),
                                 contractorData.getString("middle_name"),
                                 contractorData.getString("last_names"),
-                                contractorData.getString("phone"),
                                 contractorData.getString("email"),
+                                contractorData.getString("phone"),
                                 contractorData.getString("website"),
                                 contractorData.getString("portrait"),
                                 contractorData.getDouble("avg_rating"),

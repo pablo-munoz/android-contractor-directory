@@ -1,11 +1,10 @@
-:token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50X2lkIjoiYTIyMWEwNTEtNjM4Ny00ZWYwLTg3ZjAtMGViZTRlZDg1OWJlIiwiaWF0IjoxNDkyMDUxNDMzLCJleHAiOjE0OTIyMjQyMzN9.P_VnM7u7xCf_r4PuhJIiAXCpJjeLv0R9fMlAxgjYjIM
+:token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2NvdW50X2lkIjoiNzRkZTIyODUtNzNlMS00NGYxLTg3ZmEtNDNlZWIyMTkzNmNhIiwiaWF0IjoxNDk0MTk4OTQwLCJleHAiOjE0OTQzNzE3NDB9.UOD5SDCje_fMSfCH2L4MNrOguK0vQXuZbvwJ2M97oD0
 ##################################################
 
 POST http://192.168.33.10:3000/api/v1/auth/login
 Content-Type: application/json
-
 {
-    "email": "pablosdesk@gmail.com",
+    "email": "pablo@gmail.com",
     "password": "abc123"
 }
 
@@ -37,4 +36,9 @@ GET http://192.168.33.10:3000/api/v1/account/a221a051-6387-4ef0-87f0-0ebe4ed859b
 
 ## get convos
 GET http://192.168.33.10:3000/api/v1/conversation
+Authorization: Bearer :token
+
+##
+
+GET http://192.168.33.10:3000/api/v1/conversation/74de2285-73e1-44f1-87fa-43eeb21936cadfafac67-d83b-4f1b-974e-b08641872f45
 Authorization: Bearer :token

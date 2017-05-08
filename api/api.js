@@ -81,6 +81,26 @@ app.route(constants.api_version + '/conversation')
     });
 
 
+app.route(constants.api_version + '/conversation/:conversation_id')
+    .get((request, response) => {
+        function handler(error, decoded) {
+            if (error) {
+                response.status(400).end();
+                return;
+            }
+
+            response.json({
+                data: conversation_db[request.params.conversation_id]
+            });
+        }
+
+        jwt.verify(request.header('Authorization').split(' ')[1],
+                   constants.AUTH_SECRET,
+                   handler);
+    });
+
+
+
 io.on('connection', function(socket) {
     console.log('A user connected');
 
@@ -124,12 +144,35 @@ io.on('connection', function(socket) {
                 messages: []
             };
 
+            db.select('account.id', 'account.email', 'contractor.first_name',
+                      'contractor.middle_name', 'contractor.last_names')
+                .from('account')
+                .rightJoin('contractor', 'account.id', 'contractor.account_id')
+                .where('account.id', recipient_id)
+                .orWhere('account.id', author_id)
+                .then((result) => {
+                    conversation_db[conversation_id].interlocutor_data = {
+                        [result[0].id]: result[0].first_name + ' ' + (result[0].middle_name || '') + ' ' + result[0].last_names,
+                        [result[1].id]: result[1].first_name + ' ' + (result[1].middle_name || '') + ' ' + result[1].last_names,
+
+                    };
+
+                    conversation.last_message_date = new Date();
+                    conversation.messages.push(payload);
+
+                    io.to(recipient_id).emit('new message', payload);
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+
             conversation = conversation_db[conversation_id];
+        } else {
+
+            conversation.last_message_date = new Date();
+            conversation.messages.push(payload);
+
+            io.to(recipient_id).emit('new message', payload);
         }
-
-        conversation.last_message_date = new Date();
-        conversation.messages.push(payload);
-
-        io.to(recipient_id).emit('new message', payload);
     });
 });

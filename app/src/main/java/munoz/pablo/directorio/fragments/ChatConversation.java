@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.os.Debug;
 import android.os.Handler;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,6 +25,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -37,7 +39,9 @@ import munoz.pablo.directorio.activities.MainActivity;
 import munoz.pablo.directorio.adapters.MessageAdapter;
 import munoz.pablo.directorio.models.Account;
 import munoz.pablo.directorio.models.Message;
+import munoz.pablo.directorio.services.APIRequest2;
 import munoz.pablo.directorio.utils.AndroidContractorDirectoryApp;
+import munoz.pablo.directorio.utils.Constants;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -48,6 +52,7 @@ import munoz.pablo.directorio.utils.AndroidContractorDirectoryApp;
  */
 public class ChatConversation extends Fragment {
     private static final String ARG_recipientId = "recipient_id";
+    private static final String ARG_conversationId = "conversation_id";
 
     private static final String TAG = "ChatFragment";
 
@@ -70,6 +75,7 @@ public class ChatConversation extends Fragment {
     private Account userAccount;
 
     private String recipientId;
+    private String conversationId;
 
 
     public ChatConversation() {
@@ -82,10 +88,11 @@ public class ChatConversation extends Fragment {
      *
      * @return A new instance of fragment ChatConversation.
      */
-    public static ChatConversation newInstance(String recipientId) {
+    public static ChatConversation newInstance(String recipientId, String conversationId) {
         ChatConversation fragment = new ChatConversation();
         Bundle args = new Bundle();
         args.putString(ARG_recipientId, recipientId);
+        args.putString(ARG_conversationId, conversationId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -96,6 +103,7 @@ public class ChatConversation extends Fragment {
 
         if (getArguments() != null) {
             recipientId = getArguments().getString(ARG_recipientId);
+            conversationId = getArguments().getString(ARG_conversationId);
         }
 
         setHasOptionsMenu(true);
@@ -103,18 +111,21 @@ public class ChatConversation extends Fragment {
         userAccount = ((MainActivity) getActivity()).getUserAccount();
 
         AndroidContractorDirectoryApp app = (AndroidContractorDirectoryApp) getActivity().getApplication();
+
         mSocket = app.getSocket();
-        mSocket.on(Socket.EVENT_CONNECT, onConnect);
-        mSocket.on(Socket.EVENT_DISCONNECT, onDisconnect);
-        mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
-        mSocket.on(Socket.EVENT_CONNECT_TIMEOUT, onConnectError);
-        mSocket.emit("identify", String.format("{ \"id\": \"%s\" }", userAccount.getId()));
-        mSocket.on("new message", onNewMessage);
-        mSocket.on("user joined", onUserJoined);
-        mSocket.on("user left", onUserLeft);
-        mSocket.on("typing", onTyping);
-        mSocket.on("stop typing", onStopTyping);
-        mSocket.connect();
+        if (!mSocket.connected()) {
+            mSocket.on(Socket.EVENT_CONNECT, onConnect);
+            mSocket.on(Socket.EVENT_DISCONNECT, onDisconnect);
+            mSocket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
+            mSocket.on(Socket.EVENT_CONNECT_TIMEOUT, onConnectError);
+            mSocket.emit("identify", String.format("{ \"id\": \"%s\" }", userAccount.getId()));
+            mSocket.on("new message", onNewMessage);
+            mSocket.on("user joined", onUserJoined);
+            mSocket.on("user left", onUserLeft);
+            mSocket.on("typing", onTyping);
+            mSocket.on("stop typing", onStopTyping);
+            mSocket.connect();
+        }
 
         startSignIn();
     }
@@ -124,6 +135,39 @@ public class ChatConversation extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         mAdapter = new MessageAdapter(getActivity().getApplicationContext(), mMessages);
+
+        if (conversationId != null) {
+
+            String headers = String.format("{ \"Authorization\": \"Bearer %s\" }", userAccount.getToken());
+
+            Log.d("convestaionId", conversationId);
+            APIRequest2 request = new APIRequest2.Builder()
+                    .url(Constants.API_URL + "/" + Constants.API_VERSION + "/conversation/" + conversationId)
+                    .headers(headers)
+                    .callback(new APIRequest2.Callback() {
+                        @Override
+                        public void onResult(int responseCode, JSONObject response) {
+                            try {
+                                JSONObject data = response.getJSONObject("data");
+                                JSONArray messages = data.getJSONArray("messages");
+                                JSONObject msg;
+
+                                for (int i = 0; i < messages.length(); i++) {
+                                    msg = messages.getJSONObject(i);
+                                    addMessage(msg.getString("username"), msg.getString("message"));
+                                }
+
+                            } catch (JSONException e) {
+                                Toast.makeText(getActivity(), "Ha ocurrido un error mostrando mensajes.", Toast.LENGTH_LONG).show();
+                                e.printStackTrace();
+                            }
+                        }
+                    })
+                    .build();
+
+            request.execute();
+        }
+
         return inflater.inflate(R.layout.fragment_chat, container, false);
     }
 

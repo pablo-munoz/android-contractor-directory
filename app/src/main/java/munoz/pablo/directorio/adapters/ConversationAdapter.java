@@ -7,11 +7,15 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import org.json.JSONException;
+
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import munoz.pablo.directorio.R;
 import munoz.pablo.directorio.models.Conversation;
+import munoz.pablo.directorio.utils.AndroidContractorDirectoryApp;
 
 /**
  * Created by pablo on 4/12/2017.
@@ -49,7 +53,29 @@ public class ConversationAdapter extends BaseAdapter {
 
         TextView conversationIdentifierTv = (TextView) convertView.findViewById(R.id.item_conversation_identifier);
 
-        conversationIdentifierTv.setText(conversationList.get(position).getId());
+        Conversation conversation = conversationList.get(position);
+        String conversationName = "Error obteniendo datos de interlocutor.";
+
+        AndroidContractorDirectoryApp app = (AndroidContractorDirectoryApp) activity.getApplication();
+        String userId = app.getUserAccount().getId();
+        String interlocutorId;
+
+        Iterator<String> iter = conversation.interlocutorData.keys();
+
+        while (iter.hasNext()) {
+            interlocutorId = iter.next();
+
+            if (!interlocutorId.equals(userId)) {
+                try {
+                    conversationName = conversation.interlocutorData.getString(interlocutorId);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                break;
+            }
+        }
+
+        conversationIdentifierTv.setText(conversationName);
 
         return convertView;
     }

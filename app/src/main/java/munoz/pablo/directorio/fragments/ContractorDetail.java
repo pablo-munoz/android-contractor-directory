@@ -61,6 +61,7 @@ public class ContractorDetail extends Fragment implements OnMapReadyCallback {
     private TextView idTv;
     private TextView phoneTv;
     private TextView emailTv;
+    private TextView websiteTv;
     private ImageView portraitIv;
     private RatingBar overallRatingBar;
     private RatingBar myRatingBar;
@@ -151,7 +152,7 @@ public class ContractorDetail extends Fragment implements OnMapReadyCallback {
         sendMessageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ChatConversation chatConversation = ChatConversation.newInstance(contractor.getAccountId());
+                ChatConversation chatConversation = ChatConversation.newInstance(contractor.getAccountId(), null);
                 ((MainActivity) getActivity()).changeContentFragment(chatConversation);
             }
         });
@@ -207,7 +208,9 @@ public class ContractorDetail extends Fragment implements OnMapReadyCallback {
         googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                Uri openMapIntent = Uri.parse(String.format("geo:%f, %f", addressLatLng.latitude, addressLatLng.longitude));
+                Uri openMapIntent = Uri.parse(String.format("geo:%f,%f?q=%f,%f(%s)",
+                        addressLatLng.latitude, addressLatLng.longitude,
+                        addressLatLng.latitude, addressLatLng.longitude, contractor.getFullName()));
                 Intent intent = new Intent(Intent.ACTION_VIEW, openMapIntent);
                 intent.setPackage("com.google.android.apps.maps");
                 if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
@@ -245,6 +248,7 @@ public class ContractorDetail extends Fragment implements OnMapReadyCallback {
         idTv = (TextView) view.findViewById(R.id.contractor_detail_id);
         emailTv = (TextView) view.findViewById(R.id.contractor_detail_email);
         phoneTv = (TextView) view.findViewById(R.id.contractor_detail_phone);
+        websiteTv = (TextView) view.findViewById(R.id.contractor_detail_website);
         portraitIv = (ImageView) view.findViewById(R.id.contractor_detail_img);
         overallRatingBar = (RatingBar) view.findViewById(R.id.contractor_detail_rating_bar);
         commentsLv = (ListView) view.findViewById(R.id.contractor_detail_lv);
@@ -384,6 +388,7 @@ public class ContractorDetail extends Fragment implements OnMapReadyCallback {
             idTv.setText("" + contractor.getId());
             emailTv.setText(contractor.getEmail());
             phoneTv.setText(contractor.getPhone());
+            websiteTv.setText(contractor.getWebsite());
             overallRatingBar.setRating((float) contractor.getRating());
             myRatingBar.setRating(4);
 
