@@ -128,6 +128,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_logout) {
             userAccount = Account.getAnonymous();
             updateNavigation();
+            changeContentFragment(new ContractorCategoryMenu());
         } else if (id == R.id.nav_favorites) {
             if (userAccount.isAnonymous()) {
                 changeContentFragment(new Login());
