@@ -1,48 +1,19 @@
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/activity_main_container"
+    android:id="@+id/fragment_contractor_category_container"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="@color/list_container_bg">
 
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="horizontal">
-
-        <ViewFlipper
-            android:id="@+id/viewFlipper"
-            android:layout_width="fill_parent"
-            android:layout_height="190dp">
-
-            <ImageView
-                android:id="@+id/image1"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:src="@drawable/wood" />
-
-            <ImageView
-                android:id="@+id/image2"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:src="@drawable/worker1" />
-
-            <ImageView
-                android:id="@+id/image3"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:src="@drawable/painter" />
-        </ViewFlipper>
-
-    </LinearLayout>
+    <ProgressBar
+        android:id="@+id/category_list_loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <ListView
         android:id="@+id/category_list_view"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="194dp"
-        android:layout_alignParentEnd="true" />
+        android:layout_height="wrap_content"/>
 
-</RelativeLayout>
+</LinearLayout>

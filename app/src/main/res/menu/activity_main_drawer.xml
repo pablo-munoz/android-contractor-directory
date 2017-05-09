@@ -4,7 +4,7 @@
         <item
             android:id="@+id/nav_camera"
             android:icon="@drawable/ic_list_black_24dp"
-            android:title="Directorio" />
+            android:title="Buscar contratistas" />
         <item
             android:id="@+id/add_contractor"
             android:icon="@drawable/hamer"
@@ -14,13 +14,29 @@
     <item android:title="Cuenta">
         <menu>
             <item
+                android:id="@+id/nav_account"
+                android:icon="@drawable/ic_person_outline_black_24dp"
+                android:title="Mi cuenta" />
+            <item
+                android:id="@+id/nav_logout"
+                android:icon="@drawable/ic_exit_to_app_black_24dp"
+                android:title="Logout" />
+            <item
                 android:id="@+id/nav_login"
                 android:icon="@drawable/ic_person_outline_black_24dp"
                 android:title="Iniciar Sesión" />
             <item
-                android:id="@+id/nav_send"
+                android:id="@+id/nav_register"
                 android:icon="@drawable/ic_menu_send"
                 android:title="Registrarse" />
+            <item
+                android:id="@+id/nav_favorites"
+                android:icon="@drawable/ic_bookmark_black_24dp"
+                android:title="Mis favoritos" />
+            <item
+                android:id="@+id/nav_chat"
+                android:icon="@drawable/ic_chat_bubble_outline_black_24dp"
+                android:title="Mensajes"/>
         </menu>
     </item>
 

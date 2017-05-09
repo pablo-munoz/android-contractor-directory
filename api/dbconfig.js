@@ -74,6 +74,9 @@ module.exports = {
                 type: 'enum',
                 not_null: true,
                 default: 'active'
+            },
+            address: {
+                type: 'text'
             }
         }
     },
