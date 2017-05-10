@@ -6,7 +6,7 @@ package munoz.pablo.directorio.utils;
 
 public class Constants {
     // For using your own phone make it http://<your ip>:3333
-    public static final String API_URL = "http://10.43.62.71:3333";
+    public static final String API_URL = "http://192.168.56.1:3333";
     public static final String API_VERSION = "api/v1";
-    public static final String CHAT_SERVER_URL = "http://10.43.62.71:3333";
+    public static final String CHAT_SERVER_URL = "http://192.168.56.1:3333";
 }
