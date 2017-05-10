@@ -169,7 +169,7 @@ public class ContractorDetail extends Fragment implements OnMapReadyCallback {
         callBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_CALL);
+                Intent intent = new Intent(Intent.ACTION_DIAL);
 
                 intent.setData(Uri.parse("tel:" + contractor.getPhone()));
                 startActivity(intent);

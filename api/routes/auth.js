@@ -31,6 +31,7 @@ RETURNING *;
                     response.status(200).json({
                         message: 'registration successful'
                     });
+                    return;
                 } else {
                     return result.rows[0];
                 }

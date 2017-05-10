@@ -63,10 +63,8 @@ VALUES ('${request.params.account_id}', '${request.params.contractor_id}');
             .catch((error) => {
                 console.error(error);
                 response.status(400).end();
+                return;
             });
-
-        console.log(body);
-        response.send("Got it");
     });
 
 
@@ -85,10 +83,12 @@ WHERE favorites.account_id = '${request.params.account_id}';
                         "attributes": _.omit(row, 'id')
                     }))
                 });
+                return;
             })
             .catch((error) => {
                 console.error(error);
                 response.status(400).send(error);
+                return;
             });
     });
 
