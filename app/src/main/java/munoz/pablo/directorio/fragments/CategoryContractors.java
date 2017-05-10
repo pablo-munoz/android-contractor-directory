@@ -49,7 +49,6 @@ public class CategoryContractors extends Fragment {
     private ProgressBar progressBar;
     private TextView titleTv;
     private TextView emptyQueryTv;
-    private ImageView category_image;
 
     public CategoryContractors() {
         // Required empty public constructor
@@ -87,7 +86,6 @@ public class CategoryContractors extends Fragment {
         emptyQueryTv = (TextView) view.findViewById(R.id.category_contractors_empty_query_label);
         progressBar = (ProgressBar) view.findViewById(R.id.category_contractors_loading);
         contractorListView = (ListView) view.findViewById(R.id.category_contractors_list_view);
-        category_image = (ImageView) view.findViewById(R.id.category_image);
 
         contractorList = new ArrayList<>();
         categoryModelBuilder = new ModelBuilder<>();
@@ -105,7 +103,6 @@ public class CategoryContractors extends Fragment {
                 ContractorDetail newFragment = ContractorDetail.newInstance(contractor.getId());
 
                 MainActivity mainActivity = (MainActivity) getActivity();
-
                 mainActivity.changeContentFragment(newFragment);
             }
         });
@@ -129,22 +126,7 @@ public class CategoryContractors extends Fragment {
                             contractorCategory = categoryModelBuilder.instantiateOne(response);
 
                             if (contractorCategory != null) {
-                                titleTv.setText(contractorCategory.getShortName());
-                                if(contractorCategory.getName().equalsIgnoreCase("electricistas")){
-                                    category_image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.electricity_icon));
-                                }
-                                else if(contractorCategory.getShortName().equalsIgnoreCase("herreros")){
-                                    category_image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.blacksmith_icon));
-                                }
-                                else if(contractorCategory.getShortName().equalsIgnoreCase("pintores")){
-                                    category_image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.paint_icon));
-                                }
-                                else if(contractorCategory.getShortName().equalsIgnoreCase("madereros")){
-                                    category_image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.wood_icon));
-                                }
-                                else if(contractorCategory.getShortName().equalsIgnoreCase("albañiles")){
-                                    category_image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.common_google_signin_btn_icon_dark_normal_background));
-                                }
+                                titleTv.setText(contractorCategory.getName());
                                 requestContractorInCategoryDataFromApi();
                             }
                         }

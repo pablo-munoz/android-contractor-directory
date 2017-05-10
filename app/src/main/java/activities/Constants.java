@@ -1,4 +1,6 @@
-package munoz.pablo.directorio.utils;
+package activities;
+
+import android.content.SharedPreferences;
 
 /**
  * Created by pablo on 3/6/2017.
@@ -6,8 +8,7 @@ package munoz.pablo.directorio.utils;
 
 public class Constants {
     // For using your own phone make it http://<your ip>:3333
-
-    public static final String API_URL = "http://10.43.53.96:3333";
-    public static final String API_VERSION = "api/v1";
+    public static String API_URL = "http://10.43.53.96:3333";
+    public static String PREFS_FILENAME = "prefsFile";
     public static final String CHAT_SERVER_URL = "http://10.43.53.96:3333";
 }
