@@ -118,7 +118,7 @@ SELECT * FROM contractor_summary WHERE account_id = '${account_id}';
                     json.contractor = null
                 }
             })
-            .then(() => response.json(json))
+            .then((json) => response.json(json))
             .catch((error) => {
                 console.error(error);
                 response.status(400).json({

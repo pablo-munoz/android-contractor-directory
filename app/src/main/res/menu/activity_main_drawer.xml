@@ -2,17 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
+            android:id="@+id/search_contractor"
             android:icon="@drawable/ic_list_black_24dp"
-            android:title="Buscar contratistas" />
-        <item
-            android:id="@+id/add_contractor"
-            android:icon="@drawable/hamer"
-            android:title="Añadir Contratista" />
+            android:title="Buscar contratistas"
+            />
     </group>
 
     <item android:title="Cuenta">
         <menu>
+            <group android:checkableBehavior="all">
             <item
                 android:id="@+id/nav_account"
                 android:icon="@drawable/ic_person_outline_black_24dp"
@@ -31,12 +29,13 @@
                 android:title="Registrarse" />
             <item
                 android:id="@+id/nav_favorites"
-                android:icon="@drawable/ic_bookmark_black_24dp"
+                android:icon="@drawable/ic_favorite_black_24dp"
                 android:title="Mis favoritos" />
             <item
                 android:id="@+id/nav_chat"
                 android:icon="@drawable/ic_chat_bubble_outline_black_24dp"
                 android:title="Mensajes"/>
+            </group>
         </menu>
     </item>
 

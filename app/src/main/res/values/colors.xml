@@ -10,6 +10,7 @@
     <color name="colorPrimary">#518CA1</color>
     <color name="colorPrimaryDark">#10627F</color>
     <color name="colorAccent">#272932</color>
+    <color name="colorBackground">#92B7C4</color>
 
     <!--BUTTON COLLORS-->
     <color name="button_default">#BF8156</color>
