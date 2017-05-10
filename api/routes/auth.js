@@ -31,6 +31,7 @@ RETURNING *;
                     response.status(200).json({
                         message: 'registration successful'
                     });
+                    return;
                 } else {
                     return result.rows[0];
                 }
@@ -81,6 +82,8 @@ router.route('/login')
     .post((request, response) => {
         const body = request.body;
 
+        console.log(body);
+
         const query = `
 SELECT * FROM account WHERE email = lower('${body.email}') AND
   password = crypt('${body.password}', password);
@@ -103,6 +106,7 @@ SELECT * FROM account WHERE email = lower('${body.email}') AND
                     return result.rows[0].id;
                 } else {
                     response.status(403).end();
+                    throw new Error('Auth error');
                 }
             })
             .then((account_id) => {
@@ -117,9 +121,14 @@ SELECT * FROM contractor_summary WHERE account_id = '${account_id}';
                     json.contractor = null
                 }
             })
-            .then((json) => response.json(json))
+            .then(() => response.json(json))
             .catch((error) => {
                 console.error(error);
+
+                if (error.message == 'Auth error') {
+                    return;
+                }
+
                 response.status(400).json({
                     status: 'failure processing authentication'
                 });

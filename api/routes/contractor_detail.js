@@ -163,6 +163,7 @@ router.route('/:id/rate/:rating')
             if (rating == parseFloat('nan')) {
                 console.log(`Rating attempt from ${decoded.account_id} of ${request.params.rating} with non numeric value.`);
                 response.status(400).end();
+                return;
             }
 
             const query = `
@@ -191,7 +192,10 @@ router.route('/:id/comment')
     .post((request, response) => {
 
         function handler(error, decoded) {
-            if (error) response.status(400).end();
+            if (error) {
+                response.status(400).end();
+                return;
+            }
 
             const query = `
 INSERT INTO contractor_comment (account_id, contractor_id, content)
