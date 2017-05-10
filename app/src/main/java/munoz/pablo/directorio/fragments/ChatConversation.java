@@ -136,11 +136,11 @@ public class ChatConversation extends Fragment {
         // Inflate the layout for this fragment
         mAdapter = new MessageAdapter(getActivity().getApplicationContext(), mMessages);
 
-        if (conversationId != null) {
+        if (!conversationId.equals("None")) {
 
             String headers = String.format("{ \"Authorization\": \"Bearer %s\" }", userAccount.getToken());
 
-            Log.d("convestaionId", conversationId);
+            Log.d("converstaionId", conversationId);
             APIRequest2 request = new APIRequest2.Builder()
                     .url(Constants.API_URL + "/" + Constants.API_VERSION + "/conversation/" + conversationId)
                     .headers(headers)
@@ -158,6 +158,7 @@ public class ChatConversation extends Fragment {
                                 }
 
                             } catch (JSONException e) {
+                                Log.e("ChatConversation", e.getMessage());
                                 Toast.makeText(getActivity(), "Ha ocurrido un error mostrando mensajes.", Toast.LENGTH_LONG).show();
                                 e.printStackTrace();
                             }
@@ -347,7 +348,7 @@ public class ChatConversation extends Fragment {
         try {
             payload.put("from", userAccount.getId());
             payload.put("to", recipientId);
-            payload.put("username", userAccount.getIsContractor() ? userAccount.getContractor().getFullName() : userAccount.getEmail());
+            payload.put("username", mUsername);
             payload.put("message", message);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -362,7 +363,7 @@ public class ChatConversation extends Fragment {
         if (userAccount.isAnonymous()) {
             ((MainActivity) getActivity()).changeContentFragment(new Login());
         } else {
-            if (userAccount.getIsContractor()) {
+            if (userAccount.getContractor() != null) {
                 mUsername = userAccount.getContractor().getFullName();
             } else {
                 mUsername = userAccount.getEmail();
