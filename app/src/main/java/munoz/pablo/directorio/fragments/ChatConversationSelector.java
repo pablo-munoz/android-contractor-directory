@@ -75,7 +75,6 @@ public class ChatConversationSelector extends Fragment {
                         JSONObject conversationData = data.getJSONObject(i);
 
                         String conversationId = conversationData.getString("id");
-                        String dateString = conversationData.getString("last_message_date");
                         Date lastMessageDate = new Date();
                         JSONArray interlocutorIdJsonList = conversationData.getJSONArray("interlocutors");
                         JSONObject interlocutorData = conversationData.getJSONObject("interlocutor_data");

@@ -131,6 +131,8 @@ public class ContractorDetail extends Fragment implements OnMapReadyCallback {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_contractor_detail, container, false);
 
+        Log.d("ContractorDetail", "onCreateView called");
+
         this.obtainViewReferences(view);
 
         commentEt.setVisibility(View.INVISIBLE);
@@ -152,7 +154,8 @@ public class ContractorDetail extends Fragment implements OnMapReadyCallback {
         sendMessageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ChatConversation chatConversation = ChatConversation.newInstance(contractor.getAccountId(), null);
+                Log.d("Got", "here");
+                ChatConversation chatConversation = ChatConversation.newInstance(contractor.getAccountId(), "None");
                 ((MainActivity) getActivity()).changeContentFragment(chatConversation);
             }
         });
