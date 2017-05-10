@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Directorio</string>
+    <string name="app_name">Handy</string>
     <string name="login_email_hint">Correo Electrónico</string>
     <string name="login_password_hint">Contraseña</string>
     <string name="login_button_text">Iniciar Sesión</string>

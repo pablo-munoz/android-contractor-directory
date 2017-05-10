@@ -2,14 +2,18 @@ package munoz.pablo.directorio.fragments;
 
 
 import android.app.Fragment;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,6 +49,7 @@ public class CategoryContractors extends Fragment {
     private ProgressBar progressBar;
     private TextView titleTv;
     private TextView emptyQueryTv;
+    private ImageView category_image;
 
     public CategoryContractors() {
         // Required empty public constructor
@@ -82,6 +87,7 @@ public class CategoryContractors extends Fragment {
         emptyQueryTv = (TextView) view.findViewById(R.id.category_contractors_empty_query_label);
         progressBar = (ProgressBar) view.findViewById(R.id.category_contractors_loading);
         contractorListView = (ListView) view.findViewById(R.id.category_contractors_list_view);
+        category_image = (ImageView) view.findViewById(R.id.category_image);
 
         contractorList = new ArrayList<>();
         categoryModelBuilder = new ModelBuilder<>();
@@ -105,6 +111,9 @@ public class CategoryContractors extends Fragment {
         });
 
         requestCategoryDataFromApi();
+        //Toast.makeText(this, ""+contractorCategory.getShortName(), Toast.LENGTH_SHORT).show();
+
+
 
         return view;
     }
@@ -120,7 +129,22 @@ public class CategoryContractors extends Fragment {
                             contractorCategory = categoryModelBuilder.instantiateOne(response);
 
                             if (contractorCategory != null) {
-                                titleTv.setText(contractorCategory.getName());
+                                titleTv.setText(contractorCategory.getShortName());
+                                if(contractorCategory.getName().equalsIgnoreCase("electricistas")){
+                                    category_image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.electricity_icon));
+                                }
+                                else if(contractorCategory.getShortName().equalsIgnoreCase("herreros")){
+                                    category_image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.blacksmith_icon));
+                                }
+                                else if(contractorCategory.getShortName().equalsIgnoreCase("pintores")){
+                                    category_image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.paint_icon));
+                                }
+                                else if(contractorCategory.getShortName().equalsIgnoreCase("madereros")){
+                                    category_image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.wood_icon));
+                                }
+                                else if(contractorCategory.getShortName().equalsIgnoreCase("albañiles")){
+                                    category_image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.common_google_signin_btn_icon_dark_normal_background));
+                                }
                                 requestContractorInCategoryDataFromApi();
                             }
                         }
