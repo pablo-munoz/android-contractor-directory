@@ -14,4 +14,3 @@ node_modules/
 *.retry
 *.log
 .idea/
-misc.xml
