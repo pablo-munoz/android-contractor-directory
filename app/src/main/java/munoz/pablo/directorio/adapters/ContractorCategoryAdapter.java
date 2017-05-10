@@ -55,6 +55,9 @@ public class ContractorCategoryAdapter extends ArrayAdapter<ContractorCategory> 
             categoryImg.setImageBitmap(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.paint_icon));
         }
         else if(category.getShortName().equals("alb")){
+            categoryImg.setImageBitmap(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.worker_icon));
+        }
+        else if(category.getShortName().equals("mad")){
             categoryImg.setImageBitmap(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.wood_icon));
         }
 

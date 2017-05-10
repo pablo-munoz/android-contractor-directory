@@ -78,18 +78,27 @@
                 android:id="@+id/contractor_detail_call_btn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="#FFF"
+                android:background="@drawable/rounded_button"
                 android:text="Llamar ahora"/>
 
             <Button
+                android:layout_marginTop="15dp"
                 android:id="@+id/contractor_detail_add_favorites"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Añadir a favoritos"/>
+                android:textColor="#FFF"
+                android:background="@drawable/rounded_button"
+                android:text="Añadir a favoritos"
+                />
 
             <Button
+                android:layout_marginTop="15dp"
                 android:id="@+id/contractor_detail_send_message"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="#FFF"
+                android:background="@drawable/rounded_button"
                 android:text="Enviar Mensaje"/>
 
             <com.google.android.gms.maps.MapView
