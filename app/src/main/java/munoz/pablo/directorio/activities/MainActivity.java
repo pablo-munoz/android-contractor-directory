@@ -248,17 +248,25 @@ public class MainActivity extends AppCompatActivity
         MenuItem registrationMenuItem = menu.findItem(R.id.nav_register);
         MenuItem accountMenuItem = menu.findItem(R.id.nav_account);
         MenuItem logoutMenuItem = menu.findItem(R.id.nav_logout);
+        MenuItem favoritesMenuItem = menu.findItem(R.id.nav_favorites);
+        MenuItem messagesMenuItem = menu.findItem(R.id.nav_chat);
+
 
         if (!userAccount.isAnonymous()) {
             loginMenuItem.setVisible(false);
             registrationMenuItem.setVisible(false);
             accountMenuItem.setVisible(true);
             logoutMenuItem.setVisible(true);
+            favoritesMenuItem.setVisible(true);
+            messagesMenuItem.setVisible(true);
         } else {
             loginMenuItem.setVisible(true);
             registrationMenuItem.setVisible(true);
             accountMenuItem.setVisible(false);
             logoutMenuItem.setVisible(false);
+            favoritesMenuItem.setVisible(false);
+            messagesMenuItem.setVisible(false);
+
         }
     }
 }

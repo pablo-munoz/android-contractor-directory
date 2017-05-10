@@ -16,10 +16,6 @@
                 android:icon="@drawable/ic_person_outline_black_24dp"
                 android:title="Mi cuenta" />
             <item
-                android:id="@+id/nav_logout"
-                android:icon="@drawable/ic_exit_to_app_black_24dp"
-                android:title="Logout" />
-            <item
                 android:id="@+id/nav_login"
                 android:icon="@drawable/ic_person_outline_black_24dp"
                 android:title="Iniciar Sesión" />
@@ -35,6 +31,10 @@
                 android:id="@+id/nav_chat"
                 android:icon="@drawable/ic_chat_bubble_outline_black_24dp"
                 android:title="Mensajes"/>
+                <item
+                    android:id="@+id/nav_logout"
+                    android:icon="@drawable/ic_exit_to_app_black_24dp"
+                    android:title="Logout" />
             </group>
         </menu>
     </item>
