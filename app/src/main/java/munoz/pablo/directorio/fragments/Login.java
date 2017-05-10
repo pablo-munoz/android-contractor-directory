@@ -136,8 +136,10 @@ public class Login extends Fragment {
         String password = this.mPasswordView.getText().toString();
 
         MainActivity mainActivity = (MainActivity) getActivity();
-            InputMethodManager imm = (InputMethodManager)mainActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(mLoginFormView.getWindowToken(), 0);
+
+        InputMethodManager imm = (InputMethodManager)mainActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(mLoginFormView.getWindowToken(), 0);
+
         mainActivity.attemptLogin(email, password);
     }
 

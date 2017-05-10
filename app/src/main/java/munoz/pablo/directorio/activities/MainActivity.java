@@ -22,6 +22,7 @@ import org.json.JSONObject;
 
 import io.socket.client.Socket;
 import munoz.pablo.directorio.fragments.AccountDetail;
+import munoz.pablo.directorio.fragments.CategoryContractors;
 import munoz.pablo.directorio.fragments.ChatConversationSelector;
 import munoz.pablo.directorio.fragments.ContractorCategoryMenu;
 import munoz.pablo.directorio.fragments.Favorites;
@@ -30,6 +31,7 @@ import munoz.pablo.directorio.fragments.RegistrationFragment;
 import munoz.pablo.directorio.R;
 import munoz.pablo.directorio.models.Account;
 import munoz.pablo.directorio.models.Contractor;
+import munoz.pablo.directorio.models.ContractorCategory;
 import munoz.pablo.directorio.services.APIRequest;
 import munoz.pablo.directorio.utils.AndroidContractorDirectoryApp;
 import munoz.pablo.directorio.utils.Constants;
@@ -70,6 +72,8 @@ public class MainActivity extends AppCompatActivity
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        navigationView.getMenu().getItem(0).setChecked(true);
 
         updateNavigation();
 
@@ -140,6 +144,9 @@ public class MainActivity extends AppCompatActivity
             changeContentFragment(new ChatConversationSelector());
         } else if (id == R.id.nav_account) {
             changeContentFragment(new AccountDetail());
+        }
+        else if (id == R.id.search_contractor) {
+            changeContentFragment(new ContractorCategoryMenu());
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

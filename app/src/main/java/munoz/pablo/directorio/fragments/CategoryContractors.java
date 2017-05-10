@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,6 +50,7 @@ public class CategoryContractors extends Fragment {
     private ProgressBar progressBar;
     private TextView titleTv;
     private TextView emptyQueryTv;
+    private ImageView category_image;
 
     public CategoryContractors() {
         // Required empty public constructor
@@ -110,6 +112,9 @@ public class CategoryContractors extends Fragment {
         });
 
         requestCategoryDataFromApi();
+        //Toast.makeText(this, ""+contractorCategory.getShortName(), Toast.LENGTH_SHORT).show();
+
+
 
         return view;
     }
