@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 
 public class Constants {
     // For using your own phone make it http://<your ip>:3333
-    public static String API_URL = "http://10.43.57.100:3333";
+    public static String API_URL = "http://10.43.53.96:3333";
     public static String PREFS_FILENAME = "prefsFile";
+    public static final String CHAT_SERVER_URL = "http://10.43.53.96:3333";
 }

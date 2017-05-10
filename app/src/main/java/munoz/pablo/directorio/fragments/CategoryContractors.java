@@ -45,12 +45,10 @@ public class CategoryContractors extends Fragment {
     private ContractorAdapter adapter;
     private ModelBuilder<ContractorCategory> categoryModelBuilder;
     private ModelBuilder<Contractor> contractorModelBuilder;
-    private ImageView category_image;
 
     private ProgressBar progressBar;
     private TextView titleTv;
     private TextView emptyQueryTv;
-    private ImageView category_image;
 
     public CategoryContractors() {
         // Required empty public constructor
@@ -88,7 +86,6 @@ public class CategoryContractors extends Fragment {
         emptyQueryTv = (TextView) view.findViewById(R.id.category_contractors_empty_query_label);
         progressBar = (ProgressBar) view.findViewById(R.id.category_contractors_loading);
         contractorListView = (ListView) view.findViewById(R.id.category_contractors_list_view);
-        category_image = (ImageView) view.findViewById(R.id.category_image);
 
         contractorList = new ArrayList<>();
         categoryModelBuilder = new ModelBuilder<>();
@@ -106,7 +103,6 @@ public class CategoryContractors extends Fragment {
                 ContractorDetail newFragment = ContractorDetail.newInstance(contractor.getId());
 
                 MainActivity mainActivity = (MainActivity) getActivity();
-
                 mainActivity.changeContentFragment(newFragment);
             }
         });
@@ -131,19 +127,6 @@ public class CategoryContractors extends Fragment {
 
                             if (contractorCategory != null) {
                                 titleTv.setText(contractorCategory.getName());
-                                if(contractorCategory.getShortName() == "elec"){
-                                    category_image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.electricity_icon));
-                                }
-                                else if(contractorCategory.getShortName() == "acc"){
-                                    category_image.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.blacksmith_icon));
-                                }
-                                else if(contractorCategory.getShortName() == "paint"){
-                                    category_image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.paint_icon));
-                                }
-                                else if(contractorCategory.getShortName() == "alb"){
-                                    category_image.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.wood_icon));
-                                }
-
                                 requestContractorInCategoryDataFromApi();
                             }
                         }

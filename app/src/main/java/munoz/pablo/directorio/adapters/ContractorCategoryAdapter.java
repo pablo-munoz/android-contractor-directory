@@ -1,6 +1,8 @@
 package munoz.pablo.directorio.adapters;
 
 import android.content.Context;
+import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +44,19 @@ public class ContractorCategoryAdapter extends ArrayAdapter<ContractorCategory> 
         ImageView categoryImg = (ImageView) convertView.findViewById(R.id.category_image);
 
         nameTv.setText(category.getName().toUpperCase());
+
+        if(category.getShortName().equals("elec")){
+            categoryImg.setImageBitmap(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.electricity_icon));
+        }
+        else if(category.getShortName().equals("acc")){
+            categoryImg.setImageBitmap(BitmapFactory.decodeResource(mContext.getResources(),R.drawable.blacksmith_icon));
+        }
+        else if(category.getShortName().equals("paint") ){
+            categoryImg.setImageBitmap(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.paint_icon));
+        }
+        else if(category.getShortName().equals("alb")){
+            categoryImg.setImageBitmap(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.wood_icon));
+        }
 
         return convertView;
     }
