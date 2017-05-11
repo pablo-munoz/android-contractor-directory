@@ -61,6 +61,9 @@ public class ContractorCategoryAdapter extends ArrayAdapter<ContractorCategory> 
             categoryImg.setImageBitmap(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.wood_icon));
         }
 
+        countTv.setText(category.getContractorCount() +
+                (category.getContractorCount() == 1 ? " contacto." : " contactos."));
+
         return convertView;
     }
 }

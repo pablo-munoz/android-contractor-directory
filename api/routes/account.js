@@ -93,4 +93,38 @@ WHERE favorites.account_id = '${request.params.account_id}';
     });
 
 
+router.route('/rating/:contractor_id')
+    .get((request, response) => {
+        function handler(error, decoded) {
+            const query = `
+SELECT * FROM contractor_rating WHERE contractor_id = '${request.params.contractor_id}'
+AND account_id = '${decoded.account_id}';
+`
+
+            db.raw(query)
+                .then((result) => {
+                    const rows = result.rows;
+
+                    if (rows.length) {
+                        response.json({
+                            rating: rows[0].rating
+                        });
+                    } else {
+                        response.json({
+                            rating: 3
+                        });
+                    }
+                })
+                .catch((error) => {
+                    console.error(error);
+                    response.status(400).end();
+                });
+        }
+        
+        jwt.verify(request.header('Authorization').split(' ')[1],
+                   constants.AUTH_SECRET,
+                   handler);
+    });
+
+
 module.exports = router;

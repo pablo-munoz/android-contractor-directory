@@ -82,7 +82,8 @@ public class ModelBuilder<ModelType>  {
                             id,
                             attributes.getString("name"),
                             attributes.getString("short_name"),
-                            attributes.getString("img")
+                            attributes.getString("img"),
+                            attributes.getInt("count")
                     );
                     break;
 

@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
+        //getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
@@ -132,6 +132,7 @@ public class MainActivity extends AppCompatActivity
             changeContentFragment(new RegistrationFragment());
         } else if (id == R.id.nav_logout) {
             userAccount = Account.getAnonymous();
+            ((AndroidContractorDirectoryApp) getApplication()).setUserAccount(userAccount);
             updateNavigation();
             changeContentFragment(new ContractorCategoryMenu());
         } else if (id == R.id.nav_favorites) {

@@ -66,6 +66,7 @@ public class ContractorDetail extends Fragment implements OnMapReadyCallback {
     private TextView phoneTv;
     private TextView emailTv;
     private TextView websiteTv;
+    private TextView myRatingLabel;
     private ImageView portraitIv;
     private RatingBar overallRatingBar;
     private RatingBar myRatingBar;
@@ -89,6 +90,7 @@ public class ContractorDetail extends Fragment implements OnMapReadyCallback {
     // the fragment initialization parameters
     private static final String ARG_contractorId = "contractorId";
     private static final String MAPVIEW_BUNDLE_KEY = "MapViewBundleKey";
+    private double myRating = 3;
 
     private String contractorId;
 
@@ -256,6 +258,7 @@ public class ContractorDetail extends Fragment implements OnMapReadyCallback {
         emailTv = (TextView) view.findViewById(R.id.contractor_detail_email);
         phoneTv = (TextView) view.findViewById(R.id.contractor_detail_phone);
         websiteTv = (TextView) view.findViewById(R.id.contractor_detail_website);
+        myRatingLabel = (TextView) view.findViewById(R.id.contractor_detail_my_rating_label);
         portraitIv = (ImageView) view.findViewById(R.id.contractor_detail_img);
         overallRatingBar = (RatingBar) view.findViewById(R.id.contractor_detail_rating_bar);
         commentsLv = (ListView) view.findViewById(R.id.contractor_detail_lv);
@@ -315,6 +318,7 @@ public class ContractorDetail extends Fragment implements OnMapReadyCallback {
     }
 
     private void rateContractor(float rating) {
+        myRating = rating;
         JSONObject headers = new JSONObject();
         application.injectAuthorizationHeader(headers);
 
@@ -371,6 +375,28 @@ public class ContractorDetail extends Fragment implements OnMapReadyCallback {
     }
 
     private void requestContractorDataFromApi(String contractorId) {
+        final Account userAccount = ((AndroidContractorDirectoryApp) getActivity().getApplication()).getUserAccount();
+
+         final APIRequest2 ratingReq = new APIRequest2.Builder()
+                .url(Constants.API_URL + "/api/v1/account/rating/" + contractorId)
+                .headers("{ \"Authorization\": \"Bearer " + userAccount.getToken() + "\"}")
+                .method(APIRequest2.METHOD_GET)
+                .callback(new APIRequest2.Callback() {
+                    @Override
+                    public void onResult(int responseCode, JSONObject response) {
+                        progressBar.setVisibility(View.GONE);
+                        if (responseCode == 200) {
+                            try {
+                                myRating = response.getDouble("rating");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            updateView();
+                        }
+                    }
+                })
+                .build();
+
         APIRequest2 req = new APIRequest2.Builder()
                 .url(Constants.API_URL + "/api/v1/contractor/" + contractorId)
                 .method(APIRequest2.METHOD_GET)
@@ -379,8 +405,18 @@ public class ContractorDetail extends Fragment implements OnMapReadyCallback {
                     public void onResult(int responseCode, JSONObject response) {
                         if (responseCode == 200) {
                             contractor = modelBuilder.instantiateOne(response);
-                            updateView();
-                            progressBar.setVisibility(View.GONE);
+
+                            if (userAccount.isAnonymous()) {
+                                updateView();
+                                myRatingBar.setVisibility(View.GONE);
+                                myRatingLabel.setVisibility(View.GONE);
+                                progressBar.setVisibility(View.GONE);
+                            } else {
+                                myRatingBar.setVisibility(View.VISIBLE);
+                                myRatingLabel.setVisibility(View.VISIBLE);
+                                ratingReq.execute();
+                            }
+
                         }
                     }
                 })
@@ -406,6 +442,7 @@ public class ContractorDetail extends Fragment implements OnMapReadyCallback {
             else{
                 new DownLoadImageTask(portraitIv).execute("https://heatherchristenaschmidt.files.wordpress.com/2011/09/facebook_no_profile_pic2-jpg.gif");
             }
+            myRatingBar.setRating((float) myRating);
 
             //Glide.with(ContractorDetail.this)
                     //.load(contractor.getPortrait())
