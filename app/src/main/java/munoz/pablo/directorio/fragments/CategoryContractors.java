@@ -123,6 +123,11 @@ public class CategoryContractors extends Fragment {
                     @Override
                     public void onResult(int responseCode, JSONObject response) {
                         if (responseCode == 200) {
+                            try {
+                                response.getJSONObject("data").getJSONObject("attributes").put("count", 0);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                             contractorCategory = categoryModelBuilder.instantiateOne(response);
 
                             if (contractorCategory != null) {

@@ -132,6 +132,7 @@ public class MainActivity extends AppCompatActivity
             changeContentFragment(new RegistrationFragment());
         } else if (id == R.id.nav_logout) {
             userAccount = Account.getAnonymous();
+            ((AndroidContractorDirectoryApp) getApplication()).setUserAccount(userAccount);
             updateNavigation();
             changeContentFragment(new ContractorCategoryMenu());
         } else if (id == R.id.nav_favorites) {

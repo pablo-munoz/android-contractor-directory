@@ -14,12 +14,14 @@ public class ContractorCategory {
     private String name;
     private String shortName;
     private String img;
+    private int contractor_count;
 
-    public ContractorCategory(String id, String name, String shortName, String img) {
+    public ContractorCategory(String id, String name, String shortName, String img, int contractor_count) {
         this.id = id;
         this.name = name;
         this.shortName = shortName;
         this.img = img;
+        this.contractor_count = contractor_count;
     }
 
     public String getId() {
@@ -52,5 +54,9 @@ public class ContractorCategory {
 
     public String toString() {
         return this.name;
+    }
+
+    public int getContractorCount() {
+        return this.contractor_count;
     }
 }
