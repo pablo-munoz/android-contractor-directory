@@ -398,8 +398,15 @@ public class ContractorDetail extends Fragment implements OnMapReadyCallback {
             websiteTv.setText(contractor.getWebsite());
             overallRatingBar.setRating((float) contractor.getRating());
             //myRatingBar.setRating(5);
-            Log.d("CONTRACTOR PROTRAIT",  contractor.getPortrait().toString() +" ");
-            new DownLoadImageTask(portraitIv).execute(contractor.getPortrait().toString());
+            //Log.d("CONTRACTOR PROTRAIT",  contractor.getPortrait().toString() +" ");
+
+            if(contractor.getPortrait() != null){
+                new DownLoadImageTask(portraitIv).execute(contractor.getPortrait());
+            }
+            else{
+                new DownLoadImageTask(portraitIv).execute("http://ewic.org/wp-content/themes/ewic/images/Construction%20Worker.png  ");
+            }
+
 
 
             //Glide.with(ContractorDetail.this)
