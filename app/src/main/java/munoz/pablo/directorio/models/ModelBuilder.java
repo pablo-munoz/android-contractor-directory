@@ -95,7 +95,7 @@ public class ModelBuilder<ModelType>  {
                             JSONHelper.optString(attributes, "email"),
                             JSONHelper.optString(attributes, "phone"),
                             JSONHelper.optString(attributes, "website"),
-                            "http://ewic.org/wp-content/themes/ewic/images/Construction%20Worker.png",
+                            JSONHelper.optString(attributes, "portrait"),
                             attributes.getDouble("avg_rating"),
                             attributes.getString("account_id"),
                             relationships.getJSONObject("comment").getJSONArray("data"),

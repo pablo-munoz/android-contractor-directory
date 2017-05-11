@@ -2,9 +2,12 @@ package munoz.pablo.directorio.fragments;
 
 import android.app.Fragment;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,6 +36,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 
 import munoz.pablo.directorio.R;
@@ -56,7 +61,6 @@ import munoz.pablo.directorio.utils.Constants;
  */
 public class ContractorDetail extends Fragment implements OnMapReadyCallback {
     private MainActivity mainActivity;
-
     private TextView nameTv;
     //private TextView idTv;
     private TextView phoneTv;
@@ -393,12 +397,15 @@ public class ContractorDetail extends Fragment implements OnMapReadyCallback {
             phoneTv.setText(contractor.getPhone());
             websiteTv.setText(contractor.getWebsite());
             overallRatingBar.setRating((float) contractor.getRating());
-            myRatingBar.setRating(4);
+            //myRatingBar.setRating(5);
+            Log.d("CONTRACTOR PROTRAIT",  contractor.getPortrait().toString() +" ");
+            new DownLoadImageTask(portraitIv).execute(contractor.getPortrait().toString());
 
-            Glide.with(ContractorDetail.this)
-                    .load(contractor.getPortrait())
-                    .fitCenter()
-                    .into(portraitIv);
+
+            //Glide.with(ContractorDetail.this)
+                    //.load(contractor.getPortrait())
+                    //.fitCenter()
+                    //.into(portraitIv);
 
             commentsAdapter = new JSONArrayAdapter(getActivity(), contractor.getComments(),
                     new JSONArrayAdapter.ViewBuilder() {
@@ -453,5 +460,42 @@ public class ContractorDetail extends Fragment implements OnMapReadyCallback {
             Toast.makeText(getActivity(), "No se pudo mostrar la ubicación del contratista.", Toast.LENGTH_SHORT).show();
         }
     }
+
+    private class DownLoadImageTask extends AsyncTask<String,Void,Bitmap> {
+        ImageView imageView;
+
+        public DownLoadImageTask(ImageView imageView){
+            this.imageView = imageView;
+        }
+
+        /*
+            doInBackground(Params... params)
+                Override this method to perform a computation on a background thread.
+         */
+        protected Bitmap doInBackground(String...urls){
+            String urlOfImage = urls[0];
+            Bitmap logo = null;
+            try{
+                InputStream is = new URL(urlOfImage).openStream();
+                /*
+                    decodeStream(InputStream is)
+                        Decode an input stream into a bitmap.
+                 */
+                logo = BitmapFactory.decodeStream(is);
+            }catch(Exception e){ // Catch the download exception
+                e.printStackTrace();
+            }
+            return logo;
+        }
+
+        /*
+            onPostExecute(Result result)
+                Runs on the UI thread after doInBackground(Params...).
+         */
+        protected void onPostExecute(Bitmap result){
+            imageView.setImageBitmap(result);
+        }
+    }
+
 
 }

@@ -7,23 +7,31 @@
 
     <TextView
         android:id="@+id/contractor_card_name"
-        android:textSize="18sp"
-        android:textColor="@color/colorPrimary"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textColor="@color/colorPrimary"
+        android:textSize="24sp" />
 
     <RatingBar
         android:id="@+id/contractor_card_rating"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="45dp"
+        android:layout_marginTop="5dp"
+        android:max="5"
         android:numStars="5"
+        android:rating="0.0"
+        android:scaleX=".5"
+        android:scaleY=".5"
         android:isIndicator="true"
         />
 
     <TextView
         android:id="@+id/contractor_card_phone"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:textAlignment="center" />
     <TextView
         android:id="@+id/contractor_card_email"
         android:layout_width="match_parent"
