@@ -404,10 +404,8 @@ public class ContractorDetail extends Fragment implements OnMapReadyCallback {
                 new DownLoadImageTask(portraitIv).execute(contractor.getPortrait());
             }
             else{
-                new DownLoadImageTask(portraitIv).execute("http://ewic.org/wp-content/themes/ewic/images/Construction%20Worker.png  ");
+                new DownLoadImageTask(portraitIv).execute("https://heatherchristenaschmidt.files.wordpress.com/2011/09/facebook_no_profile_pic2-jpg.gif");
             }
-
-
 
             //Glide.with(ContractorDetail.this)
                     //.load(contractor.getPortrait())
